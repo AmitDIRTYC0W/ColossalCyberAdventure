@@ -46,7 +46,7 @@ class IEntity:
         Returns
         -------
         int
-            player x
+            player x coordinate
         """
         raise NotImplementedError("getX() method not implemented")
 
@@ -61,6 +61,6 @@ class IEntity:
         Returns
         -------
         int
-            player y
+            player y coordinate
         """
         raise NotImplementedError("getY() method not implemented")
