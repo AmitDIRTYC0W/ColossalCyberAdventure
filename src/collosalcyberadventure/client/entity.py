@@ -21,25 +21,6 @@ class IEntity:
         """
         raise NotImplementedError("draw() method not implemented")
 
-    def move(self, delta_time: float):
-        """
-
-        Parameters
-        ----------
-        delta_time: float
-            time between frame refresh
-
-        Raises
-        ------
-        NotImplementedError
-            If the method is not overrided
-
-        Returns
-        -------
-        None
-        """
-        raise NotImplementedError("move() method not implemented")
-
     def update(self):
         """
 
