@@ -40,7 +40,7 @@ class IWindow(arcade.Window):
         raise NotImplementedError("get_keyboard_handler() method not implemented")
 
 
-class Window(arcade.Window, IWindow):
+class Window(IWindow):
     """ Main window class
 
     Attributes
