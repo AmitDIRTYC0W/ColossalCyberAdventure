@@ -21,25 +21,6 @@ class IEntity:
         """
         raise NotImplementedError("draw() method not implemented")
 
-    def move(self, delta_time: float):
-        """
-
-        Parameters
-        ----------
-        delta_time: float
-            time between frame refresh
-
-        Raises
-        ------
-        NotImplementedError
-            If the method is not overrided
-
-        Returns
-        -------
-        None
-        """
-        raise NotImplementedError("move() method not implemented")
-
     def update(self):
         """
 
@@ -65,7 +46,7 @@ class IEntity:
         Returns
         -------
         int
-            player x
+            player x coordinate
         """
         raise NotImplementedError("getX() method not implemented")
 
@@ -80,6 +61,6 @@ class IEntity:
         Returns
         -------
         int
-            player y
+            player y coordinate
         """
         raise NotImplementedError("getY() method not implemented")
