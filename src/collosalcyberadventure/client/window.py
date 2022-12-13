@@ -1,10 +1,12 @@
+import arcade
+
 from collosalcyberadventure.client.keyboard import IKeyboardHandler
 from typing import Final
 
 import arcade
 
 
-class IWindow:
+class IWindow(arcade.Window):
     """Interface for the window class"""
 
     def setup(self):
@@ -18,7 +20,7 @@ class IWindow:
         """
         raise NotImplementedError("setup() method not implemented")
 
-    def draw(self):
+    def on_draw(self):
         """Draws the current frame
 
         Returns
