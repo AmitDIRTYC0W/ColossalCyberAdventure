@@ -10,40 +10,24 @@ class Player(arcade.Sprite, IEntity):
     def update(self):
         """ Updates player position
 
-        Returns
-        -------
-        None
         """
         self.center_x += self.change_x
         self.center_y += self.change_y
-        print(self.change_x, self.center_x)
 
-
-
-    def getX(self):
-        """ Returns player's X coordinate
-
-        Returns
-        -------
-        int: Player's X coordinate
+    def get_position(self) -> tuple:
         """
-        return self.center_x
+        returns the player relative position to map
 
-    def getY(self):
-        """ Returns player's Y coordinate
-
-        Returns
-        -------
-        int: Player's Y coordinate
+        :return:
+        tuple(int, int) : tuple that contains player x, y position
         """
-        return self.center_y
+
+        return tuple(self.center_x, self.center_y)
 
     def update_player_speed(self, keyboard_state: dict[int, bool]):
-        """ Updates player speed - what direction he should move to according to what key was pressed
+        """ Updates player speed
+         what direction he should move to according to what key was pressed
 
-        Returns
-        -------
-        None
         """
         self.change_x = 0
         self.change_y = 0
@@ -56,5 +40,4 @@ class Player(arcade.Sprite, IEntity):
             self.change_x = -self.speed
         elif keyboard_state[arcade.key.D] and not keyboard_state[arcade.key.A]:
             self.change_x = self.speed
-
 
