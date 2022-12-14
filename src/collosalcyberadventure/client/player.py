@@ -15,8 +15,7 @@ class Player(arcade.Sprite, IEntity):
         self.center_y += self.change_y
 
     def get_position(self) -> tuple:
-        """
-        returns the player relative position to map
+        """returns the player relative position to the map
 
         :return:
         tuple(int, int) : tuple that contains player x, y position
