@@ -21,7 +21,7 @@ class Player(arcade.Sprite, IEntity):
         tuple(int, int) : tuple that contains player x, y position
         """
 
-        return tuple(self.center_x, self.center_y)
+        return tuple((self.center_x, self.center_y))
 
     def update_player_speed(self, keyboard_state: dict[int, bool]):
         """ Updates player speed
