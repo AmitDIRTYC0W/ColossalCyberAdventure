@@ -17,7 +17,7 @@ class IEntity:
 
         Returns
         -------
-        None
+
         """
         raise NotImplementedError("draw() method not implemented")
 
@@ -31,12 +31,12 @@ class IEntity:
 
         Returns
         -------
-        None
+
         """
         raise NotImplementedError("update() method not implemented")
 
-    def getX(self) -> int:
-        """
+    def get_position(self):
+        """Returns entity position
 
         Raises
         ------
@@ -45,22 +45,6 @@ class IEntity:
 
         Returns
         -------
-        int
-            player x coordinate
-        """
-        raise NotImplementedError("getX() method not implemented")
 
-    def getY(self):
         """
-
-        Raises
-        ------
-        NotImplementedError
-            If the method is not overrided
-
-        Returns
-        -------
-        int
-            player y coordinate
-        """
-        raise NotImplementedError("getY() method not implemented")
+        raise NotImplementedError("get_position() method not implemented")
