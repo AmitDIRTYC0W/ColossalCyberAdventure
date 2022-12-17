@@ -3,7 +3,7 @@ import asyncio
 
 from interruptingcow import timeout
 
-from collosalcyberadventure.client.colossalcyberadventure import ColossalCyberAdventure
+from colossalcyberadventure.client.colossalcyberadventure import ColossalCyberAdventure
 
 
 def test_window_initialization():
