@@ -1,6 +1,4 @@
-import time
 from typing import Final
-
 import arcade
 
 
@@ -23,9 +21,9 @@ class ColossalCyberAdventure(arcade.Window):
                  height: int,
                  title: str,):
         super().__init__(width, height, title)
-        self.width: Final = width
-        self.height: Final = height
-        self.title: Final = title
+        self.width: Final[int] = width
+        self.height: Final[int] = height
+        self.title: Final[str] = title
 
         arcade.set_background_color(ColossalCyberAdventure.BACKGROUND_COLOR)
 
@@ -38,9 +36,7 @@ class ColossalCyberAdventure(arcade.Window):
 
 
 class GameView(arcade.View):
-    """View of the actual game
-
-    """
+    """View of the actual game"""
     BACKGROUND_COLOR = arcade.color.JET
 
     def __init__(self):
