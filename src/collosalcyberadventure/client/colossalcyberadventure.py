@@ -1,3 +1,4 @@
+import time
 from typing import Final
 
 import arcade
@@ -33,12 +34,19 @@ class ColossalCyberAdventure(arcade.Window):
 
         Sets up window. Call this again to restart game.
         """
-        pass
+        self.show_view(GameView())
+
+
+class GameView(arcade.View):
+    """View of the actual game
+
+    """
+    BACKGROUND_COLOR = arcade.color.JET
+
+    def __init__(self):
+        super().__init__()
+
+        arcade.set_background_color(GameView.BACKGROUND_COLOR)
 
     def on_draw(self):
-        """Re-render screen
-
-        Called once every frame
-        """
         self.clear()
-        # code to draw screen
