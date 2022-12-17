@@ -1,4 +1,4 @@
-from collosalcyberadventure.client.colossalcyberadventure import ColossalCyberAdventure
+from colossalcyberadventure.game import ColossalCyberAdventure
 
 
 def main():

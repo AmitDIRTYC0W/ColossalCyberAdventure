@@ -1,9 +1,8 @@
-import arcade
 import asyncio
 
 from interruptingcow import timeout
 
-from collosalcyberadventure.client.colossalcyberadventure import ColossalCyberAdventure
+from colossalcyberadventure.game import ColossalCyberAdventure
 
 
 def test_window_initialization():
