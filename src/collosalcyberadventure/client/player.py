@@ -15,15 +15,17 @@ class Player(arcade.Sprite, IEntity):
         self.center_x += self.change_x
         self.center_y += self.change_y
 
-    def get_position(self) -> tuple:
+    def get_position(self) -> tuple[float, float]:
         """Returns the player position relative to the map
+
+        TODO: add see also when merging window into this branch for positive negative directions etc.
 
         Returns
         -------
         int
-            x value of player center
+            x value of player's center (in pixels)
         int
-            y value of player center
+            y value of player's center (in pixels)
         """
 
         return self.center_x, self.center_y
@@ -44,4 +46,3 @@ class Player(arcade.Sprite, IEntity):
             self.change_x = -self.speed
         elif keyboard_state[arcade.key.D] and not keyboard_state[arcade.key.A]:
             self.change_x = self.speed
-
