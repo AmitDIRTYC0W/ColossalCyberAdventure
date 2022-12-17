@@ -13,7 +13,7 @@ class IEntity:
         Raises
         ------
         NotImplementedError
-            If the method is not overrided
+            If the method is not overriden
 
         Returns
         -------
@@ -27,7 +27,7 @@ class IEntity:
         Raises
         ------
         NotImplementedError
-            If the method is not overrided
+            If the method is not overriden
 
         Returns
         -------
@@ -41,7 +41,7 @@ class IEntity:
         Raises
         ------
         NotImplementedError
-            If the method is not overrided
+            If the method is not overriden
 
         Returns
         -------
