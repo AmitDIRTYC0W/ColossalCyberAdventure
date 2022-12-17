@@ -9,23 +9,28 @@ class Player(arcade.Sprite, IEntity):
 
     def update(self):
         """ Updates player position
+        Run this function every update of the window
 
         """
         self.center_x += self.change_x
         self.center_y += self.change_y
 
     def get_position(self) -> tuple:
-        """returns the player relative position to the map
+        """Returns the player position relative to the map
 
-        :return:
-        tuple(int, int) : tuple that contains player x, y position
+        Returns
+        -------
+        int
+            x value of player center
+        int
+            y value of player center
         """
 
-        return tuple(self.center_x, self.center_y)
+        return self.center_x, self.center_y
 
     def update_player_speed(self, keyboard_state: dict[int, bool]):
-        """ Updates player speed
-         what direction he should move to according to what key was pressed
+        """Updates player change_x and change_y values
+        Changes these values in accordance to the currently pressed keys
 
         """
         self.change_x = 0
