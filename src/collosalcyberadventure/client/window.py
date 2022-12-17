@@ -1,6 +1,5 @@
 import arcade
 
-from collosalcyberadventure.client.keyboard import IKeyboardHandler
 from typing import Final
 
 import arcade
@@ -29,16 +28,6 @@ class IWindow(arcade.Window):
         """
         raise NotImplementedError("draw() method not implemented")
 
-    def get_keyboard_handler(self) -> IKeyboardHandler:
-        """
-
-        Returns
-        -------
-        IKeyboardHandler
-            class that handles all the keyboard logic
-        """
-        raise NotImplementedError("get_keyboard_handler() method not implemented")
-
 
 class Window(IWindow):
     """ Main window class
@@ -57,14 +46,12 @@ class Window(IWindow):
                  width: int,
                  height: int,
                  title: str,
-                 background_color: tuple[int, int, int] | tuple[int, int, int, int],
-                 keyboard_handler: IKeyboardHandler):
+                 background_color: tuple[int, int, int] | tuple[int, int, int, int]):
         super().__init__(width, height, title)
         self.width: Final = width
         self.height: Final = height
         self.title: Final = title
         self.background_color = background_color
-        self.keyboard_handler = keyboard_handler
 
         arcade.set_background_color(background_color)
 
@@ -96,6 +83,3 @@ class Window(IWindow):
     def on_key_release(self, symbol: int, modifiers: int):
         if symbol == arcade.key.W or symbol == arcade.key.A or symbol == arcade.key.S or symbol == arcade.key.D:
             self.keyboard_handler.set_key(symbol, False)
-
-    def get_keyboard_handler(self) -> IKeyboardHandler:
-        return self.keyboard_handler

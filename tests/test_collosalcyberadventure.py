@@ -3,7 +3,6 @@ import asyncio
 
 from interruptingcow import timeout
 
-from collosalcyberadventure.client.keyboard import KeyboardHandler
 from collosalcyberadventure.client.window import Window
 
 
@@ -18,7 +17,7 @@ def test_window_initialization():
     """
     try:
         with timeout(3, asyncio.CancelledError):
-            window = Window(800, 600, "test window", arcade.color.TAN, KeyboardHandler())
+            window = Window(800, 600, "test window", arcade.color.TAN)
             window.setup()
             window.run()
             assert False
