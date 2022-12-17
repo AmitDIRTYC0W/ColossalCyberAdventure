@@ -3,7 +3,7 @@ import asyncio
 
 from interruptingcow import timeout
 
-from collosalcyberadventure.client.window import Window
+from collosalcyberadventure.client.colossalcyberadventure import ColossalCyberAdventure
 
 
 def test_window_initialization():
@@ -13,11 +13,11 @@ def test_window_initialization():
     ------
     AssertionError:
         If the program exits before 3 seconds have passed
-
     """
+
     try:
         with timeout(3, asyncio.CancelledError):
-            window = Window(800, 600, "test window", arcade.color.TAN)
+            window = ColossalCyberAdventure(800, 600, "test window")
             window.setup()
             window.run()
             assert False
