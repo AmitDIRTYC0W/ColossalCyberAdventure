@@ -36,7 +36,8 @@ class ColossalCyberAdventure(arcade.Window):
 
 
 class GameView(arcade.View):
-    """View of the actual game"""
+    """View of the actual game
+    """
     BACKGROUND_COLOR = arcade.color.JET
 
     def __init__(self):
