@@ -3,9 +3,11 @@ import arcade
 
 
 class Player(arcade.Sprite, IEntity):
-    def __init__(self, resource_name, speed):
+
+    SPEED = 7
+
+    def __init__(self, resource_name):
         super().__init__(resource_name)
-        self.speed = speed
 
     def update(self):
         """ Updates player position
@@ -39,10 +41,10 @@ class Player(arcade.Sprite, IEntity):
         self.change_y = 0
 
         if keyboard_state[arcade.key.W] and not keyboard_state[arcade.key.S]:
-            self.change_y = self.speed
+            self.change_y = Player.SPEED
         elif keyboard_state[arcade.key.S] and not keyboard_state[arcade.key.W]:
-            self.change_y = -self.speed
+            self.change_y = -Player.SPEED
         if keyboard_state[arcade.key.A] and not keyboard_state[arcade.key.D]:
-            self.change_x = -self.speed
+            self.change_x = -Player.SPEED
         elif keyboard_state[arcade.key.D] and not keyboard_state[arcade.key.A]:
-            self.change_x = self.speed
+            self.change_x = Player.SPEED
