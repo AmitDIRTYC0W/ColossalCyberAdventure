@@ -11,6 +11,9 @@ class Player(arcade.Sprite, IEntity):
     def __init__(self, resource_name):
         super().__init__(resource_name)
 
+        self.center_x = 30
+        self.center_y = 30
+
     def update(self):
         """ Updates player position
         Run this function every update of the window

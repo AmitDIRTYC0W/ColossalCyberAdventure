@@ -2,7 +2,7 @@ from colossalcyberadventure.game import ColossalCyberAdventure
 
 
 def main():
-    game = ColossalCyberAdventure(500, 500, "test")
+    game = ColossalCyberAdventure(700, 700, "coins")
     game.setup()
     game.run()
 
