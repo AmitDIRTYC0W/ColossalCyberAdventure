@@ -1,3 +1,5 @@
+import math
+
 from entity import IEntity
 import arcade
 
@@ -50,3 +52,9 @@ class Player(arcade.Sprite, IEntity):
             self.change_x = -Player.SPEED
         elif keyboard_state[arcade.key.D] and not keyboard_state[arcade.key.A]:
             self.change_x = Player.SPEED
+
+        # normalize movement vector
+        vector_length = math.sqrt(self.change_x ** 2 + self.change_y ** 2)
+        if vector_length != 0:
+            self.change_x = (self.change_x / vector_length) * Player.SPEED
+            self.change_y = (self.change_y / vector_length) * Player.SPEED
