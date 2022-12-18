@@ -8,12 +8,12 @@ class Coin(arcade.Sprite, IEntity):
         self.center_x = pos_x
         self.center_y = pos_y
 
-    def get_position(self) -> tuple:
+    def get_position(self) -> tuple[float, float]:
         """returns the coin relative position to the map
 
         :return:
         tuple(int, int) : tuple that contains player x, y position
         """
 
-        return tuple((self.center_x, self.center_y))
+        return self.center_x, self.center_y
 

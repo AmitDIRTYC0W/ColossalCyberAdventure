@@ -1,8 +1,10 @@
+import random
 from typing import Final
 import arcade
 
 from arcade import key as k
 
+from colossalcyberadventure.coin import Coin
 from colossalcyberadventure.player import Player
 
 
@@ -23,7 +25,7 @@ class ColossalCyberAdventure(arcade.Window):
     def __init__(self,
                  width: int,
                  height: int,
-                 title: str,):
+                 title: str, ):
         super().__init__(width, height, title)
         self.width: Final[int] = width
         self.height: Final[int] = height
@@ -44,10 +46,17 @@ class GameView(arcade.View):
     """
     BACKGROUND_COLOR = arcade.color.JET
 
+    COIN_NUM = 10
+
     def __init__(self):
         super().__init__()
 
         self.player = Player("resources/kanye_sprite.png")
+        self.coins: list[Coin] = []
+        for i in range(GameView.COIN_NUM):
+            self.coins.append(Coin("resources/coin_sprite.png", random.randint(0, self.window.width),
+                                   random.randint(0, self.window.height)))
+            # self.coins = [Coin("resources/coin_sprite.png", 100, 100)]
         self.pressed_keys = {k.W: False, k.A: False, k.S: False, k.D: False}
 
         arcade.set_background_color(GameView.BACKGROUND_COLOR)
@@ -57,9 +66,16 @@ class GameView(arcade.View):
 
         self.player.draw()
 
+        for coin in self.coins:
+            coin.draw()
+
     def on_update(self, delta_time: float):
         self.player.update_player_speed(self.pressed_keys)
         self.player.update()
+
+        for i, coin in enumerate(self.coins):
+            if arcade.check_for_collision(self.player, coin):
+                self.coins.pop(i)
 
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol in self.pressed_keys.keys():
