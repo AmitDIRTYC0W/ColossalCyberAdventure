@@ -56,7 +56,6 @@ class GameView(arcade.View):
         for i in range(GameView.COIN_NUM):
             self.coins.append(Coin("resources/coin_sprite.png", random.randint(0, self.window.width),
                                    random.randint(0, self.window.height)))
-            # self.coins = [Coin("resources/coin_sprite.png", 100, 100)]
         self.pressed_keys = {k.W: False, k.A: False, k.S: False, k.D: False}
 
         arcade.set_background_color(GameView.BACKGROUND_COLOR)
