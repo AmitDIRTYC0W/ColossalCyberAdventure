@@ -20,7 +20,9 @@ class Player(arcade.Sprite, IEntity):
     def get_position(self) -> tuple[float, float]:
         """Returns the player position relative to the map
 
-        TODO: add see also when merging window into this branch for positive negative directions etc.
+        See Also
+        --------
+        colossalcyberadventure.game: main window class
 
         Returns
         -------
