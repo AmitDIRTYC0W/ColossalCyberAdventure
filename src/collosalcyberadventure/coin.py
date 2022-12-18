@@ -1,4 +1,4 @@
-from collosalcyberadventure.client.entity import IEntity
+from collosalcyberadventure.entity import IEntity
 import arcade
 
 
