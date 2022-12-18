@@ -156,6 +156,17 @@ files = [
 ]
 
 [[package]]
+name = "interruptingcow"
+version = "0.8"
+description = "A watchdog that interrupts long running code."
+category = "dev"
+optional = false
+python-versions = "*"
+files = [
+    {file = "interruptingcow-0.8.tar.gz", hash = "sha256:3e8cd5058b651e625702cba53e3b1fb76d7a5ec07ab69c52a167a9f784e3306c"},
+]
+
+[[package]]
 name = "packaging"
 version = "22.0"
 description = "Core utilities for Python packages"
@@ -391,4 +402,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "5b8143df078e1082e18630ebc286b0272f5341d5d3cbe41391ea6dc899830e7b"
+content-hash = "4802a6778f76832fc783625db079926ed71fc9d26643b6a0bdb89ef9ea7a7260"
