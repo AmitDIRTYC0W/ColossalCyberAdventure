@@ -1,6 +1,6 @@
 import arcade
 
-from collosalcyberadventure.keyboard import IKeyboardHandler
+from colossalcyberadventure.keyboard import IKeyboardHandler
 
 
 class IWindow(arcade.Window):

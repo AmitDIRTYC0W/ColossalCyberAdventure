@@ -1,10 +1,10 @@
 import random
 import arcade
 
-from collosalcyberadventure.keyboard import IKeyboardHandler
-from collosalcyberadventure.player import Player
-from collosalcyberadventure.window import IWindow
-from collosalcyberadventure.coin import Coin
+from colossalcyberadventure.keyboard import IKeyboardHandler
+from colossalcyberadventure.player import Player
+from colossalcyberadventure.window import IWindow
+from colossalcyberadventure.coin import Coin
 
 class KeyboardHandler(IKeyboardHandler):
 
