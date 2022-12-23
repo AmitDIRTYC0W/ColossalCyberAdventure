@@ -72,7 +72,7 @@ class GameView(arcade.View):
         self.player.update_player_speed(self.pressed_keys)
         self.player.update()
 
-        self.game_camera.move_to()
+
 
         for i, coin in enumerate(self.coins):
             if arcade.check_for_collision(self.player, coin):
