@@ -5,6 +5,12 @@ from interruptingcow import timeout
 from colossalcyberadventure.game import ColossalCyberAdventure
 
 
+"""
+If working in pycharm, remember to set current working directory to 
+{path to project}/src/colossalcyberadventure
+"""
+
+
 def test_window_initialization():
     """Opens the window for 3 seconds
 
