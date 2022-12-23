@@ -4,9 +4,9 @@ import arcade
 
 from arcade import key as k
 
-from colossalcyberadventure.coin import Coin
-from colossalcyberadventure.player import Player
-
+from src.colossalcyberadventure.coin import Coin
+from src.colossalcyberadventure.player import Player
+from src.colossalcyberadventure.camera import Camera
 
 class ColossalCyberAdventure(arcade.Window):
     """ Main window class
@@ -51,6 +51,7 @@ class GameView(arcade.View):
     def __init__(self):
         super().__init__()
 
+        self.game_camera = Camera()
         self.player = Player("resources/kanye_sprite.png")
         self.coins: list[Coin] = []
         for i in range(GameView.COIN_NUM):
@@ -71,6 +72,8 @@ class GameView(arcade.View):
     def on_update(self, delta_time: float):
         self.player.update_player_speed(self.pressed_keys)
         self.player.update()
+
+        self.game_camera.move_to()
 
         for i, coin in enumerate(self.coins):
             if arcade.check_for_collision(self.player, coin):

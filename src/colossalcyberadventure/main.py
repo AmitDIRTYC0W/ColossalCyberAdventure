@@ -1,4 +1,4 @@
-from colossalcyberadventure.game import ColossalCyberAdventure
+from src.colossalcyberadventure.game import ColossalCyberAdventure
 
 
 def main():

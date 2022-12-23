@@ -1,4 +1,4 @@
-from colossalcyberadventure.entity import IEntity
+from src.colossalcyberadventure.entity import IEntity
 import arcade
 
 
