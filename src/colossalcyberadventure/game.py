@@ -51,7 +51,6 @@ class GameView(arcade.View):
     def __init__(self):
         super().__init__()
 
-        self.game_camera = Camera()
         self.player = Player("resources/kanye_sprite.png")
         self.coins: list[Coin] = []
         for i in range(GameView.COIN_NUM):
