@@ -1,6 +1,6 @@
 import math
 
-from entity import IEntity
+from src.colossalcyberadventure.entity import IEntity
 import arcade
 
 
