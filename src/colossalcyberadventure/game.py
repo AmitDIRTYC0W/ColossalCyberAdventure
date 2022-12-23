@@ -6,7 +6,7 @@ from arcade import key as k
 
 from src.colossalcyberadventure.coin import Coin
 from src.colossalcyberadventure.player import Player
-from src.colossalcyberadventure.camera import Camera
+
 
 class ColossalCyberAdventure(arcade.Window):
     """ Main window class
