@@ -1,8 +1,8 @@
 import arcade
 
 from arcade import key as k
-from pyglet.math import Vec2
 
+from colossalcyberadventure.camera import GameCam
 from colossalcyberadventure.player import Player
 from constants import *
 
@@ -36,7 +36,7 @@ class GameView(arcade.View):
 
         self.player = Player()
         self.keyboard_state = {k.W: False, k.A: False, k.S: False, k.D: False}
-        self.camera = arcade.camera.Camera(self.window.width, self.window.height)
+        self.camera = GameCam(self.window.width, self.window.height, self.player)
         self.tile_map = arcade.load_tilemap(GameView.MAP_PATH, TILE_SCALING)
         self.scene = arcade.Scene.from_tilemap(self.tile_map)
 
@@ -54,7 +54,7 @@ class GameView(arcade.View):
         self.player.update_player_speed(self.keyboard_state)
         self.player.update_animation()
         self.player.update()
-        self.center_camera_on_player()
+        self.camera.center_camera_on_player()
 
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol in self.keyboard_state.keys():
@@ -63,20 +63,3 @@ class GameView(arcade.View):
     def on_key_release(self, symbol: int, _modifiers: int):
         if symbol in self.keyboard_state.keys():
             self.keyboard_state[symbol] = False
-
-    def center_camera_on_player(self):
-        screen_center_x = self.player.center_x - (self.camera.viewport_width / 2)
-        screen_center_y = self.player.center_y - (self.camera.viewport_height / 2)
-
-        if screen_center_x < 0:
-            screen_center_x = 0
-        if screen_center_y < 0:
-            screen_center_y = 0
-        if screen_center_x > MAP_WIDTH - self.camera.viewport_width:
-            screen_center_x = MAP_WIDTH - self.camera.viewport_width
-        if screen_center_y > MAP_HEIGHT - self.camera.viewport_height:
-            screen_center_y = MAP_HEIGHT - self.camera.viewport_height
-
-        player_centered = Vec2(screen_center_x, screen_center_y)
-
-        self.camera.move_to(player_centered)
