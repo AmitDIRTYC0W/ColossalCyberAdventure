@@ -1,5 +1,7 @@
 from enum import Enum
 
+from pyglet.math import Vec2
+
 from entity import IEntity
 from constants import *
 import arcade
@@ -34,9 +36,14 @@ class Player(arcade.Sprite, IEntity):
         # -------------------------------
         self.center_x = 30
         self.center_y = 30
-        self.state = PlayerState.IDLE
+        self._state = PlayerState.IDLE
         self.direction = Direction.LEFT
         self.texture = textures[PlayerState.IDLE][self.direction][0]
+        self.frame_counter = 0
+        self.current_texture_index = 0
+
+    def update_state(self, new_state):
+        self._state = new_state
         self.frame_counter = 0
         self.current_texture_index = 0
 
@@ -44,9 +51,9 @@ class Player(arcade.Sprite, IEntity):
         self.frame_counter += 1
         if self.frame_counter > Player.FRAMES_PER_TEXTURE:
             self.current_texture_index += 1
-            if self.current_texture_index >= self.state.value[1]:
+            if self.current_texture_index >= self._state.value[1]:
                 self.current_texture_index = 0
-            self.texture = textures[self.state][self.direction][self.current_texture_index]
+            self.texture = textures[self._state][self.direction][self.current_texture_index]
             self.frame_counter = 0
 
     def update(self):
@@ -94,14 +101,25 @@ class Player(arcade.Sprite, IEntity):
         Changes these values in accordance to the currently pressed keys
 
         """
-        self.change_x = 0
-        self.change_y = 0
+        movement_vec = Vec2(0, 0)
+
+        if True in keyboard_state.values():
+            new_state = PlayerState.WALK
+        else:
+            new_state = PlayerState.IDLE
+
+        if new_state != self._state:
+            self.update_state(new_state)
 
         if keyboard_state[arcade.key.W] and not keyboard_state[arcade.key.S]:
-            self.change_y = Player.SPEED
+            movement_vec.y = 1
         elif keyboard_state[arcade.key.S] and not keyboard_state[arcade.key.W]:
-            self.change_y = -Player.SPEED
+            movement_vec.y = -1
         if keyboard_state[arcade.key.A] and not keyboard_state[arcade.key.D]:
-            self.change_x = -Player.SPEED
+            movement_vec.x = -1
         elif keyboard_state[arcade.key.D] and not keyboard_state[arcade.key.A]:
-            self.change_x = Player.SPEED
+            movement_vec.x = 1
+
+        movement_vec = movement_vec.normalize() * Vec2(Player.SPEED, Player.SPEED)
+        self.change_x = movement_vec.x
+        self.change_y = movement_vec.y
