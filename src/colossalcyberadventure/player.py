@@ -34,8 +34,8 @@ class Player(arcade.Sprite, IEntity):
                 textures[state][Direction.LEFT].append(left)
                 textures[state][Direction.RIGHT].append(right)
         # -------------------------------
-        self.center_x = 30
-        self.center_y = 30
+        self.center_x = 60
+        self.center_y = 60
         self._state = PlayerState.IDLE
         self.direction = Direction.LEFT
         self.texture = textures[PlayerState.IDLE][self.direction][0]
