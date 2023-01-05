@@ -47,7 +47,7 @@ class GameView(arcade.View):
     def __init__(self):
         super().__init__()
 
-        self.player = Player("resources/kanye_sprite.png")
+        self.player = Player()
         self.pressed_keys = {k.W: False, k.A: False, k.S: False, k.D: False}
 
         arcade.set_background_color(GameView.BACKGROUND_COLOR)

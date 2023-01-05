@@ -1,13 +1,35 @@
+from enum import Enum
+
 from entity import IEntity
 import arcade
+
+
+class TextureState(Enum):
+    IDLE = ("idle", 7)
+    WALK = ("walk", 7)
+
+
+class Direction(Enum):
+    LEFT = "left"
+    RIGHT = "right"
+
+
+textures = {TextureState.IDLE: {"left": [], "right": []}, TextureState.WALK: {"left": [], "right": []}}
 
 
 class Player(arcade.Sprite, IEntity):
 
     SPEED = 7
 
-    def __init__(self, resource_name):
-        super().__init__(resource_name)
+    def __init__(self):
+        super().__init__()
+        # ---------Load Textures---------
+        for state in TextureState:
+            for i in range(state.value[1] + 1):
+                left, right = arcade.texture.load_texture_pair(f"res/{state.value[0]}/{i}.png")
+                textures[state]["left"].append(left)
+                textures[state]["right"].append(right)
+        # -------------------------------
 
     def update(self):
         """ Updates player position
