@@ -1,12 +1,13 @@
 from enum import Enum
 
 from entity import IEntity
+from constants import *
 import arcade
 
 
-class TextureState(Enum):
-    IDLE = ("idle", 7)
-    WALK = ("walk", 7)
+class PlayerState(Enum):
+    IDLE = ("idle", 8)
+    WALK = ("walk", 8)
 
 
 class Direction(Enum):
@@ -14,22 +15,39 @@ class Direction(Enum):
     RIGHT = "right"
 
 
-textures = {TextureState.IDLE: {"left": [], "right": []}, TextureState.WALK: {"left": [], "right": []}}
+textures = {PlayerState.IDLE: {Direction.LEFT: [], Direction.RIGHT: []},
+            PlayerState.WALK: {Direction.LEFT: [], Direction.RIGHT: []}}
 
 
 class Player(arcade.Sprite, IEntity):
-
-    SPEED = 7
+    SPEED = 3
+    FRAMES_PER_TEXTURE = 5
 
     def __init__(self):
         super().__init__()
         # ---------Load Textures---------
-        for state in TextureState:
-            for i in range(state.value[1] + 1):
-                left, right = arcade.texture.load_texture_pair(f"res/{state.value[0]}/{i}.png")
-                textures[state]["left"].append(left)
-                textures[state]["right"].append(right)
+        for state in PlayerState:
+            for i in range(state.value[1]):
+                left, right = arcade.texture.load_texture_pair(f"resources/{state.value[0]}/{i}.png")
+                textures[state][Direction.LEFT].append(left)
+                textures[state][Direction.RIGHT].append(right)
         # -------------------------------
+        self.center_x = 30
+        self.center_y = 30
+        self.state = PlayerState.IDLE
+        self.direction = Direction.LEFT
+        self.texture = textures[PlayerState.IDLE][self.direction][0]
+        self.frame_counter = 0
+        self.current_texture_index = 0
+
+    def update_animation(self, delta_time: float = 1 / 60):
+        self.frame_counter += 1
+        if self.frame_counter > Player.FRAMES_PER_TEXTURE:
+            self.current_texture_index += 1
+            if self.current_texture_index >= self.state.value[1]:
+                self.current_texture_index = 0
+            self.texture = textures[self.state][self.direction][self.current_texture_index]
+            self.frame_counter = 0
 
     def update(self):
         """ Updates player position
@@ -38,6 +56,21 @@ class Player(arcade.Sprite, IEntity):
         """
         self.center_x += self.change_x
         self.center_y += self.change_y
+
+        if self.change_x < 0:
+            self.direction = Direction.RIGHT
+        elif self.change_x > 0:
+            self.direction = Direction.LEFT
+
+        if self.left < 0:
+            self.left = 0
+        if self.right > MAP_WIDTH - 1:
+            self.right = MAP_WIDTH - 1
+
+        if self.bottom < 0:
+            self.bottom = 0
+        if self.top > MAP_HEIGHT - 1:
+            self.top = MAP_HEIGHT - 1
 
     def get_position(self) -> tuple[float, float]:
         """Returns the player position relative to the map
