@@ -63,8 +63,8 @@ class Player(arcade.Sprite, IEntity):
         if textures == {PlayerState.IDLE: {Direction.LEFT: [], Direction.RIGHT: []},
                         PlayerState.WALK: {Direction.LEFT: [], Direction.RIGHT: []}}:
             load_textures()
-        self.center_x = 60
-        self.center_y = 60
+        self.center_x = MAP_WIDTH // 2
+        self.center_y = MAP_HEIGHT // 2
         self._state = PlayerState.IDLE
         self.direction = Direction.LEFT
         self.texture = textures[PlayerState.IDLE][self.direction][0]
