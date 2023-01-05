@@ -22,7 +22,7 @@ textures = {PlayerState.IDLE: {Direction.LEFT: [], Direction.RIGHT: []},
 
 
 class Player(arcade.Sprite, IEntity):
-    SPEED = 3
+    SPEED = 7
     FRAMES_PER_TEXTURE = 5
 
     def __init__(self):
