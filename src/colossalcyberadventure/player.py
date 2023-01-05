@@ -8,6 +8,7 @@ import arcade
 
 
 class PlayerState(Enum):
+    """holds the path inside the resources folder and the amount of frames in the animation"""
     IDLE = ("idle", 8)
     WALK = ("walk", 8)
 
@@ -22,6 +23,15 @@ textures = {PlayerState.IDLE: {Direction.LEFT: [], Direction.RIGHT: []},
 
 
 def load_textures():
+    """Load textures into textures dictionary
+
+    This function loads all frames of the animation into the dictionary and also loads
+    a flipped version.
+
+    Returns
+    -------
+
+    """
     for state in PlayerState:
         for i in range(state.value[1]):
             left, right = arcade.texture.load_texture_pair(f"resources/{state.value[0]}/{i}.png")
@@ -30,12 +40,29 @@ def load_textures():
 
 
 class Player(arcade.Sprite, IEntity):
+    """Main player class
+
+    loads the textures for the player when initialized. Should only happen once.
+
+    Attributes
+    ----------
+    _state: PlayerState
+        Should only be changed by the current class
+    direction: Direction
+        What direction the player is facing
+    frame_counter: int
+        How many frames the current frame of the animation was in
+    current_texture_index: int
+        What frame number the animation is in
+    """
     SPEED = 7
     FRAMES_PER_TEXTURE = 5
 
     def __init__(self):
         super().__init__()
-        load_textures()
+        if textures == {PlayerState.IDLE: {Direction.LEFT: [], Direction.RIGHT: []},
+                        PlayerState.WALK: {Direction.LEFT: [], Direction.RIGHT: []}}:
+            load_textures()
         self.center_x = 60
         self.center_y = 60
         self._state = PlayerState.IDLE
@@ -44,7 +71,17 @@ class Player(arcade.Sprite, IEntity):
         self.frame_counter = 0
         self.current_texture_index = 0
 
-    def update_state(self, new_state):
+    def update_state(self, new_state: PlayerState):
+        """Update the player state and reset counters
+
+        Parameters
+        ----------
+        new_state: PlayerState
+
+        Returns
+        -------
+
+        """
         self._state = new_state
         self.frame_counter = 0
         self.current_texture_index = 0
@@ -59,7 +96,7 @@ class Player(arcade.Sprite, IEntity):
             self.frame_counter = 0
 
     def update(self):
-        """ Updates player position
+        """ Updates player position and checks for collision
         Run this function every update of the window
 
         """
@@ -99,9 +136,10 @@ class Player(arcade.Sprite, IEntity):
         return self.center_x, self.center_y
 
     def update_player_speed(self, keyboard_state: dict[int, bool]):
-        """Updates player change_x and change_y values
-        Changes these values in accordance to the currently pressed keys
+        """Updates player change_x and change_y values and the player state
 
+        Changes these values in accordance to the currently pressed keys.
+        Change the state to walking if the player is moving idle if not.
         """
         movement_vec = Vec2(0, 0)
 

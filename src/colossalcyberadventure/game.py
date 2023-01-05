@@ -26,6 +26,14 @@ class ColossalCyberAdventure(arcade.Window):
 
 class GameView(arcade.View):
     """View of the actual game
+
+    Attributes
+    ----------
+    player: Player
+    keyboard_state: dict[int, bool]
+    map: arcade.tilemap.TileMap
+        The full map
+    scene: arcade.scene.Scene
     """
 
     BACKGROUND_COLOR = arcade.color.JET
@@ -37,8 +45,8 @@ class GameView(arcade.View):
         self.player = Player()
         self.keyboard_state = {k.W: False, k.A: False, k.S: False, k.D: False}
         self.camera = GameCam(self.window.width, self.window.height, self.player)
-        self.tile_map = arcade.load_tilemap(GameView.MAP_PATH, TILE_SCALING)
-        self.scene = arcade.Scene.from_tilemap(self.tile_map)
+        self.map = arcade.load_tilemap(GameView.MAP_PATH, TILE_SCALING)
+        self.scene = arcade.Scene.from_tilemap(self.map)
 
         arcade.set_background_color(GameView.BACKGROUND_COLOR)
 
