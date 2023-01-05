@@ -21,19 +21,21 @@ textures = {PlayerState.IDLE: {Direction.LEFT: [], Direction.RIGHT: []},
             PlayerState.WALK: {Direction.LEFT: [], Direction.RIGHT: []}}
 
 
+def load_textures():
+    for state in PlayerState:
+        for i in range(state.value[1]):
+            left, right = arcade.texture.load_texture_pair(f"resources/{state.value[0]}/{i}.png")
+            textures[state][Direction.LEFT].append(left)
+            textures[state][Direction.RIGHT].append(right)
+
+
 class Player(arcade.Sprite, IEntity):
     SPEED = 7
     FRAMES_PER_TEXTURE = 5
 
     def __init__(self):
         super().__init__()
-        # ---------Load Textures---------
-        for state in PlayerState:
-            for i in range(state.value[1]):
-                left, right = arcade.texture.load_texture_pair(f"resources/{state.value[0]}/{i}.png")
-                textures[state][Direction.LEFT].append(left)
-                textures[state][Direction.RIGHT].append(right)
-        # -------------------------------
+        load_textures()
         self.center_x = 60
         self.center_y = 60
         self._state = PlayerState.IDLE
