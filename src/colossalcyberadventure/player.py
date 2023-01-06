@@ -34,7 +34,7 @@ def load_textures():
     """
     for state in PlayerState:
         for i in range(state.value[1]):
-            left, right = arcade.texture.load_texture_pair(f"resources/{state.value[0]}/{i}.png")
+            left, right = arcade.texture.load_texture_pair(f"resources/player/{state.value[0]}/{i}.png")
             textures[state][Direction.LEFT].append(left)
             textures[state][Direction.RIGHT].append(right)
 
