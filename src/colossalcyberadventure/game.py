@@ -8,6 +8,7 @@ from constants import *
 
 
 class ColossalCyberAdventure(arcade.Window):
+    """Main window class. (0, 0) at the bottom left."""
     TITLE = "Colossal Cyber Adventure"
     BACKGROUND_COLOR = arcade.color.AMAZON
 
