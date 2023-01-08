@@ -8,7 +8,7 @@ import arcade
 
 
 class PlayerState(Enum):
-    """holds the path inside the resources folder and the amount of frames in the animation"""
+    """Holds the path inside the resources folder and the amount of frames in the animation"""
     IDLE = ("idle", 8)
     WALK = ("walk", 8)
 
@@ -96,7 +96,7 @@ class Player(arcade.Sprite, IEntity):
             self.frame_counter = 0
 
     def update(self):
-        """ Updates player position and checks for collision
+        """Updates player position and checks for collision
         Run this function every update of the window
 
         """
@@ -119,11 +119,11 @@ class Player(arcade.Sprite, IEntity):
             self.top = MAP_HEIGHT - 1
 
     def get_position(self) -> tuple[float, float]:
-        """Returns the player position relative to the map
+        """Returns the player position relative to the map in px
 
         See Also
         --------
-        colossalcyberadventure.game: main window class
+        colossalcyberadventure.game.ColossalCyberAdventure: main window class
 
         Returns
         -------
@@ -132,7 +132,6 @@ class Player(arcade.Sprite, IEntity):
         int
             y value of player's center (in pixels)
         """
-
         return self.center_x, self.center_y
 
     def update_player_speed(self, keyboard_state: dict[int, bool]):
