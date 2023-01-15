@@ -3,7 +3,7 @@ from colossalcyberadventure.game import ColossalCyberAdventure
 
 def main():
     game = ColossalCyberAdventure()
-    game.setup()
+    game.setupStartScreen()
     game.run()
 
 
