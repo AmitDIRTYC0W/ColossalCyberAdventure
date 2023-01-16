@@ -66,13 +66,14 @@ class GameView(arcade.View):
         self.scene.draw()
         self.player.draw()
         self.bullet_list.draw()
-
+        self.player.draw_health_bar()
     def on_update(self, delta_time: float):
         self.bullet_list.update()
         self.player.update_player_speed(self.keyboard_state)
         self.player.update_animation()
         self.player.update()
         self.camera.center_camera_on_player()
+        self.player.health_bar.set_health_box()
 
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol in self.keyboard_state.keys():
