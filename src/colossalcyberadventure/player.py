@@ -174,11 +174,15 @@ class Player(arcade.Sprite, IEntity):
         self.change_y = movement_vec.y
 
     def draw_health_bar(self):
-        arcade.draw_rectangle_filled(center_x=self.health_bar.inner_rect_stats.get("CENTER_X"),
+        delta_x = ((100 - self.health_bar.health_points) * 1.6)/2
+
+
+        arcade.draw_rectangle_filled(center_x=self.health_bar.inner_rect_stats.get("CENTER_X")-delta_x,
                                      center_y=self.health_bar.inner_rect_stats.get("CENTER_Y"),
                                      width=self.health_bar.inner_rect_stats.get("WIDTH"),
                                      height=self.health_bar.inner_rect_stats.get("HEIGHT"),
                                      color=self.health_bar.inner_rect_stats.get("COLOR"))
+
         arcade.draw_rectangle_outline(center_x=self.health_bar.outer_rect_stats.get("CENTER_X"),
                                       center_y=self.health_bar.outer_rect_stats.get("CENTER_Y"),
                                       width=self.health_bar.outer_rect_stats.get("WIDTH"),
