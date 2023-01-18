@@ -7,7 +7,7 @@ from colossalcyberadventure.player import Player
 
 
 class Bullet(arcade.Sprite):
-    SPEED = 10
+    SPEED = 15
     SPRITE_PATH = "resources/bullet/0.png"
 
     def __init__(self, origin_x: float, origin_y: float, target_x: float, target_y: float):
