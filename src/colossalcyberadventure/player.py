@@ -7,7 +7,7 @@ from constants import *
 import arcade
 
 
-class PlayerState(Enum):
+class PlayerAnimationState(Enum):
     """Holds the path inside the resources folder and the amount of frames in the animation"""
     IDLE = ("idle", 8)
     WALK = ("walk", 8)
@@ -18,8 +18,8 @@ class Direction(Enum):
     RIGHT = "right"
 
 
-textures = {PlayerState.IDLE: {Direction.LEFT: [], Direction.RIGHT: []},
-            PlayerState.WALK: {Direction.LEFT: [], Direction.RIGHT: []}}
+textures = {PlayerAnimationState.IDLE: {Direction.LEFT: [], Direction.RIGHT: []},
+            PlayerAnimationState.WALK: {Direction.LEFT: [], Direction.RIGHT: []}}
 
 
 def load_textures():
@@ -32,7 +32,7 @@ def load_textures():
     -------
 
     """
-    for state in PlayerState:
+    for state in PlayerAnimationState:
         for i in range(state.value[1]):
             left, right = arcade.texture.load_texture_pair(f"resources/player/{state.value[0]}/{i}.png")
             textures[state][Direction.LEFT].append(left)
@@ -46,7 +46,7 @@ class Player(arcade.Sprite, IEntity):
 
     Attributes
     ----------
-    _state: PlayerState
+    _state: PlayerAnimationState
         Should only be changed by the current class
     direction: Direction
         What direction the player is facing
@@ -60,25 +60,23 @@ class Player(arcade.Sprite, IEntity):
 
     def __init__(self):
         super().__init__()
-        if textures == {PlayerState.IDLE: {Direction.LEFT: [], Direction.RIGHT: []},
-                        PlayerState.WALK: {Direction.LEFT: [], Direction.RIGHT: []}}:
+        if textures == {PlayerAnimationState.IDLE: {Direction.LEFT: [], Direction.RIGHT: []},
+                        PlayerAnimationState.WALK: {Direction.LEFT: [], Direction.RIGHT: []}}:
             load_textures()
-        # self.center_x = MAP_WIDTH // 2
-        # self.center_y = MAP_HEIGHT // 2
-        self.center_x = 0
-        self.center_y = 0
-        self._state = PlayerState.IDLE
+        self.center_x = MAP_WIDTH // 2
+        self.center_y = MAP_HEIGHT // 2
+        self._state = PlayerAnimationState.IDLE
         self.direction = Direction.LEFT
-        self.texture = textures[PlayerState.IDLE][self.direction][0]
+        self.texture = textures[PlayerAnimationState.IDLE][self.direction][0]
         self.frame_counter = 0
         self.current_texture_index = 0
 
-    def update_state(self, new_state: PlayerState):
+    def update_state(self, new_state: PlayerAnimationState):
         """Update the player state and reset counters
 
         Parameters
         ----------
-        new_state: PlayerState
+        new_state: PlayerAnimationState
 
         Returns
         -------
@@ -145,9 +143,9 @@ class Player(arcade.Sprite, IEntity):
         movement_vec = Vec2(0, 0)
 
         if True in keyboard_state.values():
-            new_state = PlayerState.WALK
+            new_state = PlayerAnimationState.WALK
         else:
-            new_state = PlayerState.IDLE
+            new_state = PlayerAnimationState.IDLE
 
         if new_state != self._state:
             self.update_state(new_state)
