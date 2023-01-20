@@ -99,7 +99,6 @@ class Player(arcade.Sprite, IEntity):
             self.texture = textures[self._state][self.direction][self.current_texture_index]
             self.frame_counter = 0
 
-
     def update(self):
         """Updates player position and checks for collision
         Run this function every update of the window
@@ -124,9 +123,9 @@ class Player(arcade.Sprite, IEntity):
             self.top = MAP_HEIGHT - 1
 
         self.health_bar.inner_rect_stats["CENTER_X"] = self.center_x
-        self.health_bar.inner_rect_stats["CENTER_Y"] = self.center_y + 45
+        self.health_bar.inner_rect_stats["CENTER_Y"] = self.center_y + VERTICAL_OFFSET
         self.health_bar.outer_rect_stats["CENTER_X"] = self.center_x
-        self.health_bar.outer_rect_stats["CENTER_Y"] = self.center_y + 45
+        self.health_bar.outer_rect_stats["CENTER_Y"] = self.center_y + VERTICAL_OFFSET
 
     def get_position(self) -> tuple[float, float]:
         """Returns the player position relative to the map in px
@@ -174,15 +173,12 @@ class Player(arcade.Sprite, IEntity):
         self.change_y = movement_vec.y
 
     def draw_health_bar(self):
-        delta_x = ((100 - self.health_bar.health_points) * 1.6)/2
-
-
+        delta_x = ((FULL_HEALTH - self.health_bar.health_points) * SCALE_HP_TO_HB)/2
         arcade.draw_rectangle_filled(center_x=self.health_bar.inner_rect_stats.get("CENTER_X")-delta_x,
                                      center_y=self.health_bar.inner_rect_stats.get("CENTER_Y"),
                                      width=self.health_bar.inner_rect_stats.get("WIDTH"),
                                      height=self.health_bar.inner_rect_stats.get("HEIGHT"),
                                      color=self.health_bar.inner_rect_stats.get("COLOR"))
-
         arcade.draw_rectangle_outline(center_x=self.health_bar.outer_rect_stats.get("CENTER_X"),
                                       center_y=self.health_bar.outer_rect_stats.get("CENTER_Y"),
                                       width=self.health_bar.outer_rect_stats.get("WIDTH"),

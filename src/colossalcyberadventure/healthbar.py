@@ -1,23 +1,23 @@
 import arcade
+from constants import *
 
 
 class HealthBar:
     def __init__(self, player_x: float, player_y: float):
-        self.health_points: float = 50  # 100 is full HP
+        self.health_points: float = HEALTH_POINTS  # 100 is full HP
         self.outer_rect_stats: dict = {"CENTER_X": player_x,
-                                       "CENTER_Y": player_y+45,
-                                       "WIDTH": 160,
-                                       "HEIGHT": 25,
-                                       "BORDER_WIDTH": 2,
+                                       "CENTER_Y": player_y + VERTICAL_OFFSET,
+                                       "WIDTH": OUTER_RECTANGLE_WIDTH,
+                                       "HEIGHT": OUTER_RECTANGLE_HEIGHT,
+                                       "BORDER_WIDTH": OUTER_RECTANGLE_THICKNESS,
                                        "COLOR": arcade.color.BLACK
                                        }
         self.inner_rect_stats: dict = {"CENTER_X": player_x,
-                                       "CENTER_Y": player_y+45,
+                                       "CENTER_Y": player_y + VERTICAL_OFFSET,
                                        "WIDTH": None,
-                                       "HEIGHT": 25,
-                                       "COLOR": (36, 93, 45)
+                                       "HEIGHT": INNER_RECTANGLE_HEIGHT,
+                                       "COLOR": INNER_RECTANGLE_COLOR
                                        }
 
-    def set_health_box(self):
-        self.inner_rect_stats["WIDTH"] = self.health_points*1.6
-
+    def set_inner_rectangle_width(self):
+        self.inner_rect_stats["WIDTH"] = self.health_points * SCALE_HP_TO_HB
