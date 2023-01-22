@@ -2,29 +2,13 @@ import arcade
 
 from arcade import key as k, SpriteList
 from pyglet.math import Vec2
+import arcade.gui
+from arcade import key as k
 
 from colossalcyberadventure.bullet import Bullet
 from colossalcyberadventure.camera import GameCam
 from colossalcyberadventure.player import Player
 from constants import *
-
-
-class ColossalCyberAdventure(arcade.Window):
-    """Main window class. (0, 0) at the bottom left."""
-    TITLE = "Colossal Cyber Adventure"
-    BACKGROUND_COLOR = arcade.color.AMAZON
-
-    def __init__(self):
-        super().__init__(title=ColossalCyberAdventure.TITLE, fullscreen=True)
-
-        arcade.set_background_color(ColossalCyberAdventure.BACKGROUND_COLOR)
-
-    def setup(self):
-        """Set up window
-
-        Sets up window. Call this again to restart game.
-        """
-        self.show_view(GameView())
 
 
 class GameView(arcade.View):
