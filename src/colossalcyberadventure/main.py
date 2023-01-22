@@ -1,9 +1,9 @@
-from colossalcyberadventure.start_screen import ColossalCyberAdventure
+from colossalcyberadventure.colossal_cyber_adventure import ColossalCyberAdventure
 
 
 def main():
     game = ColossalCyberAdventure()
-    game.setupStartScreen()
+    game.setup()
     game.run()
 
 

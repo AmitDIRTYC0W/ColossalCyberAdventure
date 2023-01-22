@@ -4,27 +4,11 @@ import arcade.gui
 from colossalcyberadventure.game import GameView
 
 
-class ColossalCyberAdventure(arcade.Window):
-    """Main window class. (0, 0) at the bottom left."""
-    TITLE = "Colossal Cyber Adventure"
-    BACKGROUND_COLOR = arcade.color.AMAZON
-
-    def __init__(self):
-        super().__init__(title=ColossalCyberAdventure.TITLE, fullscreen=True)
-
-        arcade.set_background_color(ColossalCyberAdventure.BACKGROUND_COLOR)
-
-    def setupStartScreen(self):
-        """Set up window
-
-        Sets up window. Call this again to restart game.
-        """
-
-        self.show_view(StartScreenView())
-
-
 class StartScreenView(arcade.View):
     """shows the view of the starting screen and lets you press the buttons"""
+
+    BUTTON_WIDTH = 200
+    BUTTON_BOTTOM = 20
 
     def __init__(self):
         super().__init__()
@@ -41,14 +25,14 @@ class StartScreenView(arcade.View):
         self.v_box = arcade.gui.UIBoxLayout()
 
         # Create the buttons
-        start_button = arcade.gui.UIFlatButton(text="Start Game", width=200)
-        self.v_box.add(start_button.with_space_around(bottom=20))
+        start_button = arcade.gui.UIFlatButton(text="Start Game", width=StartScreenView.BUTTON_WIDTH)
+        self.v_box.add(start_button.with_space_around(bottom=StartScreenView.BUTTON_BOTTOM))
 
-        settings_button = arcade.gui.UIFlatButton(text="Settings", width=200)
-        self.v_box.add(settings_button.with_space_around(bottom=20))
+        settings_button = arcade.gui.UIFlatButton(text="Settings", width=StartScreenView.BUTTON_WIDTH)
+        self.v_box.add(settings_button.with_space_around(bottom=StartScreenView.BUTTON_BOTTOM))
 
-        quit_button = arcade.gui.UIFlatButton(text="Quit", width=200)
-        self.v_box.add(quit_button.with_space_around(bottom=20))
+        quit_button = arcade.gui.UIFlatButton(text="Quit", width=StartScreenView.BUTTON_WIDTH)
+        self.v_box.add(quit_button.with_space_around(bottom=StartScreenView.BUTTON_BOTTOM))
 
         @start_button.event("on_click")
         def on_click_settings(event):
@@ -64,6 +48,7 @@ class StartScreenView(arcade.View):
         def on_click_settings(event):
             arcade.exit()
 
+        # centers the buttons
         self.manager.add(
             arcade.gui.UIAnchorWidget(
                 anchor_x="center_x",
