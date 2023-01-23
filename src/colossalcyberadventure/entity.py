@@ -35,7 +35,7 @@ class IEntity:
         """
         raise NotImplementedError("update() method not implemented")
 
-    def get_position(self):
+    def get_position(self) -> tuple[float, float]:
         """Returns entity position
 
         Raises
