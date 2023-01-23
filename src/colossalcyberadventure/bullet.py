@@ -3,8 +3,6 @@ from math import atan2, degrees
 import arcade
 from pyglet.math import Vec2
 
-from colossalcyberadventure.player import Player
-
 
 class Bullet(arcade.Sprite):
     SPEED = 10
