@@ -40,6 +40,18 @@ class GameView(arcade.View):
         arcade.set_background_color(GameView.BACKGROUND_COLOR)
 
     def mouse_to_world_position(self, click_x: float, click_y: float) -> Vec2:
+        """Converts the position of a click to the actual world position
+
+        Parameters
+        ----------
+        click_x : float
+        click_y : float
+
+        Returns
+        -------
+        Vec2
+            x -> world x, y -> world y
+        """
         return Vec2(self.camera.position.x + click_x, self.camera.position.y + click_y)
 
     def on_draw(self):
