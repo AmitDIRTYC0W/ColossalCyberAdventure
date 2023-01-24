@@ -35,17 +35,17 @@ class StartScreenView(arcade.View):
         self.v_box.add(quit_button.with_space_around(bottom=StartScreenView.BUTTON_BOTTOM))
 
         @start_button.event("on_click")
-        def on_click_settings(event):
+        def on_click_settings(_event):
             self.manager.clear()
             game_view = GameView()
             self.window.show_view(game_view)
 
         @settings_button.event("on_click")
-        def on_click_settings(event):
+        def on_click_settings(_event):
             print("setting - insert here")
 
         @quit_button.event("on_click")
-        def on_click_settings(event):
+        def on_click_settings(_event):
             arcade.exit()
 
         # centers the buttons
