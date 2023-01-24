@@ -10,17 +10,22 @@ import arcade
 
 class PlayerAnimationState(Enum):
     """Holds the path inside the resources folder and the amount of frames in the animation"""
-    IDLE = ("idle", 8)
+    IDLE = ("idle", 1)
     WALK = ("walk", 8)
 
 
 class Direction(Enum):
+    DOWN = "down"
+    UP = "up"
     LEFT = "left"
     RIGHT = "right"
 
 
-textures = {PlayerAnimationState.IDLE: {Direction.LEFT: [], Direction.RIGHT: []},
-            PlayerAnimationState.WALK: {Direction.LEFT: [], Direction.RIGHT: []}}
+TEXTURES_BASE = {
+    PlayerAnimationState.IDLE: {Direction.LEFT: [], Direction.RIGHT: [], Direction.UP: [], Direction.DOWN: []},
+    PlayerAnimationState.WALK: {Direction.LEFT: [], Direction.RIGHT: [], Direction.UP: [], Direction.DOWN: []}}
+
+textures = TEXTURES_BASE
 
 
 def load_textures():
@@ -33,11 +38,11 @@ def load_textures():
     -------
 
     """
-    for state in PlayerAnimationState:
-        for i in range(state.value[1]):
-            left, right = arcade.texture.load_texture_pair(f"resources/player/{state.value[0]}/{i}.png")
-            textures[state][Direction.LEFT].append(left)
-            textures[state][Direction.RIGHT].append(right)
+    for direction in Direction:
+        for state in PlayerAnimationState:
+            for i in range(state.value[1]):
+                tex = arcade.load_texture(f"resources/player/{direction.value}/{state.value[0]}/{i}.png")
+                textures[state][direction].append(tex)
 
 
 class Player(arcade.Sprite, IEntity):
@@ -57,22 +62,21 @@ class Player(arcade.Sprite, IEntity):
         What frame number the animation is in
     """
 
-    def draw(self, *, draw_filter=None, pixelated=None, blend_function=None):
-        super().draw(filter=draw_filter, pixelated=pixelated, blend_function=blend_function)
-        self.health_bar.draw()
+    SPRITE_SCALE = 3
 
     SPEED = 7
     FRAMES_PER_TEXTURE = 5
 
     def __init__(self):
-        super().__init__()
-        if textures == {PlayerAnimationState.IDLE: {Direction.LEFT: [], Direction.RIGHT: []},
-                        PlayerAnimationState.WALK: {Direction.LEFT: [], Direction.RIGHT: []}}:
+        super().__init__(scale=Player.SPRITE_SCALE)
+        if textures == TEXTURES_BASE:
             load_textures()
         self.center_x = MAP_WIDTH // 2
         self.center_y = MAP_HEIGHT // 2
+        self.delta_change_x = 0
+        self.delta_change_y = 0
         self._state = PlayerAnimationState.IDLE
-        self.direction = Direction.LEFT
+        self.direction = Direction.DOWN
         self.texture = textures[PlayerAnimationState.IDLE][self.direction][0]
         self.frame_counter = 0
         self.current_texture_index = 0
@@ -93,6 +97,10 @@ class Player(arcade.Sprite, IEntity):
         self.frame_counter = 0
         self.current_texture_index = 0
 
+    def draw(self, *, draw_filter=None, pixelated=None, blend_function=None):
+        super().draw(filter=draw_filter, pixelated=pixelated, blend_function=blend_function)
+        self.health_bar.draw()
+
     def update_animation(self, delta_time: float = 1 / 60):
         self.frame_counter += 1
         if self.frame_counter > Player.FRAMES_PER_TEXTURE:
@@ -110,10 +118,15 @@ class Player(arcade.Sprite, IEntity):
         self.center_x += self.change_x
         self.center_y += self.change_y
 
+        if self.change_y < 0:
+            self.direction = Direction.DOWN
+        elif self.change_y > 0:
+            self.direction = Direction.UP
+
         if self.change_x < 0:
-            self.direction = Direction.RIGHT
-        elif self.change_x > 0:
             self.direction = Direction.LEFT
+        elif self.change_x > 0:
+            self.direction = Direction.RIGHT
 
         if self.left < 0:
             self.left = 0
