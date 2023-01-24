@@ -31,7 +31,6 @@ class GameView(arcade.View):
 
         self.player = Player()
         self.bullet_list = SpriteList()
-        # self.bullet_list.append(Bullet(10, 10, 100, 100))
         self.keyboard_state = {k.W: False, k.A: False, k.S: False, k.D: False}
         self.camera = GameCam(self.window.width, self.window.height, self.player)
         self.map = arcade.load_tilemap(GameView.MAP_PATH, TILE_SCALING)
