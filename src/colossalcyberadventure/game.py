@@ -1,6 +1,6 @@
 import arcade
 
-from arcade import key as k, SpriteList
+from arcade import SpriteList
 from pyglet.math import Vec2
 import arcade.gui
 from arcade import key as k
