@@ -35,7 +35,8 @@ class HealthBar:
 
     def draw(self):
         self.calculate_inner_values()
-        arcade.draw_rectangle_filled(self.inner_center_x, self.center_y, self.inner_width, self.height, self.inner_color)
+        arcade.draw_rectangle_filled(self.inner_center_x, self.center_y, self.inner_width, self.height,
+                                     self.inner_color)
         arcade.draw_rectangle_outline(self.center_x, self.center_y, self.width, self.height, self.outer_color,
                                       self.border_width)
 
