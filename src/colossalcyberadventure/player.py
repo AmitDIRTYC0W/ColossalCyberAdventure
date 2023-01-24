@@ -57,8 +57,8 @@ class Player(arcade.Sprite, IEntity):
         What frame number the animation is in
     """
 
-    def draw(self, *, filter=None, pixelated=None, blend_function=None):
-        super().draw(filter=filter, pixelated=pixelated, blend_function=blend_function)
+    def draw(self, *, draw_filter=None, pixelated=None, blend_function=None):
+        super().draw(filter=draw_filter, pixelated=pixelated, blend_function=blend_function)
         self.health_bar.draw()
 
     SPEED = 7
