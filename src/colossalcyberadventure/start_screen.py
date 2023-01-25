@@ -9,7 +9,7 @@ class StartScreenView(arcade.View):
 
     BUTTON_WIDTH = 200
     IP_LABEL_WIDTH = 30
-    BUTTON_BOTTOM = 20
+    BUTTON_SPACING = 20
 
     def __init__(self):
         super().__init__()
@@ -27,7 +27,7 @@ class StartScreenView(arcade.View):
 
         # Create the buttons
         start_button = arcade.gui.UIFlatButton(text="Start Game", width=StartScreenView.BUTTON_WIDTH)
-        self.v_box.add(start_button.with_space_around(bottom=StartScreenView.BUTTON_BOTTOM))
+        self.v_box.add(start_button.with_space_around(bottom=StartScreenView.BUTTON_SPACING))
 
         # Create ip field
         ip_h_box = arcade.gui.UIBoxLayout(vertical=False)
@@ -35,13 +35,13 @@ class StartScreenView(arcade.View):
         ip_field = arcade.gui.UIBorder(child=arcade.gui.UIInputText(width=StartScreenView.BUTTON_WIDTH, height=20))
         ip_h_box.add(ip_label)
         ip_h_box.add(ip_field)
-        self.v_box.add(ip_h_box.with_space_around(bottom=StartScreenView.BUTTON_BOTTOM))
+        self.v_box.add(ip_h_box.with_space_around(bottom=StartScreenView.BUTTON_SPACING))
 
         settings_button = arcade.gui.UIFlatButton(text="Settings", width=StartScreenView.BUTTON_WIDTH)
-        self.v_box.add(settings_button.with_space_around(bottom=StartScreenView.BUTTON_BOTTOM))
+        self.v_box.add(settings_button.with_space_around(bottom=StartScreenView.BUTTON_SPACING))
 
         quit_button = arcade.gui.UIFlatButton(text="Quit", width=StartScreenView.BUTTON_WIDTH)
-        self.v_box.add(quit_button.with_space_around(bottom=StartScreenView.BUTTON_BOTTOM))
+        self.v_box.add(quit_button.with_space_around(bottom=StartScreenView.BUTTON_SPACING))
 
         @start_button.event("on_click")
         def on_click_settings(_event):
