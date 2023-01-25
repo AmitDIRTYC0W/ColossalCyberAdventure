@@ -4,6 +4,7 @@ from pyglet.math import Vec2
 
 from entity import IEntity
 from constants import *
+
 from src.colossalcyberadventure.healthbar import HealthBar
 import arcade
 
@@ -145,7 +146,7 @@ class Player(arcade.Sprite, IEntity):
 
         See Also
         --------
-        colossalcyberadventure.game.ColossalCyberAdventure: main window class
+        src.colossalcyberadventure.game.ColossalCyberAdventure: main window class
 
         Returns
         -------

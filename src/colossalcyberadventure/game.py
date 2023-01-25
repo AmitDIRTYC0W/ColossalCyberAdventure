@@ -5,9 +5,9 @@ from pyglet.math import Vec2
 import arcade.gui
 from arcade import key as k
 
-from colossalcyberadventure.bullet import Bullet
-from colossalcyberadventure.camera import GameCam
-from colossalcyberadventure.player import Player
+from src.colossalcyberadventure.bullet import Bullet
+from src.colossalcyberadventure.camera import GameCam
+from src.colossalcyberadventure.player import Player
 from constants import *
 
 

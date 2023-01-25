@@ -1,6 +1,6 @@
 import arcade
 
-from colossalcyberadventure.start_screen import StartScreenView
+from src.colossalcyberadventure.start_screen import StartScreenView
 
 
 class ColossalCyberAdventure(arcade.Window):

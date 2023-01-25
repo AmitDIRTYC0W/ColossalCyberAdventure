@@ -1,7 +1,7 @@
 import arcade
 import arcade.gui
 
-from colossalcyberadventure.game import GameView
+from src.colossalcyberadventure.game import GameView
 
 
 class StartScreenView(arcade.View):
