@@ -8,6 +8,7 @@ from arcade import key as k
 from src.colossalcyberadventure.bullet import Bullet
 from src.colossalcyberadventure.camera import GameCam
 from src.colossalcyberadventure.player import Player
+from src.colossalcyberadventure.enemies import Enemy
 from constants import *
 
 
@@ -30,6 +31,9 @@ class GameView(arcade.View):
         super().__init__()
 
         self.player = Player()
+        #
+        self.enemy = Enemy(player=self.player)
+        #
         self.bullet_list = SpriteList()
         self.keyboard_state = {k.W: False, k.A: False, k.S: False, k.D: False}
         self.camera = GameCam(self.window.width, self.window.height, self.player)
@@ -60,13 +64,16 @@ class GameView(arcade.View):
 
         self.scene.draw()
         self.player.draw()
+        self.enemy.draw()
         self.bullet_list.draw()
 
     def on_update(self, delta_time: float):
         self.bullet_list.update()
         self.player.update_player_speed(self.keyboard_state)
+        self.enemy.update_enemy_speed()
         self.player.update_animation()
         self.player.update()
+        self.enemy.update()
         self.camera.center_camera_on_player()
 
     def on_key_press(self, symbol: int, modifiers: int):
