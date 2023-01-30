@@ -31,7 +31,7 @@ class GameView(arcade.View):
 
         self.player = Player()
         self.bullet_list = SpriteList()
-        self.keyboard_state = {k.W: False, k.A: False, k.S: False, k.D: False}
+        self.keyboard_state = {k.W: False, k.A: False, k.S: False, k.D: False, k.Q: False}
         self.camera = GameCam(self.window.width, self.window.height, self.player)
         self.map = arcade.load_tilemap(GameView.MAP_PATH, TILE_SCALING)
         self.scene = arcade.Scene.from_tilemap(self.map)
@@ -63,6 +63,8 @@ class GameView(arcade.View):
         self.bullet_list.draw()
 
     def on_update(self, delta_time: float):
+        if self.keyboard_state[k.Q]:
+            quit()
         self.bullet_list.update()
         self.player.update_player_speed(self.keyboard_state)
         self.player.update_animation()
