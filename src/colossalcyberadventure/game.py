@@ -26,13 +26,16 @@ class GameView(arcade.View):
 
     BACKGROUND_COLOR = arcade.color.JET
     MAP_PATH = "resources/map/map.tmj"
+    ENEMY_AMOUNT = 100
 
     def __init__(self):
         super().__init__()
 
         self.player = Player()
         #
-        self.enemy = Enemy(player=self.player)
+        self.enemy_array = []
+        for i in range(GameView.ENEMY_AMOUNT):
+            self.enemy_array.append(Enemy(player=self.player))
         #
         self.bullet_list = SpriteList()
         self.keyboard_state = {k.W: False, k.A: False, k.S: False, k.D: False}
@@ -64,16 +67,21 @@ class GameView(arcade.View):
 
         self.scene.draw()
         self.player.draw()
-        self.enemy.draw()
+        for i in range(GameView.ENEMY_AMOUNT):
+            self.enemy_array[i].draw()
         self.bullet_list.draw()
 
     def on_update(self, delta_time: float):
         self.bullet_list.update()
         self.player.update_player_speed(self.keyboard_state)
-        self.enemy.update_enemy_speed()
+        for i in range(GameView.ENEMY_AMOUNT):
+            self.enemy_array[i].update_enemy_speed()
         self.player.update_animation()
+        for i in range(GameView.ENEMY_AMOUNT):
+            self.enemy_array[i].update_animation()
+        for i in range(GameView.ENEMY_AMOUNT):
+            self.enemy_array[i].update()
         self.player.update()
-        self.enemy.update()
         self.camera.center_camera_on_player()
 
     def on_key_press(self, symbol: int, modifiers: int):

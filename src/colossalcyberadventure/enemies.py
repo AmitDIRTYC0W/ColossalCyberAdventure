@@ -1,36 +1,34 @@
 from enum import Enum
-from math import atan2, degrees
+import random
 
 from pyglet.math import Vec2
-
 
 from entity import IEntity
 from constants import *
 
 from src.colossalcyberadventure.player import Player
-from src.colossalcyberadventure.healthbar import HealthBar
 import arcade
 
 
-# class EnemyAnimationState(Enum):
-#     """Holds the path inside the resources folder and the amount of frames in the animation"""
-#     IDLE = ("idle", 1)
-#     WALK = ("walk", 8)
-#
-#
-# class Direction(Enum):
-#     DOWN = "down"
-#     UP = "up"
-#     LEFT = "left"
-#     RIGHT = "right"
-#
-#
-# TEXTURES_BASE = {
-#     PlayerAnimationState.IDLE: {Direction.LEFT: [], Direction.RIGHT: [], Direction.UP: [], Direction.DOWN: []},
-#     PlayerAnimationState.WALK: {Direction.LEFT: [], Direction.RIGHT: [], Direction.UP: [], Direction.DOWN: []}}
-#
-# textures = TEXTURES_BASE
-#
+class EnemyAnimationState(Enum):
+    """Holds the path inside the resources folder and the amount of frames in the animation"""
+    IDLE = ("idle", 1)
+    WALK = ("walk", 8)
+
+
+class Direction(Enum):
+    DOWN = "down"
+    UP = "up"
+    LEFT = "left"
+    RIGHT = "right"
+
+
+TEXTURES_BASE = {
+    EnemyAnimationState.IDLE: {Direction.LEFT: [], Direction.RIGHT: [], Direction.UP: [], Direction.DOWN: []},
+    EnemyAnimationState.WALK: {Direction.LEFT: [], Direction.RIGHT: [], Direction.UP: [], Direction.DOWN: []}}
+
+textures = TEXTURES_BASE
+
 
 def load_textures():
     """Load textures into textures dictionary
@@ -42,11 +40,11 @@ def load_textures():
     -------
 
     """
-    # for direction in Direction:
-    #     for state in PlayerAnimationState:
-    #         for i in range(state.value[1]):
-    #             tex = arcade.load_texture(f"resources/player/{direction.value}/{state.value[0]}/{i}.png")
-    #             textures[state][direction].append(tex)
+    for direction in Direction:
+        for state in EnemyAnimationState:
+            for i in range(state.value[1]):
+                tex = arcade.load_texture(f"resources/enemy/{direction.value}/{state.value[0]}/{i}.png")
+                textures[state][direction].append(tex)
 
 
 class Enemy(arcade.Sprite, IEntity):
@@ -69,52 +67,51 @@ class Enemy(arcade.Sprite, IEntity):
     SPRITE_SCALE = 3
 
     SPEED = 3
-    FRAMES_PER_TEXTURE = 5
+    FRAMES_PER_TEXTURE = 10
 
     def __init__(self, player: Player):
         super().__init__(scale=Enemy.SPRITE_SCALE)
-        # if textures == TEXTURES_BASE:
-        #     load_textures()
+        if textures == TEXTURES_BASE:
+            load_textures()
         self.player = player
-        self.center_x = MAP_WIDTH // 2 + 100
-        self.center_y = MAP_HEIGHT // 2
+        self.center_x = MAP_WIDTH // 2 + random.randint(-500, 500)
+        self.center_y = MAP_HEIGHT // 2 + random.randint(-1000, 1000)
         self.delta_change_x = 0
         self.delta_change_y = 0
-        # self._state = PlayerAnimationState.IDLE
-        # self.direction = Direction.DOWN
-        # self.texture = textures[PlayerAnimationState.IDLE][self.direction][0]
-        self.texture = arcade.load_texture(f"resources/enemy/Ide1.png")
-        # self.frame_counter = 0
-        # self.current_texture_index = 0
+        self._state = EnemyAnimationState.IDLE
+        self.direction = Direction.DOWN
+        self.texture = textures[EnemyAnimationState.IDLE][self.direction][0]
+        self.frame_counter = 0
+        self.current_texture_index = 0
         # self.health_bar = HealthBar(self, 70, 5, 1, arcade.color.BLACK, arcade.color.RED)
 
-    # def update_state(self, new_state: PlayerAnimationState):
-    #     """Update the player state and reset counters
-    #
-    #     Parameters
-    #     ----------
-    #     new_state: PlayerAnimationState
-    #
-    #     Returns
-    #     -------
-    #
-    #     """
-    #     self._state = new_state
-    #     self.frame_counter = 0
-    #     self.current_texture_index = 0
+    def update_state(self, new_state: EnemyAnimationState):
+        """Update the player state and reset counters
+
+        Parameters
+        ----------
+        new_state: PlayerAnimationState
+
+        Returns
+        -------
+
+        """
+        self._state = new_state
+        self.frame_counter = 0
+        self.current_texture_index = 0
 
     def draw(self, *, draw_filter=None, pixelated=None, blend_function=None):
         super().draw(filter=draw_filter, pixelated=pixelated, blend_function=blend_function)
         # self.health_bar.draw()
 
-    # def update_animation(self, delta_time: float = 1 / 60):
-    #     self.frame_counter += 1
-    #     if self.frame_counter > Player.FRAMES_PER_TEXTURE:
-    #         self.current_texture_index += 1
-    #         if self.current_texture_index >= self._state.value[1]:
-    #             self.current_texture_index = 0
-    #         self.texture = textures[self._state][self.direction][self.current_texture_index]
-    #         self.frame_counter = 0
+    def update_animation(self, delta_time: float = 1 / 60):
+        self.frame_counter += 1
+        if self.frame_counter > Enemy.FRAMES_PER_TEXTURE:
+            self.current_texture_index += 1
+            if self.current_texture_index >= self._state.value[1]:
+                self.current_texture_index = 0
+            self.texture = textures[self._state][self.direction][self.current_texture_index]
+            self.frame_counter = 0
 
     def update(self):
         """Updates player position and checks for collision
@@ -124,27 +121,45 @@ class Enemy(arcade.Sprite, IEntity):
         self.center_x += self.change_x
         self.center_y += self.change_y
 
-    #
-    #     if self.change_y < 0:
-    #         self.direction = Direction.DOWN
-    #     elif self.change_y > 0:
-    #         self.direction = Direction.UP
-    #
-    #     if self.change_x < 0:
-    #         self.direction = Direction.LEFT
-    #     elif self.change_x > 0:
-    #         self.direction = Direction.RIGHT
-    #
-    #     if self.left < 0:
-    #         self.left = 0
-    #     if self.right > MAP_WIDTH - 1:
-    #         self.right = MAP_WIDTH - 1
-    #
-    #     if self.bottom < 0:
-    #         self.bottom = 0
-    #     if self.top > MAP_HEIGHT - 1:
-    #         self.top = MAP_HEIGHT - 1
-    #
+        if self.change_x != 0 or self.change_y != 0:
+            self._state = EnemyAnimationState.WALK
+        else:
+            self._state = EnemyAnimationState.IDLE
+
+        if self.change_y < 0:
+            if self.change_x < 0:
+                if abs(self.change_x) > abs(self.change_y):
+                    self.direction = Direction.LEFT
+                else:
+                    self.direction = Direction.DOWN
+            else:
+                if abs(self.change_x) > abs(self.change_y):
+                    self.direction = Direction.RIGHT
+                else:
+                    self.direction = Direction.DOWN
+
+        if self.change_y > 0:
+            if self.change_x < 0:
+                if abs(self.change_x) > abs(self.change_y):
+                    self.direction = Direction.LEFT
+                else:
+                    self.direction = Direction.UP
+            else:
+                if abs(self.change_x) > abs(self.change_y):
+                    self.direction = Direction.RIGHT
+                else:
+                    self.direction = Direction.UP
+
+        if self.left < 0:
+            self.left = 0
+        if self.right > MAP_WIDTH - 1:
+            self.right = MAP_WIDTH - 1
+
+        if self.bottom < 0:
+            self.bottom = 0
+        if self.top > MAP_HEIGHT - 1:
+            self.top = MAP_HEIGHT - 1
+
     #     self.health_bar.update()
 
     def get_position(self) -> tuple[float, float]:
