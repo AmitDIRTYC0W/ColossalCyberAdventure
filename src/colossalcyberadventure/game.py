@@ -26,7 +26,7 @@ class GameView(arcade.View):
 
     BACKGROUND_COLOR = arcade.color.JET
     MAP_PATH = "resources/map/map.tmj"
-    ENEMY_AMOUNT = 100
+    ENEMY_AMOUNT = 50
 
     def __init__(self):
         super().__init__()

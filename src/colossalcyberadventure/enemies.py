@@ -13,7 +13,7 @@ import arcade
 class EnemyAnimationState(Enum):
     """Holds the path inside the resources folder and the amount of frames in the animation"""
     IDLE = ("idle", 1)
-    WALK = ("walk", 8)
+    WALK = ("walk", 4)
 
 
 class Direction(Enum):
@@ -43,7 +43,7 @@ def load_textures():
     for direction in Direction:
         for state in EnemyAnimationState:
             for i in range(state.value[1]):
-                tex = arcade.load_texture(f"resources/enemy/{direction.value}/{state.value[0]}/{i}.png")
+                tex = arcade.load_texture(f"resources/enemies/slime/{direction.value}/{state.value[0]}/{i}.png")
                 textures[state][direction].append(tex)
 
 
@@ -74,11 +74,11 @@ class Enemy(arcade.Sprite, IEntity):
         if textures == TEXTURES_BASE:
             load_textures()
         self.player = player
-        self.center_x = MAP_WIDTH // 2 + random.randint(-500, 500)
-        self.center_y = MAP_HEIGHT // 2 + random.randint(-1000, 1000)
+        self.center_x = random.randint(0, MAP_WIDTH)
+        self.center_y = random.randint(0, MAP_HEIGHT)
         self.delta_change_x = 0
         self.delta_change_y = 0
-        self._state = EnemyAnimationState.IDLE
+        self._state = EnemyAnimationState.WALK
         self.direction = Direction.DOWN
         self.texture = textures[EnemyAnimationState.IDLE][self.direction][0]
         self.frame_counter = 0
