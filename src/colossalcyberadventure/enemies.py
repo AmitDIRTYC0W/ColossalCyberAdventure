@@ -121,16 +121,15 @@ class Enemy(arcade.Sprite, IEntity):
         Run this function every update of the window
 
         """
+
+        self.update_enemy_speed()
+
         self.center_x += self.change_x
         self.center_y += self.change_y
 
-        collided_counter = 0
-        for enemy in self.enemy_array:
-            if arcade.check_for_collision(self, enemy):
-                collided_counter += 1
-        if collided_counter >= 2:
-            self.center_x -= self.change_x
-            self.center_y -= self.change_y
+        # add collision!!!!
+            # self.center_x -= self.change_x
+            # self.center_y -= self.change_y
 
         if self.change_x != 0 or self.change_y != 0:
             self._state = EnemyAnimationState.WALK

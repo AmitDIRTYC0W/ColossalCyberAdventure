@@ -33,7 +33,7 @@ class GameView(arcade.View):
 
         self.player = Player()
         #
-        self.enemy_array = SpriteList()
+        self.enemy_array = SpriteList(use_spatial_hash=True)
         for i in range(GameView.ENEMY_AMOUNT):
             self.enemy_array.append(Enemy(self.player, self.enemy_array))
         #
@@ -67,21 +67,16 @@ class GameView(arcade.View):
 
         self.scene.draw()
         self.player.draw()
-        for i in range(GameView.ENEMY_AMOUNT):
-            self.enemy_array[i].draw()
+        self.enemy_array.draw()
         self.bullet_list.draw()
 
     def on_update(self, delta_time: float):
         self.bullet_list.update()
         self.player.update_player_speed(self.keyboard_state)
-        for i in range(GameView.ENEMY_AMOUNT):
-            self.enemy_array[i].update_enemy_speed()
+        self.enemy_array.update()
         self.player.update_animation()
-        for i in range(GameView.ENEMY_AMOUNT):
-            self.enemy_array[i].update_animation()
-
-        for i in range(GameView.ENEMY_AMOUNT):
-            self.enemy_array[i].update()
+        self.enemy_array.update_animation()
+        self.enemy_array.update()
         self.player.update()
         self.camera.center_camera_on_player()
 
