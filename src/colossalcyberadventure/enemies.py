@@ -1,6 +1,7 @@
 from enum import Enum
 import random
 
+from arcade import SpriteList
 from pyglet.math import Vec2
 
 from entity import IEntity
@@ -69,11 +70,13 @@ class Enemy(arcade.Sprite, IEntity):
     SPEED = 3
     FRAMES_PER_TEXTURE = 10
 
-    def __init__(self, player: Player):
+    def __init__(self, player: Player, enemy_array: SpriteList):
         super().__init__(scale=Enemy.SPRITE_SCALE)
         if textures == TEXTURES_BASE:
             load_textures()
         self.player = player
+        self.enemy_array = enemy_array
+
         self.center_x = random.randint(0, MAP_WIDTH)
         self.center_y = random.randint(0, MAP_HEIGHT)
         self.delta_change_x = 0
@@ -121,6 +124,14 @@ class Enemy(arcade.Sprite, IEntity):
         self.center_x += self.change_x
         self.center_y += self.change_y
 
+        collided_counter = 0
+        for enemy in self.enemy_array:
+            if arcade.check_for_collision(self, enemy):
+                collided_counter += 1
+        if collided_counter >= 2:
+            self.center_x -= self.change_x
+            self.center_y -= self.change_y
+
         if self.change_x != 0 or self.change_y != 0:
             self._state = EnemyAnimationState.WALK
         else:
@@ -160,7 +171,9 @@ class Enemy(arcade.Sprite, IEntity):
         if self.top > MAP_HEIGHT - 1:
             self.top = MAP_HEIGHT - 1
 
-    #     self.health_bar.update()
+        # if arcade.check_for_collision(self.player, self):
+
+        #     self.health_bar.update()
 
     def get_position(self) -> tuple[float, float]:
         """Returns the enemy position relative to the map in px

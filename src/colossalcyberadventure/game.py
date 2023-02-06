@@ -26,16 +26,16 @@ class GameView(arcade.View):
 
     BACKGROUND_COLOR = arcade.color.JET
     MAP_PATH = "resources/map/map.tmj"
-    ENEMY_AMOUNT = 50
+    ENEMY_AMOUNT = 100
 
     def __init__(self):
         super().__init__()
 
         self.player = Player()
         #
-        self.enemy_array = []
+        self.enemy_array = SpriteList()
         for i in range(GameView.ENEMY_AMOUNT):
-            self.enemy_array.append(Enemy(player=self.player))
+            self.enemy_array.append(Enemy(self.player, self.enemy_array))
         #
         self.bullet_list = SpriteList()
         self.keyboard_state = {k.W: False, k.A: False, k.S: False, k.D: False}
@@ -79,6 +79,7 @@ class GameView(arcade.View):
         self.player.update_animation()
         for i in range(GameView.ENEMY_AMOUNT):
             self.enemy_array[i].update_animation()
+
         for i in range(GameView.ENEMY_AMOUNT):
             self.enemy_array[i].update()
         self.player.update()
