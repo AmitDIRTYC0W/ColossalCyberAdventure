@@ -24,7 +24,7 @@ class GameView(arcade.View):
     """
 
     BACKGROUND_COLOR = arcade.color.JET
-    MAP_PATH = "resources/map/map.tmj"
+    MAP_PATH = "resources/map/bigmap.tmx"
 
     def __init__(self):
         super().__init__()
