@@ -127,9 +127,10 @@ class Enemy(arcade.Sprite, IEntity):
         self.center_x += self.change_x
         self.center_y += self.change_y
 
-        # add collision!!!!
-            # self.center_x -= self.change_x
-            # self.center_y -= self.change_y
+        enemy_collisions = arcade.check_for_collision_with_list(self, self.enemy_array)
+        if len(enemy_collisions) >= 1:
+            self.center_x -= self.change_x
+            self.center_y -= self.change_y
 
         if self.change_x != 0 or self.change_y != 0:
             self._state = EnemyAnimationState.WALK

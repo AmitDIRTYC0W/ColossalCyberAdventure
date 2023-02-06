@@ -76,7 +76,6 @@ class GameView(arcade.View):
         self.enemy_array.update()
         self.player.update_animation()
         self.enemy_array.update_animation()
-        self.enemy_array.update()
         self.player.update()
         self.camera.center_camera_on_player()
 
