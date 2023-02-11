@@ -77,15 +77,19 @@ class Enemy(arcade.Sprite, IEntity):
         self.player = player
         self.enemy_array = enemy_array
 
-        self.center_x = random.randint(0, MAP_WIDTH)
-        self.center_y = random.randint(0, MAP_HEIGHT)
-        self.delta_change_x = 0
-        self.delta_change_y = 0
-        self._state = EnemyAnimationState.WALK
-        self.direction = Direction.DOWN
-        self.texture = textures[EnemyAnimationState.IDLE][self.direction][0]
-        self.frame_counter = 0
-        self.current_texture_index = 0
+        collided = True
+        while collided:
+            self.center_x = random.randint(0, MAP_WIDTH)
+            self.center_y = random.randint(0, MAP_HEIGHT)
+            self.delta_change_x = 0
+            self.delta_change_y = 0
+            self._state = EnemyAnimationState.WALK
+            self.direction = Direction.DOWN
+            self.texture = textures[EnemyAnimationState.IDLE][self.direction][0]
+            self.frame_counter = 0
+            self.current_texture_index = 0
+            if len(arcade.check_for_collision_with_list(self, self.enemy_array)) == 0:
+                collided = False
         # self.health_bar = HealthBar(self, 70, 5, 1, arcade.color.BLACK, arcade.color.RED)
 
     def update_state(self, new_state: EnemyAnimationState):
