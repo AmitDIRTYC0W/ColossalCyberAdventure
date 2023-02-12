@@ -31,7 +31,7 @@ TEXTURES_BASE = {
 slime_textures = TEXTURES_BASE
 
 
-def load_textures(base_path: str, state_enum, textures_array: dict):
+def load_textures(base_path: str, state_enum) -> dict:
     """Load textures into textures dictionary
 
     This function loads all frames of the animation into the dictionary and also loads
@@ -39,9 +39,8 @@ def load_textures(base_path: str, state_enum, textures_array: dict):
 
     Parameters
     ----------
-    textures_array: dict
-        where to load the textures to. For example slime_textures
-    base_path:
+    base_path: str
+        base path to resources directory
     state_enum:
         Enum that contains the information about the sprites.
         For an example see SlimeAnimationState.
@@ -50,25 +49,48 @@ def load_textures(base_path: str, state_enum, textures_array: dict):
     -------
 
     """
-    for direction in Direction:
-        for state in state_enum:
+    textures = {}
+
+    for state in state_enum:
+        textures[state] = {}
+        for direction in Direction:
+            textures[state][direction] = []
             for i in range(state.value[1]):
                 tex = arcade.load_texture(f"{base_path}/{direction.value}/{state.value[0]}/{i}.png")
-                textures_array[state][direction].append(tex)
+                textures[state][direction].append(tex)
+
+    return textures
 
 
 class AEnemy(arcade.Sprite):
 
-    def __init__(self, speed: float, frames_per_texture: int, initial_state, initial_direction: Direction,
-                 texture_array: dict, sprite_scale=1.0):
+    def __init__(self, player: Player, enemy_array: SpriteList, speed: float, frames_per_texture: int, initial_state,
+                 initial_direction: Direction,
+                 sprite_scale=1.0):
         super().__init__(scale=sprite_scale)
+
+        self.player = player
+        self.enemy_array = enemy_array
         self.speed = speed
         self.frame_counter = 0
         self.frames_per_texture = frames_per_texture
         self.current_texture_index = 0
         self._state = initial_state
-        self.texture_array = texture_array
         self.direction = initial_direction
+        self.textures_array = self.load_textures()
+        self.texture = self.textures_array[SlimeAnimationState.WALK][Direction.DOWN][1]
+
+        collided = True
+        while collided:
+            self.center_x = random.randint(0, MAP_WIDTH)
+            self.center_y = random.randint(0, MAP_HEIGHT)
+            self.delta_change_x = 0
+            self.delta_change_y = 0
+            if len(arcade.check_for_collision_with_list(self, self.enemy_array)) == 0:
+                collided = False
+
+    def load_textures(self) -> dict:
+        raise NotImplementedError("load_textures() not implemented")
 
     def update_animation(self, delta_time: float = 1 / 60):
         self.frame_counter += 1
@@ -76,11 +98,11 @@ class AEnemy(arcade.Sprite):
             self.current_texture_index += 1
             if self.current_texture_index >= self._state.value[1]:
                 self.current_texture_index = 0
-            self.texture = self.texture_array[self._state][self.direction][self.current_texture_index]
+            self.texture = self.textures_array[self._state][self.direction][self.current_texture_index]
             self.frame_counter = 0
 
 
-class Enemy(IEntity, AEnemy):
+class Slime(IEntity, AEnemy):
     """Main player class
 
     loads the textures for the player when initialized. Should only happen once.
@@ -104,22 +126,19 @@ class Enemy(IEntity, AEnemy):
     TEXTURES = TEXTURES_BASE
 
     def __init__(self, player: Player, enemy_array: SpriteList):
-        super().__init__(Enemy.SPEED, 5, SlimeAnimationState.IDLE, Direction.DOWN, Enemy.TEXTURES, Enemy.SPRITE_SCALE)
-        if Enemy.TEXTURES == TEXTURES_BASE:
-            load_textures("resources/enemies/slime", SlimeAnimationState, Enemy.TEXTURES)
-        self.player = player
-        self.enemy_array = enemy_array
-
-        collided = True
-        while collided:
-            self.center_x = random.randint(0, MAP_WIDTH)
-            self.center_y = random.randint(0, MAP_HEIGHT)
-            self.delta_change_x = 0
-            self.delta_change_y = 0
-            self.texture = slime_textures[SlimeAnimationState.IDLE][self.direction][0]
-            if len(arcade.check_for_collision_with_list(self, self.enemy_array)) == 0:
-                collided = False
+        super().__init__(player, enemy_array, Slime.SPEED, 5, SlimeAnimationState.IDLE, Direction.DOWN,
+                         Slime.SPRITE_SCALE)
+        # if Slime.TEXTURES == TEXTURES_BASE:
+        #     load_textures("resources/enemies/slime", SlimeAnimationState)
         # self.health_bar = HealthBar(self, 70, 5, 1, arcade.color.BLACK, arcade.color.RED)
+
+    def load_textures(self) -> dict:
+        if Slime.TEXTURES == TEXTURES_BASE:
+            textures = load_textures("resources/enemies/slime", SlimeAnimationState)
+        else:
+            textures = Slime.TEXTURES
+
+        return textures
 
     def update_state(self, new_state: SlimeAnimationState):
         """Update the player state and reset counters
@@ -140,14 +159,14 @@ class Enemy(IEntity, AEnemy):
         super().draw(filter=draw_filter, pixelated=pixelated, blend_function=blend_function)
         # self.health_bar.draw()
 
-    def update_animation(self, delta_time: float = 1 / 60):
-        self.frame_counter += 1
-        if self.frame_counter > Enemy.FRAMES_PER_TEXTURE:
-            self.current_texture_index += 1
-            if self.current_texture_index >= self._state.value[1]:
-                self.current_texture_index = 0
-            self.texture = slime_textures[self._state][self.direction][self.current_texture_index]
-            self.frame_counter = 0
+    # def update_animation(self, delta_time: float = 1 / 60):
+    #     self.frame_counter += 1
+    #     if self.frame_counter > Slime.FRAMES_PER_TEXTURE:
+    #         self.current_texture_index += 1
+    #         if self.current_texture_index >= self._state.value[1]:
+    #             self.current_texture_index = 0
+    #         self.texture = slime_textures[self._state][self.direction][self.current_texture_index]
+    #         self.frame_counter = 0
 
     def update(self):
         """Updates player position and checks for collision

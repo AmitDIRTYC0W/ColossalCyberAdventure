@@ -8,7 +8,7 @@ from arcade import key as k
 from src.colossalcyberadventure.bullet import Bullet
 from src.colossalcyberadventure.camera import GameCam
 from src.colossalcyberadventure.player import Player
-from src.colossalcyberadventure.enemies import Enemy
+from src.colossalcyberadventure.enemies import Slime
 from constants import *
 
 
@@ -35,7 +35,7 @@ class GameView(arcade.View):
         #
         self.enemy_array = SpriteList(use_spatial_hash=True)
         for i in range(GameView.ENEMY_AMOUNT):
-            self.enemy_array.append(Enemy(self.player, self.enemy_array))
+            self.enemy_array.append(Slime(self.player, self.enemy_array))
         #
         self.bullet_list = SpriteList()
         self.keyboard_state = {k.W: False, k.A: False, k.S: False, k.D: False}
