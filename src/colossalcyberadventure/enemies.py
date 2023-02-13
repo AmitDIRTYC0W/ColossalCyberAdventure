@@ -62,7 +62,7 @@ def load_textures(base_path: str, state_enum) -> dict:
     return textures
 
 
-class AEnemy(arcade.Sprite):
+class AEnemy(arcade.Sprite, IEntity):
 
     def __init__(self, player: Player, enemy_array: SpriteList, speed: float, frames_per_texture: int, initial_state,
                  initial_direction: Direction,
@@ -101,46 +101,23 @@ class AEnemy(arcade.Sprite):
             self.texture = self.textures_array[self._state][self.direction][self.current_texture_index]
             self.frame_counter = 0
 
+    def get_position(self) -> tuple[float, float]:
+        """Returns the enemy position relative to the map in px
 
-class Slime(IEntity, AEnemy):
-    """Main player class
+        See Also
+        --------
+        src.colossalcyberadventure.game.ColossalCyberAdventure: main window class
 
-    loads the textures for the player when initialized. Should only happen once.
+        Returns
+        -------
+        int
+            x value of enemy's center (in pixels)
+        int
+            y value of enemy's center (in pixels)
+        """
+        return self.center_x, self.center_y
 
-    Attributes
-    ----------
-    _state: PlayerAnimationState
-        Should only be changed by the current class
-    direction: Direction
-        What direction the player is facing
-    frame_counter: int
-        How many frames the current frame of the animation was in
-    current_texture_index: int
-        What frame number the animation is in
-    """
-
-    SPRITE_SCALE = 3
-    FRAMES_PER_TEXTURE = 10
-    SPEED = 3
-
-    TEXTURES = TEXTURES_BASE
-
-    def __init__(self, player: Player, enemy_array: SpriteList):
-        super().__init__(player, enemy_array, Slime.SPEED, 5, SlimeAnimationState.IDLE, Direction.DOWN,
-                         Slime.SPRITE_SCALE)
-        # if Slime.TEXTURES == TEXTURES_BASE:
-        #     load_textures("resources/enemies/slime", SlimeAnimationState)
-        # self.health_bar = HealthBar(self, 70, 5, 1, arcade.color.BLACK, arcade.color.RED)
-
-    def load_textures(self) -> dict:
-        if Slime.TEXTURES == TEXTURES_BASE:
-            textures = load_textures("resources/enemies/slime", SlimeAnimationState)
-        else:
-            textures = Slime.TEXTURES
-
-        return textures
-
-    def update_state(self, new_state: SlimeAnimationState):
+    def update_state(self, new_state):
         """Update the player state and reset counters
 
         Parameters
@@ -157,16 +134,6 @@ class Slime(IEntity, AEnemy):
 
     def draw(self, *, draw_filter=None, pixelated=None, blend_function=None):
         super().draw(filter=draw_filter, pixelated=pixelated, blend_function=blend_function)
-        # self.health_bar.draw()
-
-    # def update_animation(self, delta_time: float = 1 / 60):
-    #     self.frame_counter += 1
-    #     if self.frame_counter > Slime.FRAMES_PER_TEXTURE:
-    #         self.current_texture_index += 1
-    #         if self.current_texture_index >= self._state.value[1]:
-    #             self.current_texture_index = 0
-    #         self.texture = slime_textures[self._state][self.direction][self.current_texture_index]
-    #         self.frame_counter = 0
 
     def update(self):
         """Updates player position and checks for collision
@@ -223,31 +190,64 @@ class Slime(IEntity, AEnemy):
         if self.top > MAP_HEIGHT - 1:
             self.top = MAP_HEIGHT - 1
 
-        # if arcade.check_for_collision(self.player, self):
+        def update_enemy_speed(self):
+            """Basic function that walks towards the player by changing the change_x and change_y
 
-        #     self.health_bar.update()
+            Changes these values in accordance to the location of the player
+            """
 
-    def get_position(self) -> tuple[float, float]:
-        """Returns the enemy position relative to the map in px
+            target_x = self.player.center_x
+            target_y = self.player.center_y
+            origin_x, origin_y = self.get_position()
 
-        See Also
-        --------
-        src.colossalcyberadventure.game.ColossalCyberAdventure: main window class
+            self.center_x = origin_x
+            self.center_y = origin_y
+            direction = Vec2(target_x - origin_x, target_y - origin_y).normalize() * Vec2(self.speed, self.speed)
+            self.change_x = direction.x
+            self.change_y = direction.y
 
-        Returns
-        -------
-        int
-            x value of enemy's center (in pixels)
-        int
-            y value of enemy's center (in pixels)
+
+class Slime(AEnemy):
+    """Slime Class
+
+    loads the textures for the slime when initialized. Should only happen once.
+
+    Attributes
+    ----------
+    _state: SlimeAnimationState
+        Should only be changed by the current class
+    direction: Direction
+        What direction the player is facing
+    frame_counter: int
+        How many frames the current frame of the animation was in
+    current_texture_index: int
+        What frame number the animation is in
+    """
+
+    SPRITE_SCALE = 3
+    FRAMES_PER_TEXTURE = 10
+    SPEED = 3
+
+    TEXTURES = TEXTURES_BASE
+
+    def __init__(self, player: Player, enemy_array: SpriteList):
+        super().__init__(player, enemy_array, Slime.SPEED, 5, SlimeAnimationState.IDLE, Direction.DOWN,
+                         Slime.SPRITE_SCALE)
+
+    def load_textures(self) -> dict:
+        """loads the right textures of the sprite
         """
-        return self.center_x, self.center_y
+        if Slime.TEXTURES == TEXTURES_BASE:
+            textures = load_textures("resources/enemies/slime", SlimeAnimationState)
+        else:
+            textures = Slime.TEXTURES
+
+        return textures
 
     def update_enemy_speed(self):
-        """Updates player change_x and change_y values and the player state
+        """Updates slimes change_x and change_y
 
-        Changes these values in accordance to the currently pressed keys.
-        Change the state to walking if the player is moving idle if not.
+        Changes these values in accordance to the location of the player
         """
 
         target_x = self.player.center_x
