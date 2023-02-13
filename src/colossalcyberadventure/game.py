@@ -8,7 +8,8 @@ from arcade import key as k
 from src.colossalcyberadventure.bullet import Bullet
 from src.colossalcyberadventure.camera import GameCam
 from src.colossalcyberadventure.player import Player
-from src.colossalcyberadventure.enemies import Slime
+from src.colossalcyberadventure.enemies import Skeleton
+from src.colossalcyberadventure.enemies import Archer
 from constants import *
 
 
@@ -26,7 +27,8 @@ class GameView(arcade.View):
 
     BACKGROUND_COLOR = arcade.color.JET
     MAP_PATH = "resources/map/map.tmj"
-    ENEMY_AMOUNT = 10
+    SKELETON_AMOUNT = 20
+    ARCHER_AMOUNT = 10
 
     def __init__(self):
         super().__init__()
@@ -34,8 +36,10 @@ class GameView(arcade.View):
         self.player = Player()
         #
         self.enemy_array = SpriteList(use_spatial_hash=True)
-        for i in range(GameView.ENEMY_AMOUNT):
-            self.enemy_array.append(Slime(self.player, self.enemy_array))
+        for i in range(GameView.SKELETON_AMOUNT):
+            self.enemy_array.append(Skeleton(self.player, self.enemy_array))
+        for i in range(GameView.ARCHER_AMOUNT):
+            self.enemy_array.append(Archer(self.player, self.enemy_array))
         #
         self.bullet_list = SpriteList()
         self.keyboard_state = {k.W: False, k.A: False, k.S: False, k.D: False}
