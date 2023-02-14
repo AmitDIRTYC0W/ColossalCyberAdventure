@@ -84,6 +84,7 @@ class Player(arcade.Sprite, IEntity):
         self.frame_counter = 0
         self.current_texture_index = 0
         self.health_bar = HealthBar(self, 70, 5, 1, arcade.color.BLACK, arcade.color.RED)
+        self.should_reset_sprite_counter = False
 
     def update_state(self, new_state: PlayerAnimationState):
         """Update the player state and reset counters
@@ -105,12 +106,17 @@ class Player(arcade.Sprite, IEntity):
         self.health_bar.draw()
 
     def update_animation(self, delta_time: float = 1 / 60):
+
+        if self.frame_counter == 0 or self.should_reset_sprite_counter:
+            self.frame_counter = 0
+            self.current_texture_index += 1
+            if self.current_texture_index >= self._state.value[1] or self.should_reset_sprite_counter:
+                self.current_texture_index = 0
+            self.should_reset_sprite_counter = False
+            self.texture = textures[self._state][self.direction][self.current_texture_index]
+
         self.frame_counter += 1
         if self.frame_counter > Player.FRAMES_PER_TEXTURE:
-            self.current_texture_index += 1
-            if self.current_texture_index >= self._state.value[1]:
-                self.current_texture_index = 0
-            self.texture = textures[self._state][self.direction][self.current_texture_index]
             self.frame_counter = 0
 
     def update(self):
@@ -126,15 +132,18 @@ class Player(arcade.Sprite, IEntity):
                 #ToDo add death
                 projectile.remove_from_sprite_lists()
 
+        old_direction = self.direction
         if self.change_y < 0:
             self.direction = Direction.DOWN
         elif self.change_y > 0:
             self.direction = Direction.UP
-
         if self.change_x < 0:
             self.direction = Direction.LEFT
         elif self.change_x > 0:
             self.direction = Direction.RIGHT
+
+        if old_direction != self.direction:
+            self.should_reset_sprite_counter = True
 
         if self.left < 0:
             self.left = 0
