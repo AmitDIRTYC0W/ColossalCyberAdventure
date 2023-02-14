@@ -7,6 +7,7 @@ from pyglet.math import Vec2
 
 from entity import IEntity
 from constants import *
+from projectile import Projectile
 
 from src.colossalcyberadventure.player import Player
 import arcade
@@ -16,12 +17,16 @@ class SkeletonAnimationState(Enum):
     """Holds the path inside the resources folder and the amount of frames in the animation"""
     IDLE = ("idle", 4)
     WALK = ("walk", 12)
+    ATTACK = ("attack", 13)
+    DEATH = ("death", 13)
 
 
 class ArcherAnimationState(Enum):
     """Holds the path inside the resources folder and the amount of frames in the animation"""
     IDLE = ("idle", 4)
     WALK = ("walk", 8)
+    ATTACK = ("attack", 7)
+    DEATH = ("death", 8)
 
 
 class Direction(Enum):
@@ -76,11 +81,14 @@ def load_textures(base_path: str, state_enum) -> dict:
 
 class AEnemy(arcade.Sprite, IEntity):
 
-    def __init__(self, player: Player, enemy_array: SpriteList, speed: float, frames_per_texture: int, initial_state,
+    def __init__(self, player: Player, enemy_array: SpriteList, enemy_projectile_list: SpriteList,
+                 player_projectile_list: SpriteList, speed: float, frames_per_texture: int, initial_state,
                  initial_direction: Direction, animation_state,
                  sprite_scale=1.0):
         super().__init__(scale=sprite_scale)
 
+        self.player_projectile_list = player_projectile_list
+        self.enemy_projectile_list = enemy_projectile_list
         self.animation_state = animation_state
         self.player = player
         self.enemy_array = enemy_array
@@ -99,7 +107,8 @@ class AEnemy(arcade.Sprite, IEntity):
             self.center_y = random.randint(0, MAP_HEIGHT)
             self.delta_change_x = 0
             self.delta_change_y = 0
-            if len(arcade.check_for_collision_with_list(self, self.enemy_array)) == 0:
+            if len(arcade.check_for_collision_with_list(self, self.enemy_array)) == 0 and not arcade.check_for_collision(
+                    self, self.player):
                 collided = False
 
     def load_textures(self) -> dict:
@@ -153,28 +162,67 @@ class AEnemy(arcade.Sprite, IEntity):
         Run this function every update of the window
 
         """
+        DISTANCE_OF_ATTACK = 70
 
         self.update_enemy_speed()
 
         self.center_x += self.change_x
         self.center_y += self.change_y
 
-        enemy_collisions = arcade.check_for_collision_with_list(self, self.enemy_array)
-        if len(enemy_collisions) >= 1:
+        if self._state != self.animation_state.DEATH:
+            for projectile in self.player_projectile_list:
+                if arcade.check_for_collision(self, projectile):
+                    self._state = self.animation_state.DEATH
+                    projectile.remove_from_sprite_lists()
+
+        if self._state == self.animation_state.DEATH:
             self.center_x -= self.change_x
             self.center_y -= self.change_y
-            self.change_x = 0
-            self.change_y = 0
-
-        if self.change_x != 0 or self.change_y != 0:
-            self._state = self.animation_state.WALK
+            if self.current_texture_index + 1 >= self._state.value[
+                1] and self.frame_counter + 1 > self.frames_per_texture:
+                self.remove_from_sprite_lists()
         else:
-            self._state = self.animation_state.IDLE
+            enemy_collisions = arcade.check_for_collision_with_list(self, self.enemy_array)
 
-        if self.change_x < 0:
-            self.direction = Direction.RIGHT
-        else:
-            self.direction = Direction.LEFT
+            if len(enemy_collisions) >= 1:
+                self.center_x -= self.change_x
+                self.center_y -= self.change_y
+                self.change_x = 0
+                self.change_y = 0
+
+            if arcade.check_for_collision(self, self.player):
+                self.center_x -= self.change_x
+                self.center_y -= self.change_y
+                self.change_x = 0
+                self.change_y = 0
+
+            distance_to_player = sqrt(
+                abs(self.center_x - self.player.center_x) ** 2 + abs(
+                    self.center_y - self.player.center_y) ** 2)
+
+            if self.change_x != 0 or self.change_y != 0:
+                self._state = self.animation_state.WALK
+            else:
+                if distance_to_player <= DISTANCE_OF_ATTACK and (self._state == SkeletonAnimationState.IDLE
+                                                                 or self._state == SkeletonAnimationState.ATTACK):
+                    self._state = self.animation_state.ATTACK
+                elif self._state == ArcherAnimationState.IDLE or self._state == ArcherAnimationState.ATTACK:
+                    self._state = self.animation_state.ATTACK
+                    if self.current_texture_index + 1 >= self._state.value[
+                        1] and self.frame_counter + 1 > self.frames_per_texture:
+                        self.shoot()
+                else:
+                    self._state = self.animation_state.IDLE
+
+            if self.change_x < 0:
+                self.direction = Direction.RIGHT
+            elif self.change_x > 0:
+                self.direction = Direction.LEFT
+            else:
+                if self.center_x > self.player.center_x:
+                    self.direction = Direction.RIGHT
+                elif self.center_x < self.player.center_x:
+                    self.direction = Direction.LEFT
 
         if self.left < 0:
             self.left = 0
@@ -186,21 +234,11 @@ class AEnemy(arcade.Sprite, IEntity):
         if self.top > MAP_HEIGHT - 1:
             self.top = MAP_HEIGHT - 1
 
-        def update_enemy_speed(self):
-            """Basic function that walks towards the player by changing the change_x and change_y
+    def update_enemy_speed(self):
+        pass
 
-            Changes these values in accordance to the location of the player
-            """
-
-            target_x = self.player.center_x
-            target_y = self.player.center_y
-            origin_x, origin_y = self.get_position()
-
-            self.center_x = origin_x
-            self.center_y = origin_y
-            direction = Vec2(target_x - origin_x, target_y - origin_y).normalize() * Vec2(self.speed, self.speed)
-            self.change_x = direction.x
-            self.change_y = direction.y
+    def shoot(self):
+        pass
 
 
 class Skeleton(AEnemy):
@@ -226,8 +264,11 @@ class Skeleton(AEnemy):
 
     TEXTURES = SKELETON_TEXTURES_BASE
 
-    def __init__(self, player: Player, enemy_array: SpriteList):
-        super().__init__(player, enemy_array, Skeleton.SPEED, 5, SkeletonAnimationState.IDLE, Direction.RIGHT, SkeletonAnimationState,
+    def __init__(self, player: Player, enemy_array: SpriteList, enemy_projectile_list: SpriteList,
+                 player_projectile_list: SpriteList):
+        super().__init__(player, enemy_array, enemy_projectile_list, player_projectile_list, Skeleton.SPEED, 5,
+                         SkeletonAnimationState.IDLE, Direction.RIGHT,
+                         SkeletonAnimationState,
                          Skeleton.SPRITE_SCALE)
 
     def load_textures(self) -> dict:
@@ -258,7 +299,7 @@ class Skeleton(AEnemy):
 
 
 class Archer(AEnemy):
-    """Slime Class
+    """Archer Class
 
     loads the textures for the slime when initialized. Should only happen once.
 
@@ -280,8 +321,11 @@ class Archer(AEnemy):
 
     TEXTURES = ARCHER_TEXTURES_BASE
 
-    def __init__(self, player: Player, enemy_array: SpriteList):
-        super().__init__(player, enemy_array, Archer.SPEED, 5, ArcherAnimationState.IDLE, Direction.RIGHT, ArcherAnimationState,
+    def __init__(self, player: Player, enemy_array: SpriteList, enemy_projectile_list: SpriteList,
+                 player_projectile_list: SpriteList):
+        super().__init__(player, enemy_array, enemy_projectile_list, player_projectile_list, Archer.SPEED, 5,
+                         ArcherAnimationState.IDLE, Direction.RIGHT,
+                         ArcherAnimationState,
                          Archer.SPRITE_SCALE)
 
     def load_textures(self) -> dict:
@@ -293,6 +337,15 @@ class Archer(AEnemy):
             textures = Archer.TEXTURES
 
         return textures
+
+    def shoot(self):
+        ARROW_PATH = "resources/enemies/archer/arrow/0.png"
+        if self.direction == Direction.LEFT:
+            source_x = self.center_x + 30
+        else:
+            source_x = self.center_x - 30
+        self.enemy_projectile_list.append(
+            Projectile(source_x, self.center_y, self.player.center_x, self.player.center_y, ARROW_PATH))
 
     def update_enemy_speed(self):
         """Updates slimes change_x and change_y
@@ -312,7 +365,7 @@ class Archer(AEnemy):
         self.change_x = direction.x
         self.change_y = direction.y
 
-        distance_to_player = sqrt(abs(target_x - self.center_x)**2 + abs(target_y - self.center_y)**2)
+        distance_to_player = sqrt(abs(target_x - self.center_x) ** 2 + abs(target_y - self.center_y) ** 2)
         if distance_to_player < MIN_DISTANCE_TO_PLAYER:
             self.change_x = -self.change_x
             self.change_y = -self.change_y

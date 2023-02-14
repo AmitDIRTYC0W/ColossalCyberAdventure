@@ -1,5 +1,6 @@
 from enum import Enum
 
+from arcade import SpriteList
 from pyglet.math import Vec2
 
 from entity import IEntity
@@ -68,10 +69,11 @@ class Player(arcade.Sprite, IEntity):
     SPEED = 7
     FRAMES_PER_TEXTURE = 5
 
-    def __init__(self):
+    def __init__(self, enemy_projectile_list: SpriteList):
         super().__init__(scale=Player.SPRITE_SCALE)
         if textures == TEXTURES_BASE:
             load_textures()
+        self.enemy_projectile_list = enemy_projectile_list
         self.center_x = MAP_WIDTH // 2
         self.center_y = MAP_HEIGHT // 2
         self.delta_change_x = 0
@@ -118,6 +120,11 @@ class Player(arcade.Sprite, IEntity):
         """
         self.center_x += self.change_x
         self.center_y += self.change_y
+
+        for projectile in self.enemy_projectile_list:
+            if arcade.check_for_collision(self, projectile):
+                #ToDo add death
+                projectile.remove_from_sprite_lists()
 
         if self.change_y < 0:
             self.direction = Direction.DOWN
