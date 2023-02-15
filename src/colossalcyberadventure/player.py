@@ -5,6 +5,7 @@ from pyglet.math import Vec2
 
 from entity import IEntity
 from constants import *
+from projectile import Projectile
 
 from src.colossalcyberadventure.healthbar import HealthBar
 import arcade
@@ -69,10 +70,13 @@ class Player(arcade.Sprite, IEntity):
     SPEED = 7
     FRAMES_PER_TEXTURE = 5
 
-    def __init__(self, enemy_projectile_list: SpriteList):
+    def __init__(self, enemy_projectile_list: SpriteList, player_projectile_list: SpriteList, keyboard_state: dict[int, bool]):
         super().__init__(scale=Player.SPRITE_SCALE)
         if textures == TEXTURES_BASE:
             load_textures()
+        self.skill_cooldown = 0
+        self.keyboard_state = keyboard_state
+        self.player_projectile_list = player_projectile_list
         self.enemy_projectile_list = enemy_projectile_list
         self.center_x = MAP_WIDTH // 2
         self.center_y = MAP_HEIGHT // 2
@@ -124,11 +128,16 @@ class Player(arcade.Sprite, IEntity):
         Run this function every update of the window
 
         """
+        BULLET_PATH = "resources/bullet/0.png"
+        SKILL_COOLDOWN = 100
+
         self.center_x += self.change_x
         self.center_y += self.change_y
 
         for projectile in self.enemy_projectile_list:
             if arcade.check_for_collision(self, projectile):
+                if self.health_bar.health_points > 0:
+                    self.health_bar.health_points -= 2
                 #ToDo add death
                 projectile.remove_from_sprite_lists()
 
@@ -157,6 +166,21 @@ class Player(arcade.Sprite, IEntity):
 
         self.health_bar.update()
 
+        if self.skill_cooldown == 0:
+            directions = [[self.center_x, self.center_y + 1], [self.center_x + 1, self.center_y + 1],
+                          [self.center_x + 1, self.center_y], [self.center_x + 1, self.center_y - 1],
+                          [self.center_x, self.center_y - 1], [self.center_x - 1, self.center_y - 1],
+                          [self.center_x - 1, self.center_y], [self.center_x - 1, self.center_y + 1]
+                          ]
+            if self.keyboard_state[arcade.key.C]:
+                self.skill_cooldown += 1
+                for i in range(8):
+                    self.player_projectile_list.append(
+                        Projectile(self.center_x, self.center_y, directions[i][0], directions[i][1], BULLET_PATH, 2))
+        else:
+            self.skill_cooldown += 1
+            if self.skill_cooldown == SKILL_COOLDOWN:
+                self.skill_cooldown = 0
     def get_position(self) -> tuple[float, float]:
         """Returns the player position relative to the map in px
 

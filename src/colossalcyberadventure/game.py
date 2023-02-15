@@ -33,17 +33,19 @@ class GameView(arcade.View):
     def __init__(self):
         super().__init__()
 
+        self.keyboard_state = {k.W: False, k.A: False, k.S: False, k.D: False, k.C: False}
         self.player_projectile_list = SpriteList()
         self.enemy_projectile_list = SpriteList()
-        self.player = Player(self.enemy_projectile_list)
+        self.player = Player(self.enemy_projectile_list, self.player_projectile_list, self.keyboard_state)
         #
         self.enemy_array = SpriteList(use_spatial_hash=True)
         for i in range(GameView.SKELETON_AMOUNT):
-            self.enemy_array.append(Skeleton(self.player, self.enemy_array, self.enemy_projectile_list, self.player_projectile_list))
+            self.enemy_array.append(Skeleton(self.player, self.enemy_array,
+                                             self.enemy_projectile_list, self.player_projectile_list))
         for i in range(GameView.ARCHER_AMOUNT):
-            self.enemy_array.append(Archer(self.player, self.enemy_array, self.enemy_projectile_list, self.player_projectile_list))
+            self.enemy_array.append(Archer(self.player, self.enemy_array,
+                                           self.enemy_projectile_list, self.player_projectile_list))
         #
-        self.keyboard_state = {k.W: False, k.A: False, k.S: False, k.D: False}
         self.camera = GameCam(self.window.width, self.window.height, self.player)
         self.map = arcade.load_tilemap(GameView.MAP_PATH, TILE_SCALING)
         self.scene = arcade.Scene.from_tilemap(self.map)
