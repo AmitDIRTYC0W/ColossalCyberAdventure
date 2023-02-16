@@ -3,6 +3,8 @@ from enum import Enum
 from arcade import SpriteList
 from pyglet.math import Vec2
 
+import arcade.key as k
+
 from entity import IEntity
 from constants import *
 from projectile import Projectile
@@ -70,7 +72,8 @@ class Player(arcade.Sprite, IEntity):
     SPEED = 7
     FRAMES_PER_TEXTURE = 5
 
-    def __init__(self, enemy_projectile_list: SpriteList, player_projectile_list: SpriteList, keyboard_state: dict[int, bool]):
+    def __init__(self, enemy_projectile_list: SpriteList, player_projectile_list: SpriteList,
+                 keyboard_state: dict[int, bool]):
         super().__init__(scale=Player.SPRITE_SCALE)
         if textures == TEXTURES_BASE:
             load_textures()
@@ -138,7 +141,7 @@ class Player(arcade.Sprite, IEntity):
             if arcade.check_for_collision(self, projectile):
                 if self.health_bar.health_points > 0:
                     self.health_bar.health_points -= 2
-                #ToDo add death
+                # ToDo add death
                 projectile.remove_from_sprite_lists()
 
         old_direction = self.direction
@@ -172,7 +175,7 @@ class Player(arcade.Sprite, IEntity):
                           [self.center_x, self.center_y - 1], [self.center_x - 1, self.center_y - 1],
                           [self.center_x - 1, self.center_y], [self.center_x - 1, self.center_y + 1]
                           ]
-            if self.keyboard_state[arcade.key.C]:
+            if self.keyboard_state[k.C]:
                 self.skill_cooldown += 1
                 for i in range(8):
                     self.player_projectile_list.append(
@@ -181,6 +184,7 @@ class Player(arcade.Sprite, IEntity):
             self.skill_cooldown += 1
             if self.skill_cooldown == SKILL_COOLDOWN:
                 self.skill_cooldown = 0
+
     def get_position(self) -> tuple[float, float]:
         """Returns the player position relative to the map in px
 
@@ -205,7 +209,7 @@ class Player(arcade.Sprite, IEntity):
         """
         movement_vec = Vec2(0, 0)
 
-        if True in keyboard_state.values():
+        if keyboard_state[k.W] or keyboard_state[k.A] or keyboard_state[k.S] or keyboard_state[k.D]:
             new_state = PlayerAnimationState.WALK
         else:
             new_state = PlayerAnimationState.IDLE
@@ -213,13 +217,13 @@ class Player(arcade.Sprite, IEntity):
         if new_state != self._state:
             self.update_state(new_state)
 
-        if keyboard_state[arcade.key.W] and not keyboard_state[arcade.key.S]:
+        if keyboard_state[k.W] and not keyboard_state[k.S]:
             movement_vec.y = 1
-        elif keyboard_state[arcade.key.S] and not keyboard_state[arcade.key.W]:
+        elif keyboard_state[k.S] and not keyboard_state[k.W]:
             movement_vec.y = -1
-        if keyboard_state[arcade.key.A] and not keyboard_state[arcade.key.D]:
+        if keyboard_state[k.A] and not keyboard_state[k.D]:
             movement_vec.x = -1
-        elif keyboard_state[arcade.key.D] and not keyboard_state[arcade.key.A]:
+        elif keyboard_state[k.D] and not keyboard_state[k.A]:
             movement_vec.x = 1
 
         movement_vec = movement_vec.normalize() * Vec2(Player.SPEED, Player.SPEED)
