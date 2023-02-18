@@ -27,7 +27,7 @@ class GameView(arcade.View):
 
     BACKGROUND_COLOR = arcade.color.JET
     MAP_PATH = "resources/map/map.tmj"
-    SKELETON_AMOUNT = 25
+    SKELETON_AMOUNT = 15
     ARCHER_AMOUNT = 5
 
     def __init__(self):
