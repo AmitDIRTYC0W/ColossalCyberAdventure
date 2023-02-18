@@ -15,20 +15,18 @@ import arcade
 
 class PlayerAnimationState(Enum):
     """Holds the path inside the resources folder and the amount of frames in the animation"""
-    IDLE = ("idle", 1)
+    IDLE = ("idle", 8)
     WALK = ("walk", 8)
 
 
 class Direction(Enum):
-    DOWN = "down"
-    UP = "up"
     LEFT = "left"
     RIGHT = "right"
 
 
 TEXTURES_BASE = {
-    PlayerAnimationState.IDLE: {Direction.LEFT: [], Direction.RIGHT: [], Direction.UP: [], Direction.DOWN: []},
-    PlayerAnimationState.WALK: {Direction.LEFT: [], Direction.RIGHT: [], Direction.UP: [], Direction.DOWN: []}}
+    PlayerAnimationState.IDLE: {Direction.LEFT: [], Direction.RIGHT: []},
+    PlayerAnimationState.WALK: {Direction.LEFT: [], Direction.RIGHT: []}}
 
 textures = TEXTURES_BASE
 
@@ -43,11 +41,15 @@ def load_textures():
     -------
 
     """
-    for direction in Direction:
-        for state in PlayerAnimationState:
-            for i in range(state.value[1]):
-                tex = arcade.load_texture(f"resources/player/{direction.value}/{state.value[0]}/{i}.png")
-                textures[state][direction].append(tex)
+    for state in PlayerAnimationState:
+        textures[state] = {}
+        textures[state][Direction.RIGHT] = []
+        textures[state][Direction.LEFT] = []
+        for i in range(state.value[1]):
+            tex_left, tex_right = arcade.load_texture_pair(f"resources/player/{state.value[0]}/{i}.png")
+            textures[state][Direction.RIGHT].append(tex_left)
+            textures[state][Direction.LEFT].append(tex_right)
+
 
 
 class Player(arcade.Sprite, IEntity):
@@ -67,7 +69,7 @@ class Player(arcade.Sprite, IEntity):
         What frame number the animation is in
     """
 
-    SPRITE_SCALE = 3
+    SPRITE_SCALE = 2
 
     SPEED = 7
     FRAMES_PER_TEXTURE = 5
@@ -86,7 +88,7 @@ class Player(arcade.Sprite, IEntity):
         self.delta_change_x = 0
         self.delta_change_y = 0
         self._state = PlayerAnimationState.IDLE
-        self.direction = Direction.DOWN
+        self.direction = Direction.RIGHT
         self.texture = textures[PlayerAnimationState.IDLE][self.direction][0]
         self.frame_counter = 0
         self.current_texture_index = 0
@@ -145,10 +147,6 @@ class Player(arcade.Sprite, IEntity):
                 projectile.remove_from_sprite_lists()
 
         old_direction = self.direction
-        if self.change_y < 0:
-            self.direction = Direction.DOWN
-        elif self.change_y > 0:
-            self.direction = Direction.UP
         if self.change_x < 0:
             self.direction = Direction.LEFT
         elif self.change_x > 0:
@@ -209,7 +207,7 @@ class Player(arcade.Sprite, IEntity):
         """
         movement_vec = Vec2(0, 0)
 
-        if keyboard_state[k.W] or keyboard_state[k.A] or keyboard_state[k.S] or keyboard_state[k.D]:
+        if keyboard_state[k.A] or keyboard_state[k.D]:
             new_state = PlayerAnimationState.WALK
         else:
             new_state = PlayerAnimationState.IDLE

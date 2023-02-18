@@ -162,7 +162,7 @@ class AEnemy(arcade.Sprite, IEntity):
         Run this function every update of the window
 
         """
-        DISTANCE_OF_ATTACK = 70
+        DISTANCE_OF_ATTACK = 60
 
         self.update_enemy_speed()
 
