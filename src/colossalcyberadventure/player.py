@@ -51,7 +51,6 @@ def load_textures():
             textures[state][Direction.LEFT].append(tex_right)
 
 
-
 class Player(arcade.Sprite, IEntity):
     """Main player class
 
