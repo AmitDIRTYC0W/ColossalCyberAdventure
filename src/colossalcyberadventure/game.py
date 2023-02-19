@@ -1,4 +1,7 @@
+from pathlib import Path
+
 import arcade
+from pytiled_parser import parse_world
 
 from arcade import SpriteList
 from pyglet.math import Vec2
@@ -24,7 +27,7 @@ class GameView(arcade.View):
     """
 
     BACKGROUND_COLOR = arcade.color.JET
-    MAP_PATH = "resources/map/bigmap.tmx"
+    WORLD_PATH = "resources/map/yes.world"
 
     def __init__(self):
         super().__init__()
@@ -33,8 +36,11 @@ class GameView(arcade.View):
         self.bullet_list = SpriteList()
         self.keyboard_state = {k.W: False, k.A: False, k.S: False, k.D: False, k.Q: False}
         self.camera = GameCam(self.window.width, self.window.height, self.player)
-        self.map = arcade.load_tilemap(GameView.MAP_PATH, TILE_SCALING)
-        self.scene = arcade.Scene.from_tilemap(self.map)
+        # self.map = arcade.load_tilemap(GameView.MAP_PATH, TILE_SCALING)
+        # self.scene = arcade.Scene.from_tilemap(self.map)
+        w = parse_world(Path(GameView.WORLD_PATH))
+        tilemap = arcade.tilemap.TileMap(map_file=w.maps[0].map_file)
+        self.scene = arcade.Scene.from_tilemap(tilemap)
 
         arcade.set_background_color(GameView.BACKGROUND_COLOR)
 
