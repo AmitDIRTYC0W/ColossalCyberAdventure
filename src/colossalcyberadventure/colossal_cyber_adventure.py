@@ -1,6 +1,6 @@
 import arcade
 
-from src.colossalcyberadventure.start_screen import StartScreenView
+from src.colossalcyberadventure.login_screen import LoginScreenView
 
 
 class ColossalCyberAdventure(arcade.Window):
@@ -19,4 +19,4 @@ class ColossalCyberAdventure(arcade.Window):
         Sets up window. Call this again to restart game.
         """
 
-        self.show_view(StartScreenView())
+        self.show_view(LoginScreenView())

@@ -3,6 +3,7 @@ from enum import Enum
 from arcade import SpriteList
 from pyglet.math import Vec2
 
+import time
 import arcade.key as k
 
 from entity import IEntity
@@ -78,7 +79,8 @@ class Player(arcade.Sprite, IEntity):
         super().__init__(scale=Player.SPRITE_SCALE)
         if textures == TEXTURES_BASE:
             load_textures()
-        self.skill_cooldown = 0
+        self.time = time.localtime()
+        self.last_skill_use = self.time
         self.keyboard_state = keyboard_state
         self.player_projectile_list = player_projectile_list
         self.enemy_projectile_list = enemy_projectile_list
@@ -165,22 +167,10 @@ class Player(arcade.Sprite, IEntity):
             self.top = MAP_HEIGHT - 1
 
         self.health_bar.update()
+        self.time = time.localtime()
 
-        if self.skill_cooldown == 0:
-            directions = [[self.center_x, self.center_y + 1], [self.center_x + 1, self.center_y + 1],
-                          [self.center_x + 1, self.center_y], [self.center_x + 1, self.center_y - 1],
-                          [self.center_x, self.center_y - 1], [self.center_x - 1, self.center_y - 1],
-                          [self.center_x - 1, self.center_y], [self.center_x - 1, self.center_y + 1]
-                          ]
-            if self.keyboard_state[k.C]:
-                self.skill_cooldown += 1
-                for i in range(8):
-                    self.player_projectile_list.append(
-                        Projectile(self.center_x, self.center_y, directions[i][0], directions[i][1], BULLET_PATH, 2))
-        else:
-            self.skill_cooldown += 1
-            if self.skill_cooldown == SKILL_COOLDOWN:
-                self.skill_cooldown = 0
+        if self.keyboard_state[k.C]:
+            self.on_skill_1()
 
     def get_position(self) -> tuple[float, float]:
         """Returns the player position relative to the map in px
@@ -226,3 +216,17 @@ class Player(arcade.Sprite, IEntity):
         movement_vec = movement_vec.normalize() * Vec2(Player.SPEED, Player.SPEED)
         self.change_x = movement_vec.x
         self.change_y = movement_vec.y
+
+    def on_skill_1(self):
+        PROJECTILE_PATH = "resources/bullet/0.png"
+        if abs(self.time.tm_sec - self.last_skill_use.tm_sec) >= 2:
+            directions = [[self.center_x, self.center_y + 1], [self.center_x + 1, self.center_y + 1],
+                          [self.center_x + 1, self.center_y], [self.center_x + 1, self.center_y - 1],
+                          [self.center_x, self.center_y - 1], [self.center_x - 1, self.center_y - 1],
+                          [self.center_x - 1, self.center_y], [self.center_x - 1, self.center_y + 1]
+                          ]
+
+            for i in range(8):
+                self.player_projectile_list.append(
+                    Projectile(self.center_x, self.center_y, directions[i][0], directions[i][1], PROJECTILE_PATH, 2))
+            self.last_skill_use = time.localtime()

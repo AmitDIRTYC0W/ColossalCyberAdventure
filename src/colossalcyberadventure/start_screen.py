@@ -9,7 +9,7 @@ class StartScreenView(arcade.View):
 
     BUTTON_WIDTH = 200
     IP_LABEL_WIDTH = 30
-    BUTTON_SPACING = 20
+    BUTTON_SPACING = 30
 
     def __init__(self):
         super().__init__()
