@@ -8,8 +8,6 @@ class Projectile(arcade.Sprite):
     Sprite_Path = None
     SPEED = 15
 
-    # SPRITE_PATH = "resources/enemies/archer/arrow/0.png"
-
     def __init__(self, origin_x: float, origin_y: float, target_x: float, target_y: float, Sprite_Path: str,
                  SPRITE_SCALE=2.5, time_to_live=80):
         self.Sprite_Path = Sprite_Path

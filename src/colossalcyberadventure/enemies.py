@@ -169,22 +169,7 @@ class AEnemy(arcade.Sprite, IEntity):
         self.frame_counter = 0
         self.current_texture_index = 0
 
-    def draw(self, *, draw_filter=None, pixelated=None, blend_function=None):
-        super().draw(filter=draw_filter, pixelated=pixelated, blend_function=blend_function)
-
-    def update(self):
-        """Updates player position and checks for collision
-        Run this function every update of the window
-
-        """
-        # ToDo move this into each enemy!!!
-        DISTANCE_OF_ATTACK = 60
-
-        self.update_enemy_speed()
-
-        self.center_x += self.change_x
-        self.center_y += self.change_y
-
+    def check_death(self, enemy_to_spawn):
         if self._state != self.animation_state.DEATH:
             for projectile in self.player_projectile_list:
                 if arcade.check_for_collision(self, projectile):
@@ -198,65 +183,14 @@ class AEnemy(arcade.Sprite, IEntity):
                     self.frame_counter + 1 > self.frames_per_texture:
                 self.remove_from_sprite_lists()
 
-                self.enemy_array.append(Skeleton(self.player, self.enemy_array,
-                                                 self.enemy_projectile_list, self.player_projectile_list))
-                if self.sprite_scale == 5:
-                    for i in range(4):
-                        self.enemy_array.append(Slime(self.player, self.enemy_array,
-                                                      self.enemy_projectile_list, self.player_projectile_list,
-                                                      SPRITE_SCALE=3))
-        else:
-            enemy_collisions = arcade.check_for_collision_with_list(self, self.enemy_array)
+                self.enemy_array.append(enemy_to_spawn(self.player, self.enemy_array,
+                                                       self.enemy_projectile_list, self.player_projectile_list))
 
-            if len(enemy_collisions) >= 1:
-                self.center_x -= self.change_x
-                self.center_y -= self.change_y
-                self.change_x = 0
-                self.change_y = 0
+    def draw(self, *, draw_filter=None, pixelated=None, blend_function=None):
+        super().draw(filter=draw_filter, pixelated=pixelated, blend_function=blend_function)
 
-            if arcade.check_for_collision(self, self.player):
-                self.center_x -= self.change_x
-                self.center_y -= self.change_y
-                self.change_x = 0
-                self.change_y = 0
-
-            distance_to_player = sqrt(
-                abs(self.center_x - self.player.center_x) ** 2 + abs(
-                    self.center_y - self.player.center_y) ** 2)
-
-            if self.change_x != 0 or self.change_y != 0:
-                self._state = self.animation_state.WALK
-            else:
-                if distance_to_player <= DISTANCE_OF_ATTACK and (self._state == SkeletonAnimationState.IDLE
-                                                                 or self._state == SkeletonAnimationState.ATTACK):
-                    self._state = self.animation_state.ATTACK
-                elif self._state == ArcherAnimationState.IDLE or self._state == ArcherAnimationState.ATTACK:
-                    self._state = self.animation_state.ATTACK
-                    if self.current_texture_index + 1 >= self._state.value[1] and \
-                            self.frame_counter + 1 > self.frames_per_texture:
-                        self.shoot()
-                else:
-                    self._state = self.animation_state.IDLE
-
-            if self.change_x < 0:
-                self.direction = Direction.RIGHT
-            elif self.change_x > 0:
-                self.direction = Direction.LEFT
-            else:
-                if self.center_x > self.player.center_x:
-                    self.direction = Direction.RIGHT
-                elif self.center_x < self.player.center_x:
-                    self.direction = Direction.LEFT
-
-        if self.left < 0:
-            self.left = 0
-        if self.right > MAP_WIDTH - 1:
-            self.right = MAP_WIDTH - 1
-
-        if self.bottom < 0:
-            self.bottom = 0
-        if self.top > MAP_HEIGHT - 1:
-            self.top = MAP_HEIGHT - 1
+    def update(self):
+        pass
 
     def update_enemy_speed(self):
         pass
@@ -304,6 +238,61 @@ class Skeleton(AEnemy):
             textures = Skeleton.TEXTURES
 
         return textures
+
+    def update(self):
+        """Updates player position and checks for collision
+        Run this function every update of the window
+
+        """
+        DISTANCE_OF_ATTACK = 60
+
+        self.update_enemy_speed()
+
+        self.center_x += self.change_x
+        self.center_y += self.change_y
+
+        self.check_death(Skeleton)
+
+        if self._state != self.animation_state.DEATH:
+            enemy_collisions = arcade.check_for_collision_with_list(self, self.enemy_array)
+
+            if len(enemy_collisions) >= 1 or arcade.check_for_collision(self, self.player):
+                self.center_x -= self.change_x
+                self.center_y -= self.change_y
+                self.change_x = 0
+                self.change_y = 0
+                self._state = self.animation_state.IDLE
+
+            distance_to_player = sqrt(
+                abs(self.center_x - self.player.center_x) ** 2 + abs(
+                    self.center_y - self.player.center_y) ** 2)
+
+            if self.change_x != 0 or self.change_y != 0:
+                self._state = self.animation_state.WALK
+            else:
+                if distance_to_player <= DISTANCE_OF_ATTACK and (self._state == self.animation_state.IDLE
+                                                                 or self._state == self.animation_state.ATTACK):
+                    self._state = self.animation_state.ATTACK
+
+            if self.change_x < 0:
+                self.direction = Direction.RIGHT
+            elif self.change_x > 0:
+                self.direction = Direction.LEFT
+            else:
+                if self.center_x > self.player.center_x:
+                    self.direction = Direction.RIGHT
+                elif self.center_x < self.player.center_x:
+                    self.direction = Direction.LEFT
+
+        if self.left < 0:
+            self.left = 0
+        if self.right > MAP_WIDTH - 1:
+            self.right = MAP_WIDTH - 1
+
+        if self.bottom < 0:
+            self.bottom = 0
+        if self.top > MAP_HEIGHT - 1:
+            self.top = MAP_HEIGHT - 1
 
     def update_enemy_speed(self):
         """Updates slimes change_x and change_y
@@ -370,6 +359,65 @@ class Archer(AEnemy):
             source_x = self.center_x - 30
         self.enemy_projectile_list.append(
             Projectile(source_x, self.center_y, self.player.center_x, self.player.center_y, ARROW_PATH))
+
+    def update(self):
+        """Updates player position and checks for collision
+        Run this function every update of the window
+
+        """
+        MAX_DISTANCE_OF_ATTACK = 500
+
+        self.update_enemy_speed()
+
+        self.center_x += self.change_x
+        self.center_y += self.change_y
+
+        self.check_death(Archer)
+
+        if self._state != self.animation_state.DEATH:
+            enemy_collisions = arcade.check_for_collision_with_list(self, self.enemy_array)
+
+            if len(enemy_collisions) >= 1 or arcade.check_for_collision(self, self.player):
+                self.center_x -= self.change_x
+                self.center_y -= self.change_y
+                self.change_x = 0
+                self.change_y = 0
+                self._state = self.animation_state.IDLE
+
+            distance_to_player = sqrt(
+                abs(self.center_x - self.player.center_x) ** 2 + abs(
+                    self.center_y - self.player.center_y) ** 2)
+
+            if self.change_x != 0 or self.change_y != 0:
+                self._state = self.animation_state.WALK
+            elif distance_to_player <= MAX_DISTANCE_OF_ATTACK and (self._state == self.animation_state.IDLE or
+                                                                   self._state == self.animation_state.ATTACK):
+                self._state = self.animation_state.ATTACK
+                if self.current_texture_index + 1 >= self._state.value[1] and \
+                        self.frame_counter + 1 > self.frames_per_texture:
+                    self.shoot()
+            else:
+                self._state = self.animation_state.IDLE
+
+            if self.change_x < 0:
+                self.direction = Direction.RIGHT
+            elif self.change_x > 0:
+                self.direction = Direction.LEFT
+            else:
+                if self.center_x > self.player.center_x:
+                    self.direction = Direction.RIGHT
+                elif self.center_x < self.player.center_x:
+                    self.direction = Direction.LEFT
+
+        if self.left < 0:
+            self.left = 0
+        if self.right > MAP_WIDTH - 1:
+            self.right = MAP_WIDTH - 1
+
+        if self.bottom < 0:
+            self.bottom = 0
+        if self.top > MAP_HEIGHT - 1:
+            self.top = MAP_HEIGHT - 1
 
     def update_enemy_speed(self):
         """Updates slimes change_x and change_y

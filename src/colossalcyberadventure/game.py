@@ -30,7 +30,7 @@ class GameView(arcade.View):
     MAP_PATH = "resources/map/map.tmj"
     SKELETON_AMOUNT = 15
     ARCHER_AMOUNT = 5
-    SLIME_AMOUNT = 5
+    SLIME_AMOUNT = 0
 
     def __init__(self):
         super().__init__()
@@ -47,9 +47,9 @@ class GameView(arcade.View):
         for i in range(GameView.ARCHER_AMOUNT):
             self.enemy_array.append(Archer(self.player, self.enemy_array,
                                            self.enemy_projectile_list, self.player_projectile_list))
-        for i in range(GameView.SLIME_AMOUNT):
-            self.enemy_array.append(Slime(
-                self.player, self.enemy_array, self.enemy_projectile_list, self.player_projectile_list))
+        # for i in range(GameView.SLIME_AMOUNT):
+        #     self.enemy_array.append(Slime(
+        #         self.player, self.enemy_array, self.enemy_projectile_list, self.player_projectile_list))
         #
         self.camera = GameCam(self.window.width, self.window.height, self.player)
         self.map = arcade.load_tilemap(GameView.MAP_PATH, TILE_SCALING)
