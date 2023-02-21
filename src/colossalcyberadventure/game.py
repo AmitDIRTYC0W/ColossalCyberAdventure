@@ -5,6 +5,7 @@ from pyglet.math import Vec2
 import arcade.gui
 from arcade import key as k
 
+from src.colossalcyberadventure.weapon import AWeapon
 from src.colossalcyberadventure.projectile import Projectile
 from src.colossalcyberadventure.camera import GameCam
 from src.colossalcyberadventure.player import Player
@@ -36,8 +37,8 @@ class GameView(arcade.View):
         super().__init__()
 
         self.keyboard_state = {k.W: False, k.A: False, k.S: False, k.D: False, k.C: False}
-        self.player_projectile_list = SpriteList()
-        self.enemy_projectile_list = SpriteList()
+        self.player_projectile_list = SpriteList(use_spatial_hash=True)
+        self.enemy_projectile_list = SpriteList(use_spatial_hash=True)
         self.player = Player(self.enemy_projectile_list, self.player_projectile_list, self.keyboard_state)
         #
         self.enemy_array = SpriteList(use_spatial_hash=True)
@@ -51,6 +52,8 @@ class GameView(arcade.View):
         #     self.enemy_array.append(Slime(
         #         self.player, self.enemy_array, self.enemy_projectile_list, self.player_projectile_list))
         #
+        self.weapon = AWeapon(self.player)
+
         self.camera = GameCam(self.window.width, self.window.height, self.player)
         self.map = arcade.load_tilemap(GameView.MAP_PATH, TILE_SCALING)
         self.scene = arcade.Scene.from_tilemap(self.map)
@@ -82,6 +85,7 @@ class GameView(arcade.View):
         self.enemy_array.draw()
         self.player_projectile_list.draw()
         self.enemy_projectile_list.draw()
+        # self.weapon.draw()
 
     def on_update(self, delta_time: float):
         self.player.update_player_speed(self.keyboard_state)
@@ -92,6 +96,7 @@ class GameView(arcade.View):
         self.camera.center_camera_on_player()
         self.player_projectile_list.update()
         self.enemy_projectile_list.update()
+        # self.weapon.update()
 
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol in self.keyboard_state.keys():

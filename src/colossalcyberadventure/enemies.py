@@ -365,7 +365,7 @@ class Archer(AEnemy):
         Run this function every update of the window
 
         """
-        MAX_DISTANCE_OF_ATTACK = 500
+        MAX_DISTANCE_OF_ATTACK = 700
 
         self.update_enemy_speed()
 
