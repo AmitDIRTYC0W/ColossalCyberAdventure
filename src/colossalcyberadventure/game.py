@@ -11,7 +11,6 @@ from src.colossalcyberadventure.camera import GameCam
 from src.colossalcyberadventure.player import Player
 from src.colossalcyberadventure.enemies import Skeleton
 from src.colossalcyberadventure.enemies import Archer
-from src.colossalcyberadventure.enemies import Slime
 from constants import *
 
 
@@ -48,10 +47,6 @@ class GameView(arcade.View):
         for i in range(GameView.ARCHER_AMOUNT):
             self.enemy_array.append(Archer(self.player, self.enemy_array,
                                            self.enemy_projectile_list, self.player_projectile_list))
-        # for i in range(GameView.SLIME_AMOUNT):
-        #     self.enemy_array.append(Slime(
-        #         self.player, self.enemy_array, self.enemy_projectile_list, self.player_projectile_list))
-        #
         self.weapon = AWeapon(self.player)
 
         self.camera = GameCam(self.window.width, self.window.height, self.player)
@@ -85,7 +80,7 @@ class GameView(arcade.View):
         self.enemy_array.draw()
         self.player_projectile_list.draw()
         self.enemy_projectile_list.draw()
-        # self.weapon.draw()
+        self.weapon.draw()
 
     def on_update(self, delta_time: float):
         self.player.update_player_speed(self.keyboard_state)
@@ -96,7 +91,7 @@ class GameView(arcade.View):
         self.camera.center_camera_on_player()
         self.player_projectile_list.update()
         self.enemy_projectile_list.update()
-        # self.weapon.update()
+        self.weapon.update()
 
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol in self.keyboard_state.keys():
