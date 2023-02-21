@@ -108,6 +108,8 @@ class GameView(arcade.View):
             self.keyboard_state[symbol] = False
 
     def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
+        if self.inventory_state:
+            return
         BULLET_PATH = "resources/bullet/0.png"
         world_pos = self.mouse_to_world_position(x, y)
         self.player_projectile_list.append(Projectile(
