@@ -7,7 +7,7 @@ from src.colossalcyberadventure.entity import IEntity
 
 class Weapon(arcade.Sprite):
     def __init__(self, owner: IEntity):
-        super().__init__(arcade.Sprite, filename="resources/weapons/laser_pistol.png", scale=0.1)
+        super().__init__(filename="resources/weapons/laser_pistol.png", scale=0.1)
         self.flipped_horizontally = False
         self.owner = owner
         self.owner_x = owner.get_position()[0]
@@ -22,11 +22,8 @@ class Weapon(arcade.Sprite):
 
 
     def update_weapon_angle(self, x, y):
-        if x - self.center_x > 0:
-            self.angle = math.atan2(y - self.center_y, x - self.center_x) * 180/math.pi
-        if x - self.center_x < 0:
-            self.flipped_horizontally = True
-            self.angle = math.atan2(y - self.center_y, x - self.center_x) * 180 / math.pi
+        self.angle = math.atan2(y - self.center_y, x - self.center_x) * 180/math.pi
+
 
 
 

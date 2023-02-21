@@ -94,7 +94,7 @@ class Player(arcade.Sprite, IEntity):
         self.current_texture_index = 0
         self.health_bar = HealthBar(self, 70, 5, 1, arcade.color.BLACK, arcade.color.RED)
         self.should_reset_sprite_counter = False
-        self.gun = Weapon(True, owner=self)
+        self.gun = Weapon(owner=self)
 
     def update_state(self, new_state: PlayerAnimationState):
         """Update the player state and reset counters
