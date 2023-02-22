@@ -10,7 +10,6 @@ from constants import *
 from projectile import Projectile
 
 from src.colossalcyberadventure.healthbar import HealthBar
-from src.colossalcyberadventure.weapons import Weapon
 from src.colossalcyberadventure.inventory import Inventory
 import arcade
 
