@@ -3,7 +3,6 @@ import glob
 
 
 def main():
-    print(glob.glob("./*"))
     game = ColossalCyberAdventure()
     game.setup()
     game.run()
