@@ -8,8 +8,8 @@ from pyglet.math import Vec2
 from entity import IEntity
 from constants import *
 from projectile import Projectile
+from player import Player
 
-from src.colossalcyberadventure.player import Player
 import arcade
 
 
