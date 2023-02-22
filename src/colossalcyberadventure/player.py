@@ -3,7 +3,7 @@ from enum import Enum
 from pyglet.math import Vec2
 
 from entity import IEntity
-from constants import *
+from globals import *
 
 from src.colossalcyberadventure.healthbar import HealthBar
 import arcade
@@ -72,8 +72,8 @@ class Player(arcade.Sprite, IEntity):
         super().__init__(scale=Player.SPRITE_SCALE)
         if textures == TEXTURES_BASE:
             load_textures()
-        self.center_x = MAP_WIDTH // 2
-        self.center_y = MAP_HEIGHT // 2
+        self.center_x = 30
+        self.center_y = 30
         self.delta_change_x = 0
         self.delta_change_y = 0
         self._state = PlayerAnimationState.IDLE
@@ -131,13 +131,13 @@ class Player(arcade.Sprite, IEntity):
 
         if self.left < 0:
             self.left = 0
-        if self.right > MAP_WIDTH - 1:
-            self.right = MAP_WIDTH - 1
+        if self.right > map_width - 1:
+            self.right = map_width - 1
 
         if self.bottom < 0:
             self.bottom = 0
-        if self.top > MAP_HEIGHT - 1:
-            self.top = MAP_HEIGHT - 1
+        if self.top > map_height - 1:
+            self.top = map_height - 1
 
         self.health_bar.update()
 

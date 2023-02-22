@@ -1,9 +1,10 @@
+from math import floor
 from pathlib import Path
 
 import arcade
 from pytiled_parser import parse_world
 
-from arcade import SpriteList
+from arcade import SpriteList, Scene
 from pyglet.math import Vec2
 import arcade.gui
 from arcade import key as k
@@ -11,7 +12,7 @@ from arcade import key as k
 from src.colossalcyberadventure.bullet import Bullet
 from src.colossalcyberadventure.camera import GameCam
 from src.colossalcyberadventure.player import Player
-from constants import *
+from globals import *
 
 
 class GameView(arcade.View):
@@ -27,7 +28,9 @@ class GameView(arcade.View):
     """
 
     BACKGROUND_COLOR = arcade.color.JET
-    WORLD_PATH = "resources/map/yes.world"
+    WORLD_PATH = "resources/map/map.world"
+    MAP_PARTIAL_WIDTH = 2560
+    MAP_PARTIAL_HEIGHT = 1440
 
     def __init__(self):
         super().__init__()
@@ -38,11 +41,25 @@ class GameView(arcade.View):
         self.camera = GameCam(self.window.width, self.window.height, self.player)
         # self.map = arcade.load_tilemap(GameView.MAP_PATH, TILE_SCALING)
         # self.scene = arcade.Scene.from_tilemap(self.map)
-        w = parse_world(Path(GameView.WORLD_PATH))
-        tilemap = arcade.tilemap.TileMap(map_file=w.maps[0].map_file)
-        self.scene = arcade.Scene.from_tilemap(tilemap)
+        self.world = parse_world(Path(GameView.WORLD_PATH))
+        tilemap = arcade.tilemap.TileMap(map_file=self.world.maps[0].map_file)
+        # y-x.tmx
+        self.scene = arcade.Scene()
+        for spritelist in self.get_scene_from_partial_tilemap(0, 0).sprite_lists:
+            self.scene.add_sprite_list("terst", True, spritelist)
+
+        self.flag = False
 
         arcade.set_background_color(GameView.BACKGROUND_COLOR)
+
+    def get_scene_from_partial_tilemap(self, x, y):
+        return arcade.Scene.from_tilemap(
+            arcade.load_tilemap(self.world.maps[x * 30 + y].map_file, use_spatial_hash=True,
+                                offset=Vec2(x * 2560, y * 1440), scaling=2.0))
+
+    def connect_scenes(self, other_scene: Scene, key: str):
+        for spritelist in other_scene.sprite_lists:
+            self.scene.add_sprite_list(key, True, spritelist)
 
     def mouse_to_world_position(self, click_x: float, click_y: float) -> Vec2:
         """Converts the position of a click to the actual world position
@@ -69,6 +86,14 @@ class GameView(arcade.View):
         self.bullet_list.draw()
 
     def on_update(self, delta_time: float):
+        # load map
+        map_x = round(self.player.center_x / GameView.MAP_PARTIAL_WIDTH)
+        map_y = round(self.player.center_y / GameView.MAP_PARTIAL_HEIGHT)
+        if self.player.center_x > 2400 and not self.flag:
+            s = self.get_scene_from_partial_tilemap(1, 0)
+            self.connect_scenes(s, "1234")
+            self.flag = True
+
         if self.keyboard_state[k.Q]:
             quit()
         self.bullet_list.update()
