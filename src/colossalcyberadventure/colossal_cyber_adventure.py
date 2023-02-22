@@ -1,6 +1,6 @@
 import arcade
 
-from src.colossalcyberadventure.login_screen import LoginScreenView
+from login_screen import LoginScreenView
 
 
 class ColossalCyberAdventure(arcade.Window):

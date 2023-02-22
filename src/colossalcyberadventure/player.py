@@ -10,8 +10,8 @@ from entity import IEntity
 from constants import *
 from projectile import Projectile
 
-from src.colossalcyberadventure.healthbar import HealthBar
-from src.colossalcyberadventure.inventory import Inventory
+from healthbar import HealthBar
+from inventory import Inventory
 import arcade
 
 

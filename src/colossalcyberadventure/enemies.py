@@ -9,7 +9,7 @@ from entity import IEntity
 from constants import *
 from projectile import Projectile
 
-from src.colossalcyberadventure.player import Player
+from player import Player
 import arcade
 
 

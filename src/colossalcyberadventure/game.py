@@ -5,12 +5,12 @@ from pyglet.math import Vec2
 import arcade.gui
 from arcade import key as k
 
-from src.colossalcyberadventure.weapon import AWeapon
-from src.colossalcyberadventure.projectile import Projectile
-from src.colossalcyberadventure.camera import GameCam
-from src.colossalcyberadventure.player import Player
-from src.colossalcyberadventure.enemies import Skeleton
-from src.colossalcyberadventure.enemies import Archer
+from weapon import AWeapon
+from projectile import Projectile
+from camera import GameCam
+from player import Player
+from enemies import Skeleton
+from enemies import Archer
 from constants import *
 
 

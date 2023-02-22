@@ -1,6 +1,6 @@
 import arcade
 
-from colossalcyberadventure.player import Player, Direction, PlayerAnimationState
+from player import Player, Direction, PlayerAnimationState
 
 
 class AWeapon(arcade.Sprite):
