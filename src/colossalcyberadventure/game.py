@@ -106,3 +106,7 @@ class GameView(arcade.View):
         world_pos = self.mouse_to_world_position(x, y)
         self.player_projectile_list.append(Projectile(
             self.player.center_x, self.player.center_y, world_pos.x, world_pos.y, BULLET_PATH, 1))
+
+    def on_mouse_motion(self, x: int, y: int, dx: int, dy: int):
+        mouse_pos = self.mouse_to_world_position(x, y)
+        self.player.gun.update_weapon_angle(mouse_pos[0], mouse_pos[1])

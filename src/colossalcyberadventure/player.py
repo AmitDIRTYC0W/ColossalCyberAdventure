@@ -11,6 +11,7 @@ from constants import *
 from projectile import Projectile
 
 from src.colossalcyberadventure.healthbar import HealthBar
+from src.colossalcyberadventure.weapons import Weapon
 import arcade
 
 
@@ -95,6 +96,7 @@ class Player(arcade.Sprite, IEntity):
         self.current_texture_index = 0
         self.health_bar = HealthBar(self, 70, 5, 1, arcade.color.BLACK, arcade.color.RED)
         self.should_reset_sprite_counter = False
+        self.gun = Weapon(owner=self)
 
     def update_state(self, new_state: PlayerAnimationState):
         """Update the player state and reset counters
@@ -114,6 +116,7 @@ class Player(arcade.Sprite, IEntity):
     def draw(self, *, draw_filter=None, pixelated=None, blend_function=None):
         super().draw(filter=draw_filter, pixelated=pixelated, blend_function=blend_function)
         self.health_bar.draw()
+        self.gun.draw()
 
     def update_animation(self, delta_time: float = 1 / 60):
 
@@ -177,6 +180,8 @@ class Player(arcade.Sprite, IEntity):
 
     def get_direction(self):
         return self.direction
+
+        self.gun.update()
 
     def get_position(self) -> tuple[float, float]:
         """Returns the player position relative to the map in px
