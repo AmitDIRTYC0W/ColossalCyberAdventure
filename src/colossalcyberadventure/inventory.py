@@ -21,6 +21,7 @@ class ItemSlot(arcade.Sprite):
         self.center_x = -99  # placeholder
         self.center_y = -99  # placeholder
         self.item = None
+        self.alpha = 99
 
     def set_texture(self):
         pass
@@ -59,8 +60,8 @@ class Inventory:
                 self.grid[row][column].center_y = y + camera_y
 
     def draw(self):
-        arcade.draw_rectangle_filled(color=(255, 255, 255), center_x=self.center_x,
-                                     center_y=self.center_y, width=self.width, height=self.height)
+        #arcade.draw_rectangle_filled(color=(255, 255, 255), center_x=self.center_x,
+        #                             center_y=self.center_y, width=self.width, height=self.height, alpha)
         for row in range(ROW_COUNT):
             for column in range(COLUMN_COUNT):
                 self.grid[row][column].draw()
