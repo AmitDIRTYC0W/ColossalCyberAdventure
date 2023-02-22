@@ -9,6 +9,7 @@ import arcade.key as k
 from entity import IEntity
 from constants import *
 from projectile import Projectile
+from enemies import SkeletonAnimationState
 
 from src.colossalcyberadventure.healthbar import HealthBar
 from src.colossalcyberadventure.inventory import Inventory
@@ -144,7 +145,7 @@ class Player(arcade.Sprite, IEntity):
 
         for projectile in self.enemy_projectile_list:
             if arcade.check_for_collision(self, projectile):
-                self.reduce_health(2)
+                self.reduce_health(1)
                 # ToDo add death
                 projectile.remove_from_sprite_lists()
 

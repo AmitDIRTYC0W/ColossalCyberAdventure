@@ -189,6 +189,9 @@ class AEnemy(arcade.Sprite, IEntity):
     def draw(self, *, draw_filter=None, pixelated=None, blend_function=None):
         super().draw(filter=draw_filter, pixelated=pixelated, blend_function=blend_function)
 
+    def get_state(self):
+        return self._state
+
     def update(self):
         pass
 
