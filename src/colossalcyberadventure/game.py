@@ -29,7 +29,7 @@ class GameView(arcade.View):
     BACKGROUND_COLOR = arcade.color.JET
     MAP_PATH = "resources/map/map.tmj"
     SKELETON_AMOUNT = 15
-    ARCHER_AMOUNT = 5
+    ARCHER_AMOUNT = 0
     SLIME_AMOUNT = 0
 
     def __init__(self):
@@ -70,6 +70,9 @@ class GameView(arcade.View):
         """
         return Vec2(self.camera.position.x + click_x, self.camera.position.y + click_y)
 
+    def get_enemy_array(self):
+        return self.enemy_array
+
     def on_draw(self):
         self.clear()
 
@@ -83,7 +86,7 @@ class GameView(arcade.View):
         self.weapon.draw()
 
     def on_update(self, delta_time: float):
-        self.player.update_player_speed(self.keyboard_state)
+        self.player.update_player_speed(self.keyboard_state, self.enemy_array)
         self.enemy_array.update()
         self.player.update_animation()
         self.enemy_array.update_animation()
@@ -105,8 +108,4 @@ class GameView(arcade.View):
         BULLET_PATH = "resources/bullet/0.png"
         world_pos = self.mouse_to_world_position(x, y)
         self.player_projectile_list.append(Projectile(
-            self.player.center_x, self.player.center_y, world_pos.x, world_pos.y, BULLET_PATH, 1))
-
-    def on_mouse_motion(self, x: int, y: int, dx: int, dy: int):
-        mouse_pos = self.mouse_to_world_position(x, y)
-        self.player.gun.update_weapon_angle(mouse_pos[0], mouse_pos[1])
+            self.weapon.center_x, self.weapon.center_y, world_pos.x, world_pos.y, BULLET_PATH, 1))

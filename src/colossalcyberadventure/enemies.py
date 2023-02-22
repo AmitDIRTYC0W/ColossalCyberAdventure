@@ -244,7 +244,9 @@ class Skeleton(AEnemy):
         Run this function every update of the window
 
         """
-        DISTANCE_OF_ATTACK = 60
+        DISTANCE_OF_ATTACK = 50
+        TOP_Y_DISTANCE_OF_ATTACK = 15
+        BOTTOM_Y_DISTANCE_OF_ATTACK = -130
 
         self.update_enemy_speed()
 
@@ -263,16 +265,17 @@ class Skeleton(AEnemy):
                 self.change_y = 0
                 self._state = self.animation_state.IDLE
 
-            distance_to_player = sqrt(
-                abs(self.center_x - self.player.center_x) ** 2 + abs(
-                    self.center_y - self.player.center_y) ** 2)
-
             if self.change_x != 0 or self.change_y != 0:
                 self._state = self.animation_state.WALK
             else:
-                if distance_to_player <= DISTANCE_OF_ATTACK and (self._state == self.animation_state.IDLE
-                                                                 or self._state == self.animation_state.ATTACK):
+                if (abs(self.player.center_x - self.left) <= DISTANCE_OF_ATTACK or
+                    abs(self.right - self.player.center_x) <= DISTANCE_OF_ATTACK) and\
+                    BOTTOM_Y_DISTANCE_OF_ATTACK <= self.center_y - self.player.center_y <= TOP_Y_DISTANCE_OF_ATTACK and\
+                        (self._state == self.animation_state.IDLE or self._state == self.animation_state.ATTACK):
                     self._state = self.animation_state.ATTACK
+                    if self.current_texture_index + 1 >= self._state.value[1] and \
+                            self.frame_counter + 1 > self.frames_per_texture:
+                        self.player.reduce_health(1)
 
             if self.change_x < 0:
                 self.direction = Direction.RIGHT

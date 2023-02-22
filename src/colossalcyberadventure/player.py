@@ -11,7 +11,6 @@ from constants import *
 from projectile import Projectile
 
 from src.colossalcyberadventure.healthbar import HealthBar
-from src.colossalcyberadventure.weapons import Weapon
 import arcade
 
 
@@ -96,7 +95,6 @@ class Player(arcade.Sprite, IEntity):
         self.current_texture_index = 0
         self.health_bar = HealthBar(self, 70, 5, 1, arcade.color.BLACK, arcade.color.RED)
         self.should_reset_sprite_counter = False
-        self.gun = Weapon(owner=self)
 
     def update_state(self, new_state: PlayerAnimationState):
         """Update the player state and reset counters
@@ -116,7 +114,6 @@ class Player(arcade.Sprite, IEntity):
     def draw(self, *, draw_filter=None, pixelated=None, blend_function=None):
         super().draw(filter=draw_filter, pixelated=pixelated, blend_function=blend_function)
         self.health_bar.draw()
-        self.gun.draw()
 
     def update_animation(self, delta_time: float = 1 / 60):
 
@@ -137,16 +134,15 @@ class Player(arcade.Sprite, IEntity):
         Run this function every update of the window
 
         """
-        BULLET_PATH = "resources/bullet/0.png"
-        SKILL_COOLDOWN = 100
+        # BULLET_PATH = "resources/bullet/0.png"
+        # SKILL_COOLDOWN = 100
 
         self.center_x += self.change_x
         self.center_y += self.change_y
 
         for projectile in self.enemy_projectile_list:
             if arcade.check_for_collision(self, projectile):
-                if self.health_bar.health_points > 0:
-                    self.health_bar.health_points -= 2
+                self.reduce_health(2)
                 # ToDo add death
                 projectile.remove_from_sprite_lists()
 
@@ -181,8 +177,6 @@ class Player(arcade.Sprite, IEntity):
     def get_direction(self):
         return self.direction
 
-        self.gun.update()
-
     def get_position(self) -> tuple[float, float]:
         """Returns the player position relative to the map in px
 
@@ -199,7 +193,7 @@ class Player(arcade.Sprite, IEntity):
         """
         return self.center_x, self.center_y
 
-    def update_player_speed(self, keyboard_state: dict[int, bool]):
+    def update_player_speed(self, keyboard_state: dict[int, bool], enemy_array):
         """Updates player change_x and change_y values and the player state
 
         Changes these values in accordance to the currently pressed keys.
@@ -227,6 +221,19 @@ class Player(arcade.Sprite, IEntity):
         movement_vec = movement_vec.normalize() * Vec2(Player.SPEED, Player.SPEED)
         self.change_x = movement_vec.x
         self.change_y = movement_vec.y
+        self.center_x += self.change_x
+        self.center_y += self.change_y
+
+        enemy_collisions = arcade.check_for_collision_with_list(self, enemy_array)
+
+        if len(enemy_collisions) >= 1:
+            self.reduce_health(0.2)
+            self.center_x -= self.change_x
+            self.center_y -= self.change_y
+            self.change_x = 0
+            self.change_y = 0
+        self.center_x -= self.change_x
+        self.center_y -= self.change_y
 
     def on_skill_1(self):
         PROJECTILE_PATH = "resources/bullet/0.png"
@@ -241,3 +248,7 @@ class Player(arcade.Sprite, IEntity):
                 self.player_projectile_list.append(
                     Projectile(self.center_x, self.center_y, directions[i][0], directions[i][1], PROJECTILE_PATH, 2))
             self.last_skill_use = self.real_time
+
+    def reduce_health(self, amount):
+        if self.health_bar.health_points > 0:
+            self.health_bar.health_points -= amount
