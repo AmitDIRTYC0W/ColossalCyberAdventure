@@ -1,4 +1,5 @@
 {
+    "onlyShowAdjacentMaps": True,
     "maps": [
         {
             "fileName": "0-0.tmx",
