@@ -9,7 +9,6 @@ import arcade.key as k
 from entity import IEntity
 from constants import *
 from projectile import Projectile
-from enemies import SkeletonAnimationState
 
 from src.colossalcyberadventure.healthbar import HealthBar
 from src.colossalcyberadventure.inventory import Inventory
@@ -82,7 +81,8 @@ class Player(arcade.Sprite, IEntity):
         if textures == TEXTURES_BASE:
             load_textures()
         self.real_time = time.localtime()
-        self.last_skill_use = self.real_time
+        self.last_skill_1_use = self.real_time
+        self.last_skill_2_use = self.real_time
         self.keyboard_state = keyboard_state
         self.player_projectile_list = player_projectile_list
         self.enemy_projectile_list = enemy_projectile_list
@@ -174,6 +174,9 @@ class Player(arcade.Sprite, IEntity):
         if self.keyboard_state[k.C]:
             self.on_skill_1()
 
+        if self.keyboard_state[k.H]:
+            self.on_skill_2()
+
     def get_state(self):
         return self._state
 
@@ -240,7 +243,7 @@ class Player(arcade.Sprite, IEntity):
 
     def on_skill_1(self):
         PROJECTILE_PATH = "resources/bullet/0.png"
-        if abs(self.real_time.tm_sec - self.last_skill_use.tm_sec) >= 2:
+        if abs(self.real_time.tm_sec - self.last_skill_1_use.tm_sec) >= 2:
             directions = [[self.center_x, self.center_y + 1], [self.center_x + 1, self.center_y + 1],
                           [self.center_x + 1, self.center_y], [self.center_x + 1, self.center_y - 1],
                           [self.center_x, self.center_y - 1], [self.center_x - 1, self.center_y - 1],
@@ -250,7 +253,17 @@ class Player(arcade.Sprite, IEntity):
             for i in range(8):
                 self.player_projectile_list.append(
                     Projectile(self.center_x, self.center_y, directions[i][0], directions[i][1], PROJECTILE_PATH, 2))
-            self.last_skill_use = self.real_time
+            self.last_skill_1_use = self.real_time
+
+    def on_skill_2(self):
+        if abs(self.real_time.tm_sec - self.last_skill_2_use.tm_sec) >= 5:
+            if self.health_bar.health_points <= 80:
+                self.health_bar.health_points += 20
+            elif self.health_bar.health_points <= 100:
+                self.health_bar.health_points = 100
+            else:
+                return
+            self.last_skill_2_use = self.real_time
 
     def reduce_health(self, amount):
         if self.health_bar.health_points > 0:

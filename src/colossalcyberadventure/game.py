@@ -35,7 +35,7 @@ class GameView(arcade.View):
     def __init__(self):
         super().__init__()
 
-        self.keyboard_state = {k.W: False, k.A: False, k.S: False, k.D: False, k.C: False}
+        self.keyboard_state = {k.W: False, k.A: False, k.S: False, k.D: False, k.C: False, k.H: False}
         self.player_projectile_list = SpriteList(use_spatial_hash=True)
         self.enemy_projectile_list = SpriteList(use_spatial_hash=True)
         self.inventory_state = False
