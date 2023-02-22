@@ -38,6 +38,9 @@ class GameView(arcade.View):
         self.keyboard_state = {k.W: False, k.A: False, k.S: False, k.D: False, k.C: False}
         self.player_projectile_list = SpriteList(use_spatial_hash=True)
         self.enemy_projectile_list = SpriteList(use_spatial_hash=True)
+        self.inventory_state = False
+        self.player_projectile_list = SpriteList()
+        self.enemy_projectile_list = SpriteList()
         self.player = Player(self.enemy_projectile_list, self.player_projectile_list, self.keyboard_state)
         #
         self.enemy_array = SpriteList(use_spatial_hash=True)
@@ -84,6 +87,8 @@ class GameView(arcade.View):
         self.player_projectile_list.draw()
         self.enemy_projectile_list.draw()
         self.weapon.draw()
+        if self.inventory_state:
+            self.player.inventory.draw()
 
     def on_update(self, delta_time: float):
         self.player.update_player_speed(self.keyboard_state, self.enemy_array)
@@ -95,17 +100,26 @@ class GameView(arcade.View):
         self.player_projectile_list.update()
         self.enemy_projectile_list.update()
         self.weapon.update()
+        self.player.inventory.update(self.camera.position.x, self.camera.position.y)
 
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol in self.keyboard_state.keys():
             self.keyboard_state[symbol] = True
+        if symbol == arcade.key.I:
+            self.inventory_state = not self.inventory_state
 
     def on_key_release(self, symbol: int, _modifiers: int):
         if symbol in self.keyboard_state.keys():
             self.keyboard_state[symbol] = False
 
     def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
+        if self.inventory_state:
+            return
         BULLET_PATH = "resources/bullet/0.png"
         world_pos = self.mouse_to_world_position(x, y)
         self.player_projectile_list.append(Projectile(
             self.weapon.center_x, self.weapon.center_y, world_pos.x, world_pos.y, BULLET_PATH, 1))
+
+    def on_mouse_motion(self, x: int, y: int, dx: int, dy: int):
+        mouse_pos = self.mouse_to_world_position(x, y)
+        self.player.gun.update_weapon_angle(mouse_pos[0], mouse_pos[1])
