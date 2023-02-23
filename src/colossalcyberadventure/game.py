@@ -102,6 +102,8 @@ class GameView(arcade.View):
         self.weapon.update()
         self.player.inventory.update(self.camera.position.x, self.camera.position.y)
 
+
+
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol in self.keyboard_state.keys():
             self.keyboard_state[symbol] = True
@@ -115,7 +117,9 @@ class GameView(arcade.View):
     def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
         world_pos = self.mouse_to_world_position(x, y)
         if self.inventory_state:
-            return
+            for item_slot in self.player.inventory.grid_sprite_list:
+                item_slot.is_touched(world_pos[0], world_pos[1])
+
         else:
             BULLET_PATH = "resources/bullet/0.png"
             self.player_projectile_list.append(Projectile(
