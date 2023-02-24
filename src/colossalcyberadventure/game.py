@@ -44,6 +44,7 @@ class GameView(arcade.View):
         self.world = parse_world(Path(GameView.WORLD_PATH))
         # y-x.tmx
         self.scene = arcade.Scene()
+        self.non_drawn_scene = arcade.Scene()
         map_world_x, map_world_y = floor(self.player.center_x / GameView.MAP_PARTIAL_WIDTH), floor(
             self.player.center_y / GameView.MAP_PARTIAL_HEIGHT
         )
@@ -55,7 +56,7 @@ class GameView(arcade.View):
 
     def get_scene_from_partial_tilemap(self, x, y):
         return arcade.Scene.from_tilemap(
-            # I know it looks like it should be y * WORLD_TILEMAP_WIDTH + x but IDGAF
+            # I know it looks like it should be y * WORLD_TILEMAP_WIDTH + x but IDGAF - i dont give a fuck?
             arcade.load_tilemap(self.world.maps[x * GameView.WORLD_TILEMAP_WIDTH + y].map_file, use_spatial_hash=True,
                                 offset=Vec2(x * GameView.MAP_PARTIAL_WIDTH, y * GameView.MAP_PARTIAL_HEIGHT)))
 
@@ -94,10 +95,15 @@ class GameView(arcade.View):
             for x in range(max(0, map_x - 1), min(GameView.WORLD_TILEMAP_WIDTH - 1, map_x + 2)):
                 key = f"{map_x + x}-{map_y + y}"
                 if not (key in self.maps_in_loading or key in self.scene.name_mapping.keys()):
+                    # if not (key in self.non_drawn_scene.name_mapping.keys()):
                     self.maps_in_loading.append(key)
                     t = Thread(target=load_map, args=(self, map_x + x, map_y + y))
                     t.start()
-
+        # print(len(self.scene.name_mapping.keys()))
+        # if len(self.scene.name_mapping.keys()) > 9:
+        # for key in self.scene.name_mapping.keys():
+                # print(key[0])
+            # print("potat")
         if self.keyboard_state[k.Q]:
             quit()
         self.bullet_list.update()
