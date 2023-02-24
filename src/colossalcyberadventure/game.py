@@ -93,13 +93,10 @@ class GameView(arcade.View):
         for y in range(max(0, map_y - 1), min(GameView.WORLD_TILEMAP_HEIGHT - 1, map_y + 2)):
             for x in range(max(0, map_x - 1), min(GameView.WORLD_TILEMAP_WIDTH - 1, map_x + 2)):
                 key = f"{map_x + x}-{map_y + y}"
-                print("maps in loading:", self.maps_in_loading, "name_mappings keys:", self.scene.name_mapping.keys())
                 if not (key in self.maps_in_loading or key in self.scene.name_mapping.keys()):
-                    print("starting thread", key)
                     self.maps_in_loading.append(key)
                     t = Thread(target=load_map, args=(self, map_x + x, map_y + y))
                     t.start()
-            print("-------------------")
 
         if self.keyboard_state[k.Q]:
             quit()
