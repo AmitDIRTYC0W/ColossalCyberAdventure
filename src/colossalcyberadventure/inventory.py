@@ -14,9 +14,6 @@ class ItemSlot(arcade.Sprite):
         self.alpha = 99
         self.touched_flag = False
 
-    def set_texture(self):
-        pass
-
     def is_touched(self, mouse_x, mouse_y):
         bottom_left_x = self.center_x - self.width / 2
         bottom_left_y = self.center_y - self.height / 2

@@ -278,7 +278,7 @@ class Skeleton(AEnemy):
                     self._state = self.animation_state.ATTACK
                     if self.current_texture_index + 1 >= self._state.value[1] and \
                             self.frame_counter + 1 > self.frames_per_texture:
-                        self.player.reduce_health(1)
+                        self.player.reduce_health(2)
 
             if self.change_x < 0:
                 self.direction = Direction.RIGHT
