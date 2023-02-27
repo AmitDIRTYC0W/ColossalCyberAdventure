@@ -50,14 +50,14 @@ class Inventory:
     def update(self, camera_x, camera_y):
         self.owner_x = self.owner.get_position()[0]
         self.owner_y = self.owner.get_position()[1]
-        self.center_x = camera_x + 1920 - (405 / 2)
-        self.center_y = camera_y + 1080 / 2
+        self.center_x = camera_x + constants.SCREEN_WIDTH - (405 / 2)
+        self.center_y = camera_y + constants.SCREEN_WIDTH / 2
         i = 0
         for row in range(ROW_COUNT):
             for column in range(COLUMN_COUNT):
                 x = column * (WIDTH + MARGIN) + (WIDTH / 2 + MARGIN)
-                y = row * (HEIGHT + MARGIN) + (HEIGHT / 2 + MARGIN)
-                self.grid_sprite_list[i].center_x = x + camera_x + constants.SCREEN_WIDTH - ((130 + MARGIN) * 3)
+                y = row * (HEIGHT + MARGIN) + (HEIGHT / 2 + MARGIN) + ((constants.SCREEN_HEIGHT/2) - (1.5*HEIGHT + MARGIN))
+                self.grid_sprite_list[i].center_x = x + camera_x + constants.SCREEN_WIDTH - ((WIDTH + MARGIN) * 3)
                 self.grid_sprite_list[i].center_y = y + camera_y
                 i += 1
         self.update_color()

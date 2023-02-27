@@ -92,7 +92,6 @@ class GameView(arcade.View):
         self.weapon.draw()
         if self.inventory_state:
             self.player.inventory.draw()
-            print(constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT)
 
     def on_update(self, delta_time: float):
         self.player.update_player_speed(self.keyboard_state, self.enemy_array)
