@@ -105,8 +105,6 @@ class GameView(arcade.View):
         self.weapon.update()
         self.player.inventory.update(self.camera.position.x, self.camera.position.y)
 
-
-
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol in self.keyboard_state.keys():
             self.keyboard_state[symbol] = True

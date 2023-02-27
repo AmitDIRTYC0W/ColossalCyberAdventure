@@ -56,7 +56,7 @@ class Inventory:
         for row in range(ROW_COUNT):
             for column in range(COLUMN_COUNT):
                 x = column * (WIDTH + MARGIN) + (WIDTH / 2 + MARGIN)
-                y = row * (HEIGHT + MARGIN) + (HEIGHT / 2 + MARGIN) + ((constants.SCREEN_HEIGHT/2) - (1.5*HEIGHT + MARGIN))
+                y = row * (HEIGHT + MARGIN) + (HEIGHT / 2 + MARGIN) + ((constants.SCREEN_HEIGHT/2) - (2*HEIGHT + MARGIN))
                 self.grid_sprite_list[i].center_x = x + camera_x + constants.SCREEN_WIDTH - ((WIDTH + MARGIN) * 3)
                 self.grid_sprite_list[i].center_y = y + camera_y
                 i += 1
