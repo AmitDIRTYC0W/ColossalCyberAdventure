@@ -17,3 +17,7 @@ MARGIN = 5
 # screen settings
 SCREEN_HEIGHT = 0
 SCREEN_WIDTH = 0
+
+#bot
+TARGET_X =0
+TARGET_Y = 0

@@ -1,3 +1,5 @@
+import random
+
 import arcade
 
 from arcade import SpriteList
@@ -40,6 +42,7 @@ class GameView(arcade.View):
         self.player_projectile_list = SpriteList(use_spatial_hash=True)
         self.enemy_projectile_list = SpriteList(use_spatial_hash=True)
         self.inventory_state = False
+        self.bot_on = False
         self.player_projectile_list = SpriteList()
         self.enemy_projectile_list = SpriteList()
         self.player = Player(self.enemy_projectile_list, self.player_projectile_list, self.keyboard_state)
@@ -92,8 +95,8 @@ class GameView(arcade.View):
         self.weapon.draw()
         if self.inventory_state:
             self.player.inventory.draw()
-            print(constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT)
-
+        if self.bot_on:
+            self.player.bot()
     def on_update(self, delta_time: float):
         self.player.update_player_speed(self.keyboard_state, self.enemy_array)
         self.enemy_array.update()
@@ -107,13 +110,13 @@ class GameView(arcade.View):
         self.player.inventory.update(self.camera.position.x, self.camera.position.y)
 
 
-
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol in self.keyboard_state.keys():
             self.keyboard_state[symbol] = True
         if symbol == arcade.key.I:
             self.inventory_state = not self.inventory_state
-
+        if symbol == arcade.key.B:
+            self.bot_on = not self.bot_on
     def on_key_release(self, symbol: int, _modifiers: int):
         if symbol in self.keyboard_state.keys():
             self.keyboard_state[symbol] = False

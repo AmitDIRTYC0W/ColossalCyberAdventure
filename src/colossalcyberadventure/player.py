@@ -1,3 +1,4 @@
+import random
 from enum import Enum
 
 from arcade import SpriteList
@@ -9,6 +10,7 @@ import arcade.key as k
 from entity import IEntity
 from constants import *
 from projectile import Projectile
+from src.colossalcyberadventure import constants
 
 from src.colossalcyberadventure.healthbar import HealthBar
 from src.colossalcyberadventure.inventory import Inventory
@@ -268,3 +270,30 @@ class Player(arcade.Sprite, IEntity):
     def reduce_health(self, amount):
         if self.health_bar.health_points > 0:
             self.health_bar.health_points -= amount
+
+    def auto_move(self,x_target, y_target):
+
+        print(TARGET_X)
+        x_diff = x_target - self.center_x
+        y_diff = y_target - self.center_y
+
+        random_vec = Vec2(x_diff, y_diff)
+        random_vec = random_vec.normalize() * Vec2(Player.SPEED, Player.SPEED)
+
+        self.change_x = random_vec.x
+        self.change_y = random_vec.y
+        self.center_x += self.change_x
+        self.center_y += self.change_y
+        if abs(x_diff) <= Player.SPEED:
+            print("reached")
+            constants.TARGET_X = random.randrange(0, MAP_WIDTH, 500)
+            constants.TARGET_Y = random.randrange(0, MAP_HEIGHT, 600)
+            self.auto_move(constants.TARGET_X,constants.TARGET_Y)
+
+    def bot(self):
+        if int(time.time()) % 5 == 0:
+            print("times up")
+            constants.TARGET_X = random.randrange(0,MAP_WIDTH,500)
+            constants.TARGET_Y = random.randrange(0,MAP_HEIGHT,600)
+            print(constants.TARGET_X)
+        self.auto_move(constants.TARGET_X,constants.TARGET_Y)
