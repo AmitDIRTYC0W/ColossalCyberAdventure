@@ -12,3 +12,8 @@ COLUMN_COUNT = 3
 WIDTH = 130
 HEIGHT = 130
 MARGIN = 5
+
+
+# screen settings
+SCREEN_HEIGHT = 0
+SCREEN_WIDTH = 0

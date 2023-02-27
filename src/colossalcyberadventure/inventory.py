@@ -2,6 +2,7 @@ import arcade
 
 from src.colossalcyberadventure.entity import IEntity
 from src.colossalcyberadventure.constants import *
+import constants
 
 
 class ItemSlot(arcade.Sprite):
@@ -56,7 +57,7 @@ class Inventory:
             for column in range(COLUMN_COUNT):
                 x = column * (WIDTH + MARGIN) + (WIDTH / 2 + MARGIN)
                 y = row * (HEIGHT + MARGIN) + (HEIGHT / 2 + MARGIN)
-                self.grid_sprite_list[i].center_x = x + camera_x + 1920 - ((130 + MARGIN) * 3)
+                self.grid_sprite_list[i].center_x = x + camera_x + constants.SCREEN_WIDTH - ((130 + MARGIN) * 3)
                 self.grid_sprite_list[i].center_y = y + camera_y
                 i += 1
         self.update_color()

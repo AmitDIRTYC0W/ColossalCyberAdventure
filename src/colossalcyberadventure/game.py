@@ -12,6 +12,7 @@ from src.colossalcyberadventure.player import Player
 from src.colossalcyberadventure.enemies import Skeleton
 from src.colossalcyberadventure.enemies import Archer
 from constants import *
+import constants
 
 
 class GameView(arcade.View):
@@ -53,6 +54,8 @@ class GameView(arcade.View):
         self.weapon = AWeapon(self.player)
 
         self.camera = GameCam(self.window.width, self.window.height, self.player)
+        constants.SCREEN_WIDTH = self.window.width
+        constants.SCREEN_HEIGHT = self.window.height
         self.map = arcade.load_tilemap(GameView.MAP_PATH, TILE_SCALING)
         self.scene = arcade.Scene.from_tilemap(self.map)
 
@@ -89,6 +92,7 @@ class GameView(arcade.View):
         self.weapon.draw()
         if self.inventory_state:
             self.player.inventory.draw()
+            print(constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT)
 
     def on_update(self, delta_time: float):
         self.player.update_player_speed(self.keyboard_state, self.enemy_array)
