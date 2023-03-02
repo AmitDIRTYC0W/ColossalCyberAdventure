@@ -135,8 +135,7 @@ class GameView(arcade.View):
     def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
         world_pos = self.mouse_to_world_position(x, y)
         if self.inventory_state:
-            for item_slot in self.player.inventory.grid_sprite_list:
-                item_slot.is_touched(world_pos[0], world_pos[1])
+            return
 
         else:
             BULLET_PATH = "resources/bullet/0.png"
