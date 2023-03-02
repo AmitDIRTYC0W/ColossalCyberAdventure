@@ -13,6 +13,7 @@ from projectile import Projectile
 from src.colossalcyberadventure.healthbar import HealthBar
 from src.colossalcyberadventure.inventory import Inventory
 import arcade
+import constants
 
 
 class PlayerAnimationState(Enum):
@@ -178,6 +179,9 @@ class Player(arcade.Sprite, IEntity):
 
         if self.keyboard_state[k.H]:
             self.on_skill_2()
+
+        constants.COIN_COUNTER = self.coin_count
+        constants.SHROOM_COUNTER = self.shroom_count
 
     def get_state(self):
         return self._state
