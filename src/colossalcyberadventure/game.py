@@ -1,3 +1,5 @@
+import random
+
 import arcade
 
 from arcade import SpriteList
@@ -11,6 +13,7 @@ from src.colossalcyberadventure.camera import GameCam
 from src.colossalcyberadventure.player import Player
 from src.colossalcyberadventure.enemies import Skeleton
 from src.colossalcyberadventure.enemies import Archer
+from src.colossalcyberadventure.item import Coin, HealthShroom
 from constants import *
 import constants
 
@@ -58,8 +61,19 @@ class GameView(arcade.View):
         constants.SCREEN_HEIGHT = self.window.height
         self.map = arcade.load_tilemap(GameView.MAP_PATH, TILE_SCALING)
         self.scene = arcade.Scene.from_tilemap(self.map)
+        self.coin_list = arcade.SpriteList()
+        self.shroom_list = arcade.SpriteList()
 
         arcade.set_background_color(GameView.BACKGROUND_COLOR)
+        for i in range(20):
+            x = random.randrange(MAP_WIDTH)
+            y = random.randrange(MAP_HEIGHT)
+            coin = Coin(x, y)
+            self.coin_list.append(coin)
+            x = random.randrange(MAP_WIDTH)
+            y = random.randrange(MAP_HEIGHT)
+            healthshroom = HealthShroom(x, y)
+            self.shroom_list.append(healthshroom)
 
     def mouse_to_world_position(self, click_x: float, click_y: float) -> Vec2:
         """Converts the position of a click to the actual world position
@@ -90,6 +104,8 @@ class GameView(arcade.View):
         self.player_projectile_list.draw()
         self.enemy_projectile_list.draw()
         self.weapon.draw()
+        self.coin_list.draw()
+        self.shroom_list.draw()
         if self.inventory_state:
             self.player.inventory.draw()
 
@@ -104,6 +120,7 @@ class GameView(arcade.View):
         self.enemy_projectile_list.update()
         self.weapon.update()
         self.player.inventory.update(self.camera.position.x, self.camera.position.y)
+        self.player.check_collision_with_items(self.coin_list, self.shroom_list)
 
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol in self.keyboard_state.keys():

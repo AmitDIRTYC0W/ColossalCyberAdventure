@@ -98,6 +98,8 @@ class Player(arcade.Sprite, IEntity):
         self.health_bar = HealthBar(self, 70, 5, 1, arcade.color.BLACK, arcade.color.RED)
         self.should_reset_sprite_counter = False
         self.inventory = Inventory(owner=self)
+        self.coin_count = 3
+        self.shroom_count = 1
 
     def update_state(self, new_state: PlayerAnimationState):
         """Update the player state and reset counters
@@ -268,3 +270,13 @@ class Player(arcade.Sprite, IEntity):
     def reduce_health(self, amount):
         if self.health_bar.health_points > 0:
             self.health_bar.health_points -= amount
+
+    def check_collision_with_items(self, coin_list: arcade.sprite_list, healthshroom_list: arcade.sprite_list):
+        coins_hit_list = arcade.check_for_collision_with_list(self, coin_list)
+        shroom_hit_list = arcade.check_for_collision_with_list(self, healthshroom_list)
+        self.coin_count += len(coins_hit_list)
+        self.shroom_count += len(shroom_hit_list)
+        for coin in coins_hit_list:
+            coin.remove_from_sprite_lists()
+        for shroom in shroom_hit_list:
+            shroom.remove_from_sprite_lists()
