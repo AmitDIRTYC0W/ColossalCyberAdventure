@@ -41,7 +41,7 @@ class GameView(arcade.View):
     def __init__(self):
         super().__init__()
 
-        self.keyboard_state = {k.W: False, k.A: False, k.S: False, k.D: False, k.C: False, k.H: False}
+        self.keyboard_state = {k.W: False, k.A: False, k.S: False, k.D: False, k.C: False, k.H: False, k.Q: False, k.I: False}
         self.player_projectile_list = SpriteList(use_spatial_hash=True)
         self.enemy_projectile_list = SpriteList(use_spatial_hash=True)
         self.inventory_state = False
@@ -117,8 +117,7 @@ class GameView(arcade.View):
         self.enemy_array.update()
         if self.keyboard_state[k.Q]:
             quit()
-        self.bullet_list.update()
-        self.player.update_player_speed(self.keyboard_state)
+        self.player.update_player_speed(self.keyboard_state, self.enemy_array)
         self.player.update_animation()
         self.enemy_array.update_animation()
         self.player.update()
