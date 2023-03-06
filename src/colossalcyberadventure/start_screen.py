@@ -9,7 +9,7 @@ class StartScreenView(arcade.View):
 
     BUTTON_WIDTH = 200
     IP_LABEL_WIDTH = 30
-    BUTTON_SPACING = 20
+    BUTTON_SPACING = 30
 
     def __init__(self):
         super().__init__()
@@ -24,7 +24,6 @@ class StartScreenView(arcade.View):
 
         # Create a vertical BoxGroup to align buttons
         self.v_box = arcade.gui.UIBoxLayout()
-
         # Create the buttons
         start_button = arcade.gui.UIFlatButton(text="Start Game", width=StartScreenView.BUTTON_WIDTH)
         self.v_box.add(start_button.with_padding(bottom=StartScreenView.BUTTON_SPACING))

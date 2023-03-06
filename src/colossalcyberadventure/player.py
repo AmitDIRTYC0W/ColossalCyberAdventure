@@ -1,30 +1,37 @@
+import time
 from enum import Enum
 
+import arcade
+import arcade.key as k
+from arcade import SpriteList
 from pyglet.math import Vec2
 
+from constants import *
+from entity import IEntity
+from projectile import Projectile
 from entity import IEntity
 from globals import *
 
 from src.colossalcyberadventure.healthbar import HealthBar
-import arcade
+from src.colossalcyberadventure.inventory import Inventory
+from src.colossalcyberadventure.item import Coin
+from src.colossalcyberadventure.item import HealthShroom
 
 
 class PlayerAnimationState(Enum):
     """Holds the path inside the resources folder and the amount of frames in the animation"""
-    IDLE = ("idle", 1)
+    IDLE = ("idle", 8)
     WALK = ("walk", 8)
 
 
 class Direction(Enum):
-    DOWN = "down"
-    UP = "up"
     LEFT = "left"
     RIGHT = "right"
 
 
 TEXTURES_BASE = {
-    PlayerAnimationState.IDLE: {Direction.LEFT: [], Direction.RIGHT: [], Direction.UP: [], Direction.DOWN: []},
-    PlayerAnimationState.WALK: {Direction.LEFT: [], Direction.RIGHT: [], Direction.UP: [], Direction.DOWN: []}}
+    PlayerAnimationState.IDLE: {Direction.LEFT: [], Direction.RIGHT: []},
+    PlayerAnimationState.WALK: {Direction.LEFT: [], Direction.RIGHT: []}}
 
 textures = TEXTURES_BASE
 
@@ -39,11 +46,14 @@ def load_textures():
     -------
 
     """
-    for direction in Direction:
-        for state in PlayerAnimationState:
-            for i in range(state.value[1]):
-                tex = arcade.load_texture(f"resources/player/{direction.value}/{state.value[0]}/{i}.png")
-                textures[state][direction].append(tex)
+    for state in PlayerAnimationState:
+        textures[state] = {}
+        textures[state][Direction.RIGHT] = []
+        textures[state][Direction.LEFT] = []
+        for i in range(state.value[1]):
+            tex_left, tex_right = arcade.load_texture_pair(f"resources/player/{state.value[0]}/{i}.png")
+            textures[state][Direction.RIGHT].append(tex_left)
+            textures[state][Direction.LEFT].append(tex_right)
 
 
 class Player(arcade.Sprite, IEntity):
@@ -63,25 +73,37 @@ class Player(arcade.Sprite, IEntity):
         What frame number the animation is in
     """
 
-    SPRITE_SCALE = 3
+    SPRITE_SCALE = 2
 
     SPEED = 7
     FRAMES_PER_TEXTURE = 5
 
-    def __init__(self):
+    def __init__(self, enemy_projectile_list: SpriteList, player_projectile_list: SpriteList, item_array: SpriteList,
+                 keyboard_state: dict[int, bool]):
         super().__init__(scale=Player.SPRITE_SCALE)
         if textures == TEXTURES_BASE:
             load_textures()
         self.center_x = 30
         self.center_y = 30
+        self.real_time = time.localtime()
+        self.last_skill_1_use = self.real_time
+        self.last_skill_2_use = self.real_time
+        self.keyboard_state = keyboard_state
+        self.player_projectile_list = player_projectile_list
+        self.enemy_projectile_list = enemy_projectile_list
         self.delta_change_x = 0
         self.delta_change_y = 0
         self._state = PlayerAnimationState.IDLE
-        self.direction = Direction.DOWN
+        self.direction = Direction.RIGHT
         self.texture = textures[PlayerAnimationState.IDLE][self.direction][0]
         self.frame_counter = 0
         self.current_texture_index = 0
         self.health_bar = HealthBar(self, 70, 5, 1, arcade.color.BLACK, arcade.color.RED)
+        self.should_reset_sprite_counter = False
+        self.item_array = item_array
+        self.coin_counter = 0
+        self.health_shroom_counter = 0
+        self.inventory = Inventory(self.coin_counter, self.health_shroom_counter, self, owner=self)
 
     def update_state(self, new_state: PlayerAnimationState):
         """Update the player state and reset counters
@@ -103,12 +125,17 @@ class Player(arcade.Sprite, IEntity):
         self.health_bar.draw()
 
     def update_animation(self, delta_time: float = 1 / 60):
+
+        if self.frame_counter == 0 or self.should_reset_sprite_counter:
+            self.frame_counter = 0
+            self.current_texture_index += 1
+            if self.current_texture_index >= self._state.value[1] or self.should_reset_sprite_counter:
+                self.current_texture_index = 0
+            self.should_reset_sprite_counter = False
+            self.texture = textures[self._state][self.direction][self.current_texture_index]
+
         self.frame_counter += 1
         if self.frame_counter > Player.FRAMES_PER_TEXTURE:
-            self.current_texture_index += 1
-            if self.current_texture_index >= self._state.value[1]:
-                self.current_texture_index = 0
-            self.texture = textures[self._state][self.direction][self.current_texture_index]
             self.frame_counter = 0
 
     def update(self):
@@ -119,15 +146,20 @@ class Player(arcade.Sprite, IEntity):
         self.center_x += self.change_x
         self.center_y += self.change_y
 
-        if self.change_y < 0:
-            self.direction = Direction.DOWN
-        elif self.change_y > 0:
-            self.direction = Direction.UP
+        for projectile in self.enemy_projectile_list:
+            if arcade.check_for_collision(self, projectile):
+                self.reduce_health(1)
+                # ToDo add death
+                projectile.remove_from_sprite_lists()
 
+        old_direction = self.direction
         if self.change_x < 0:
             self.direction = Direction.LEFT
         elif self.change_x > 0:
             self.direction = Direction.RIGHT
+
+        if old_direction != self.direction:
+            self.should_reset_sprite_counter = True
 
         if self.left < 0:
             self.left = 0
@@ -140,6 +172,21 @@ class Player(arcade.Sprite, IEntity):
             self.top = map_height - 1
 
         self.health_bar.update()
+        self.real_time = time.localtime()
+
+        if self.keyboard_state[k.C]:
+            self.on_skill_1()
+
+        if self.keyboard_state[k.H]:
+            self.on_skill_2()
+
+        self.check_collision_with_items()
+
+    def get_state(self):
+        return self._state
+
+    def get_direction(self):
+        return self.direction
 
     def get_position(self) -> tuple[float, float]:
         """Returns the player position relative to the map in px
@@ -157,7 +204,7 @@ class Player(arcade.Sprite, IEntity):
         """
         return self.center_x, self.center_y
 
-    def update_player_speed(self, keyboard_state: dict[int, bool]):
+    def update_player_speed(self, keyboard_state: dict[int, bool], enemy_array):
         """Updates player change_x and change_y values and the player state
 
         Changes these values in accordance to the currently pressed keys.
@@ -165,7 +212,7 @@ class Player(arcade.Sprite, IEntity):
         """
         movement_vec = Vec2(0, 0)
 
-        if True in keyboard_state.values():
+        if keyboard_state[k.A] or keyboard_state[k.D]:
             new_state = PlayerAnimationState.WALK
         else:
             new_state = PlayerAnimationState.IDLE
@@ -173,15 +220,68 @@ class Player(arcade.Sprite, IEntity):
         if new_state != self._state:
             self.update_state(new_state)
 
-        if keyboard_state[arcade.key.W] and not keyboard_state[arcade.key.S]:
+        if keyboard_state[k.W] and not keyboard_state[k.S]:
             movement_vec.y = 1
-        elif keyboard_state[arcade.key.S] and not keyboard_state[arcade.key.W]:
+        elif keyboard_state[k.S] and not keyboard_state[k.W]:
             movement_vec.y = -1
-        if keyboard_state[arcade.key.A] and not keyboard_state[arcade.key.D]:
+        if keyboard_state[k.A] and not keyboard_state[k.D]:
             movement_vec.x = -1
-        elif keyboard_state[arcade.key.D] and not keyboard_state[arcade.key.A]:
+        elif keyboard_state[k.D] and not keyboard_state[k.A]:
             movement_vec.x = 1
 
         movement_vec = movement_vec.normalize() * Player.SPEED
         self.change_x = movement_vec.x
         self.change_y = movement_vec.y
+        self.center_x += self.change_x
+        self.center_y += self.change_y
+
+        enemy_collisions = arcade.check_for_collision_with_list(self, enemy_array)
+
+        if len(enemy_collisions) >= 1:
+            self.reduce_health(0.2)
+            self.center_x -= self.change_x
+            self.center_y -= self.change_y
+            self.change_x = 0
+            self.change_y = 0
+        self.center_x -= self.change_x
+        self.center_y -= self.change_y
+
+    def on_skill_1(self):
+        PROJECTILE_PATH = "resources/bullet/0.png"
+        if abs(self.real_time.tm_sec - self.last_skill_1_use.tm_sec) >= 2:
+            directions = [[self.center_x, self.center_y + 1], [self.center_x + 1, self.center_y + 1],
+                          [self.center_x + 1, self.center_y], [self.center_x + 1, self.center_y - 1],
+                          [self.center_x, self.center_y - 1], [self.center_x - 1, self.center_y - 1],
+                          [self.center_x - 1, self.center_y], [self.center_x - 1, self.center_y + 1]
+                          ]
+
+            for i in range(8):
+                self.player_projectile_list.append(
+                    Projectile(self.center_x, self.center_y, directions[i][0], directions[i][1], PROJECTILE_PATH, 2))
+            self.last_skill_1_use = self.real_time
+
+    def on_skill_2(self):
+        if abs(self.real_time.tm_sec - self.last_skill_2_use.tm_sec) >= 5:
+            if self.health_bar.health_points <= 80:
+                self.health_bar.health_points += 20
+            elif self.health_bar.health_points <= 100:
+                self.health_bar.health_points = 100
+            else:
+                return
+            self.last_skill_2_use = self.real_time
+
+    def reduce_health(self, amount):
+        if self.health_bar.health_points > 0:
+            self.health_bar.health_points -= amount
+
+    def check_collision_with_items(self):
+        item_collided_list = arcade.check_for_collision_with_list(self, self.item_array)
+        for item in item_collided_list:
+            if isinstance(item, Coin):
+                self.coin_counter += 1
+            if isinstance(item, HealthShroom):
+                self.health_shroom_counter += 1
+            item.remove_from_sprite_lists()
+
+    def get_item_counter(self):
+        return self.coin_counter, self.health_shroom_counter
