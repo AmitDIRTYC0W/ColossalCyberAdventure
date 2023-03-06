@@ -1,0 +1,98 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "example.tmx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "fileStates": {
+        "0-0.tmx": {
+            "scale": 0.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 19186,
+                "y": -10350
+            }
+        },
+        "2-0.tmx": {
+            "scale": 0.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 19186,
+                "y": -9262
+            }
+        },
+        "[A]Water_pipo.tsx": {
+            "scaleInDock": 1
+        },
+        "[Base]BaseChip_pipo.tsx": {
+            "scaleInDock": 1
+        },
+        "example.tmx": {
+            "scale": 1,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 549,
+                "y": 326
+            }
+        },
+        "example1.tmx": {
+            "scale": 1.5,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 480,
+                "y": 270.6666666666667
+            }
+        },
+        "example1tmx.tmx": {
+            "scale": 1,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 508,
+                "y": 308
+            }
+        },
+        "example2.tmx": {
+            "scale": 1,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 473,
+                "y": 139
+            }
+        },
+        "example3.tmx": {
+            "scale": 1,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 298,
+                "y": 324
+            }
+        },
+        "example4.tmx": {
+            "scale": 1,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 386,
+                "y": 294
+            }
+        }
+    },
+    "loadedWorlds": [
+        "C:/Users/yotam/Desktop/ColossalCyberAdventure/src/scripts/resources/map/map.world"
+    ],
+    "map.height": 17,
+    "map.lastUsedFormat": "tmx",
+    "openFiles": [
+        "0-0.tmx",
+        "2-0.tmx",
+        "example.tmx"
+    ],
+    "project": "untitled.tiled-project",
+    "recentFiles": [
+        "0-0.tmx",
+        "2-0.tmx",
+        "example.tmx"
+    ]
+}
