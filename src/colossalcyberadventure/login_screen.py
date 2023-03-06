@@ -31,16 +31,14 @@ class LoginScreenView(arcade.View):
         # Create ip field
         username_h_box = arcade.gui.UIBoxLayout(vertical=False)
         username_label = arcade.gui.UILabel(text="Username: ", width=LoginScreenView.BUTTON_LABEL_WIDTH)
-        username_field = arcade.gui.UIBorder(child=arcade.gui.UIInputText
-        (width=LoginScreenView.BUTTON_WIDTH, height=40))
+        username_field = arcade.gui.UIBorder(child=arcade.gui.UIInputText(width=LoginScreenView.BUTTON_WIDTH, height=40))
         username_h_box.add(username_label)
         username_h_box.add(username_field)
         self.v_box.add(username_h_box.with_space_around(bottom=LoginScreenView.BUTTON_SPACING))
 
         password_h_box = arcade.gui.UIBoxLayout(vertical=False)
         password_label = arcade.gui.UILabel(text="Password: ", width=LoginScreenView.BUTTON_LABEL_WIDTH)
-        password_field = arcade.gui.UIBorder(child=arcade.gui.UIInputText
-        (width=LoginScreenView.BUTTON_WIDTH, height=40))
+        password_field = arcade.gui.UIBorder(child=arcade.gui.UIInputText(width=LoginScreenView.BUTTON_WIDTH, height=40))
         password_h_box.add(password_label)
         password_h_box.add(password_field)
         self.v_box.add(password_h_box.with_space_around(bottom=LoginScreenView.BUTTON_SPACING))

@@ -1,6 +1,6 @@
 from math import atan2, degrees
-
 from math import sqrt
+
 import arcade
 from pyglet.math import Vec2
 

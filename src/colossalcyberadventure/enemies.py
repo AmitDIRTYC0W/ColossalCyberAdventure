@@ -1,16 +1,15 @@
-from enum import Enum
 import random
+from enum import Enum
 from math import sqrt
 
+import arcade
 from arcade import SpriteList
 from pyglet.math import Vec2
 
-from entity import IEntity
 from constants import *
-from projectile import Projectile
+from entity import IEntity
 from player import Player
-
-import arcade
+from projectile import Projectile
 
 
 class SkeletonAnimationState(Enum):
@@ -272,8 +271,9 @@ class Skeleton(AEnemy):
                 self._state = self.animation_state.WALK
             else:
                 if (abs(self.player.center_x - self.left) <= DISTANCE_OF_ATTACK or
-                    abs(self.right - self.player.center_x) <= DISTANCE_OF_ATTACK) and\
-                    BOTTOM_Y_DISTANCE_OF_ATTACK <= self.center_y - self.player.center_y <= TOP_Y_DISTANCE_OF_ATTACK and\
+                    abs(self.right - self.player.center_x) <= DISTANCE_OF_ATTACK) and \
+                        BOTTOM_Y_DISTANCE_OF_ATTACK <= self.center_y - \
+                        self.player.center_y <= TOP_Y_DISTANCE_OF_ATTACK and \
                         (self._state == self.animation_state.IDLE or self._state == self.animation_state.ATTACK):
                     self._state = self.animation_state.ATTACK
                     if self.current_texture_index + 1 >= self._state.value[1] and \
