@@ -1,18 +1,21 @@
+import random
+
 import arcade
-
-from arcade import SpriteList
-from pyglet.math import Vec2
 import arcade.gui
+from arcade import SpriteList
 from arcade import key as k
+from pyglet.math import Vec2
 
-from src.colossalcyberadventure.weapon import AWeapon
-from src.colossalcyberadventure.projectile import Projectile
-from src.colossalcyberadventure.camera import GameCam
-from src.colossalcyberadventure.player import Player
-from src.colossalcyberadventure.enemies import Skeleton
-from src.colossalcyberadventure.enemies import Archer
-from constants import *
 import constants
+from constants import *
+from src.colossalcyberadventure.camera import GameCam
+from src.colossalcyberadventure.enemies import Archer
+from src.colossalcyberadventure.enemies import Skeleton
+from src.colossalcyberadventure.item import Coin
+from src.colossalcyberadventure.item import HealthShroom
+from src.colossalcyberadventure.player import Player
+from src.colossalcyberadventure.projectile import Projectile
+from src.colossalcyberadventure.weapon import AWeapon
 
 
 class GameView(arcade.View):
@@ -32,6 +35,8 @@ class GameView(arcade.View):
     SKELETON_AMOUNT = 15
     ARCHER_AMOUNT = 0
     SLIME_AMOUNT = 0
+    COIN_AMOUNT = 10
+    HEALTH_SHROOM_AMOUNT = 10
 
     def __init__(self):
         super().__init__()
@@ -42,7 +47,20 @@ class GameView(arcade.View):
         self.inventory_state = False
         self.player_projectile_list = SpriteList()
         self.enemy_projectile_list = SpriteList()
-        self.player = Player(self.enemy_projectile_list, self.player_projectile_list, self.keyboard_state)
+        self.item_array = arcade.SpriteList()
+
+        for i in range(GameView.COIN_AMOUNT):
+            x = random.randrange(MAP_WIDTH)
+            y = random.randrange(MAP_HEIGHT)
+            coin = Coin(x, y)
+            self.item_array.append(coin)
+        for i in range(GameView.HEALTH_SHROOM_AMOUNT):
+            x = random.randrange(MAP_WIDTH)
+            y = random.randrange(MAP_HEIGHT)
+            healthshroom = HealthShroom(x, y)
+            self.item_array.append(healthshroom)
+        self.player = Player(self.enemy_projectile_list, self.player_projectile_list, self.item_array,
+                             self.keyboard_state)
         #
         self.enemy_array = SpriteList(use_spatial_hash=True)
         for i in range(GameView.SKELETON_AMOUNT):
@@ -90,6 +108,7 @@ class GameView(arcade.View):
         self.player_projectile_list.draw()
         self.enemy_projectile_list.draw()
         self.weapon.draw()
+        self.item_array.draw()
         if self.inventory_state:
             self.player.inventory.draw()
 
@@ -122,8 +141,7 @@ class GameView(arcade.View):
     def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
         world_pos = self.mouse_to_world_position(x, y)
         if self.inventory_state:
-            for item_slot in self.player.inventory.grid_sprite_list:
-                item_slot.is_touched(world_pos[0], world_pos[1])
+            return
 
         else:
             BULLET_PATH = "resources/bullet/0.png"

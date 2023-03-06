@@ -1,18 +1,18 @@
+import time
 from enum import Enum
 
+import arcade
+import arcade.key as k
 from arcade import SpriteList
 from pyglet.math import Vec2
 
-import time
-import arcade.key as k
-
-from entity import IEntity
 from constants import *
+from entity import IEntity
 from projectile import Projectile
-
 from src.colossalcyberadventure.healthbar import HealthBar
 from src.colossalcyberadventure.inventory import Inventory
-import arcade
+from src.colossalcyberadventure.item import Coin
+from src.colossalcyberadventure.item import HealthShroom
 
 
 class PlayerAnimationState(Enum):
@@ -75,7 +75,7 @@ class Player(arcade.Sprite, IEntity):
     SPEED = 7
     FRAMES_PER_TEXTURE = 5
 
-    def __init__(self, enemy_projectile_list: SpriteList, player_projectile_list: SpriteList,
+    def __init__(self, enemy_projectile_list: SpriteList, player_projectile_list: SpriteList, item_array: SpriteList,
                  keyboard_state: dict[int, bool]):
         super().__init__(scale=Player.SPRITE_SCALE)
         if textures == TEXTURES_BASE:
@@ -97,7 +97,10 @@ class Player(arcade.Sprite, IEntity):
         self.current_texture_index = 0
         self.health_bar = HealthBar(self, 70, 5, 1, arcade.color.BLACK, arcade.color.RED)
         self.should_reset_sprite_counter = False
-        self.inventory = Inventory(owner=self)
+        self.item_array = item_array
+        self.coin_counter = 0
+        self.health_shroom_counter = 0
+        self.inventory = Inventory(self.coin_counter, self.health_shroom_counter, self, owner=self)
 
     def update_state(self, new_state: PlayerAnimationState):
         """Update the player state and reset counters
@@ -176,6 +179,8 @@ class Player(arcade.Sprite, IEntity):
 
         if self.keyboard_state[k.H]:
             self.on_skill_2()
+
+        self.check_collision_with_items()
 
     def get_state(self):
         return self._state
@@ -268,3 +273,15 @@ class Player(arcade.Sprite, IEntity):
     def reduce_health(self, amount):
         if self.health_bar.health_points > 0:
             self.health_bar.health_points -= amount
+
+    def check_collision_with_items(self):
+        item_collided_list = arcade.check_for_collision_with_list(self, self.item_array)
+        for item in item_collided_list:
+            if isinstance(item, Coin):
+                self.coin_counter += 1
+            if isinstance(item, HealthShroom):
+                self.health_shroom_counter += 1
+            item.remove_from_sprite_lists()
+
+    def get_item_counter(self):
+        return self.coin_counter, self.health_shroom_counter
