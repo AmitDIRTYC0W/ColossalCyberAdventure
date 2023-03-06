@@ -32,8 +32,8 @@ class GameView(arcade.View):
 
     BACKGROUND_COLOR = arcade.color.JET
     MAP_PATH = "resources/map/map.tmj"
-    SKELETON_AMOUNT = 15
-    ARCHER_AMOUNT = 0
+    SKELETON_AMOUNT = 10
+    ARCHER_AMOUNT = 5
     SLIME_AMOUNT = 0
     COIN_AMOUNT = 10
     HEALTH_SHROOM_AMOUNT = 10

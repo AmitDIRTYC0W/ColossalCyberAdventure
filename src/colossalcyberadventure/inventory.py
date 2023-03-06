@@ -59,18 +59,20 @@ class Inventory:
         self.player_indicator.center_y = camera_y + constants.SCREEN_HEIGHT / 2 - (constants.HEIGHT + MARGIN)
 
     def draw(self):
-        self.coins_indicator.draw()
-        arcade.draw_text(f"X{self.coin_counter}",
-                         start_x=self.coins_indicator.center_x + 100 / 2,
-                         start_y=self.coins_indicator.center_y - 110 / 2,
-                         bold=True,
-                         font_size=15)
-        self.shroom_indicator.draw()
-        arcade.draw_text(f"X{self.health_shroom_counter}",
-                         start_x=self.shroom_indicator.center_x + 100 / 2,
-                         start_y=self.shroom_indicator.center_y - 110 / 2,
-                         bold=True,
-                         font_size=15)
+        if self.coin_counter != 0:
+            self.coins_indicator.draw()
+            arcade.draw_text(f"X{self.coin_counter}",
+                             start_x=self.coins_indicator.center_x + 100 / 2,
+                             start_y=self.coins_indicator.center_y - 110 / 2,
+                             bold=True,
+                             font_size=15)
+        if self.health_shroom_counter != 0:
+            self.shroom_indicator.draw()
+            arcade.draw_text(f"X{self.health_shroom_counter}",
+                             start_x=self.shroom_indicator.center_x + 100 / 2,
+                             start_y=self.shroom_indicator.center_y - 110 / 2,
+                             bold=True,
+                             font_size=15)
         self.player_indicator.draw()
         arcade.draw_text(f"YOU:",
                          start_x=self.player_indicator.center_x - 130 / 2,
