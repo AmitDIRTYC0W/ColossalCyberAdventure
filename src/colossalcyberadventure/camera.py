@@ -1,16 +1,27 @@
+from typing import List
+
 import arcade.camera
+from arcade import SpriteList, Sprite
 from pyglet.math import Vec2
+from pytiled_parser.tiled_object import Point
 
 from constants import *
+import constants
 
 
 class GameCam(arcade.camera.Camera):
 
-    def __init__(self, width, height, player):
-        super().__init__(width, height)
+    def __init__(self, player):
+        super().__init__()
+        constants.SCREEN_WIDTH = self.viewport_width
+        constants.SCREEN_HEIGHT = self.viewport_height
+
         self.player = player
 
-    def zoom(self, change: float):
+    def zoom(self):
+        pass
+
+    def get_sprites_at_point(self, point: "Point", sprite_list: "SpriteList") -> List["Sprite"]:
         pass
 
     def center_camera_on_player(self):

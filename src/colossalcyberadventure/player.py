@@ -1,14 +1,16 @@
 import time
 from enum import Enum
+from math import floor
 
 import arcade
 import arcade.key as k
 from arcade import SpriteList
 from pyglet.math import Vec2
 
-from constants import *
-from entity import IEntity
 from projectile import Projectile
+from entity import IEntity
+from constants import *
+
 from src.colossalcyberadventure.healthbar import HealthBar
 from src.colossalcyberadventure.inventory import Inventory
 from src.colossalcyberadventure.item import Coin
@@ -72,24 +74,25 @@ class Player(arcade.Sprite, IEntity):
 
     SPRITE_SCALE = 2
 
-    SPEED = 7
+    SPEED = 5
     FRAMES_PER_TEXTURE = 5
 
     def __init__(self, enemy_projectile_list: SpriteList, player_projectile_list: SpriteList, item_array: SpriteList,
-                 keyboard_state: dict[int, bool]):
-        super().__init__(scale=Player.SPRITE_SCALE)
+                 keyboard_state: dict[int, bool], scene: arcade.Scene):
+        super().__init__(scale=Player.SPRITE_SCALE, path_or_texture="resources/player/idle/0.png")
         if textures == TEXTURES_BASE:
             load_textures()
+        self.center_x = 30
+        self.center_y = 30
         self.real_time = time.localtime()
         self.last_skill_1_use = self.real_time
         self.last_skill_2_use = self.real_time
         self.keyboard_state = keyboard_state
         self.player_projectile_list = player_projectile_list
         self.enemy_projectile_list = enemy_projectile_list
-        self.center_x = MAP_WIDTH // 2
-        self.center_y = MAP_HEIGHT // 2
         self.delta_change_x = 0
         self.delta_change_y = 0
+        self.scene = scene
         self._state = PlayerAnimationState.IDLE
         self.direction = Direction.RIGHT
         self.texture = textures[PlayerAnimationState.IDLE][self.direction][0]
@@ -120,6 +123,7 @@ class Player(arcade.Sprite, IEntity):
     def draw(self, *, draw_filter=None, pixelated=None, blend_function=None):
         super().draw(filter=draw_filter, pixelated=pixelated, blend_function=blend_function)
         self.health_bar.draw()
+        self.draw_hit_box()
 
     def update_animation(self, delta_time: float = 1 / 60):
 
@@ -130,6 +134,7 @@ class Player(arcade.Sprite, IEntity):
                 self.current_texture_index = 0
             self.should_reset_sprite_counter = False
             self.texture = textures[self._state][self.direction][self.current_texture_index]
+            self.set_hit_box(self.texture.hit_box_points)
 
         self.frame_counter += 1
         if self.frame_counter > Player.FRAMES_PER_TEXTURE:
@@ -140,9 +145,6 @@ class Player(arcade.Sprite, IEntity):
         Run this function every update of the window
 
         """
-        # BULLET_PATH = "resources/bullet/0.png"
-        # SKILL_COOLDOWN = 100
-
         self.center_x += self.change_x
         self.center_y += self.change_y
 
@@ -170,6 +172,15 @@ class Player(arcade.Sprite, IEntity):
             self.bottom = 0
         if self.top > MAP_HEIGHT - 1:
             self.top = MAP_HEIGHT - 1
+
+        # collisions_obstacles = arcade.check_for_collision_with_list(self, self.scene[
+        #     f"{floor(self.center_x / SINGLE_MAP_WIDTH)}-{floor(self.center_y / SINGLE_MAP_HEIGHT)}:obstacles"])
+        # collisions_water = arcade.check_for_collision_with_list(self, self.scene[
+        #     f"{floor(self.center_x / SINGLE_MAP_WIDTH)}-{floor(self.center_y / SINGLE_MAP_HEIGHT)}:water"])
+        #
+        # if len(collisions_obstacles) > 0 or len(collisions_water) > 0:
+        #     self.center_x -= self.change_x
+        #     self.center_x -= self.change_y
 
         self.health_bar.update()
         self.real_time = time.localtime()
@@ -229,7 +240,7 @@ class Player(arcade.Sprite, IEntity):
         elif keyboard_state[k.D] and not keyboard_state[k.A]:
             movement_vec.x = 1
 
-        movement_vec = movement_vec.normalize() * Vec2(Player.SPEED, Player.SPEED)
+        movement_vec = movement_vec.normalize() * Player.SPEED
         self.change_x = movement_vec.x
         self.change_y = movement_vec.y
         self.center_x += self.change_x

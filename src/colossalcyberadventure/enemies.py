@@ -135,6 +135,7 @@ class AEnemy(arcade.Sprite, IEntity):
             if self.current_texture_index >= self._state.value[1]:
                 self.current_texture_index = 0
             self.texture = self.textures_array[self._state][self.direction][self.current_texture_index]
+            self.set_hit_box(self.texture.hit_box_points)
             self.frame_counter = 0
 
     def get_position(self) -> tuple[float, float]:
@@ -312,7 +313,7 @@ class Skeleton(AEnemy):
 
         self.center_x = origin_x
         self.center_y = origin_y
-        direction = Vec2(target_x - origin_x, target_y - origin_y).normalize() * Vec2(self.speed, self.speed)
+        direction = Vec2(target_x - origin_x, target_y - origin_y).normalize() * self.speed
         self.change_x = direction.x
         self.change_y = direction.y
 
@@ -439,7 +440,7 @@ class Archer(AEnemy):
 
         self.center_x = origin_x
         self.center_y = origin_y
-        direction = Vec2(target_x - origin_x, target_y - origin_y).normalize() * Vec2(self.speed, self.speed)
+        direction = Vec2(target_x - origin_x, target_y - origin_y).normalize() * self.speed
         self.change_x = direction.x
         self.change_y = direction.y
 

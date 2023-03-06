@@ -19,8 +19,7 @@ class Projectile(arcade.Sprite):
         self.origin_y = origin_y
         self.center_x = origin_x
         self.center_y = origin_y
-        direction = Vec2(target_x - origin_x, target_y - origin_y).normalize() * Vec2(Projectile.SPEED,
-                                                                                      Projectile.SPEED)
+        direction = Vec2(target_x - origin_x, target_y - origin_y).normalize() * Projectile.SPEED
         self.change_x = direction.x
         self.change_y = direction.y
         self.angle = degrees(atan2(direction.y, direction.x))

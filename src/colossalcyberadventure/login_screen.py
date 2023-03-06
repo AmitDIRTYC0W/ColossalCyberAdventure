@@ -26,25 +26,25 @@ class LoginScreenView(arcade.View):
         self.v_box = arcade.gui.UIBoxLayout()
         # Create the buttons
         login_button = arcade.gui.UIFlatButton(text="Login", width=LoginScreenView.BUTTON_WIDTH)
-        self.v_box.add(login_button.with_space_around(bottom=LoginScreenView.BUTTON_SPACING))
+        self.v_box.add(login_button.with_padding(bottom=LoginScreenView.BUTTON_SPACING))
 
         # Create ip field
         username_h_box = arcade.gui.UIBoxLayout(vertical=False)
         username_label = arcade.gui.UILabel(text="Username: ", width=LoginScreenView.BUTTON_LABEL_WIDTH)
-        username_field = arcade.gui.UIBorder(child=arcade.gui.UIInputText(width=LoginScreenView.BUTTON_WIDTH, height=40))
+        username_field = arcade.gui.UIInputText(width=LoginScreenView.BUTTON_WIDTH, height=40).with_border(width=1)
         username_h_box.add(username_label)
         username_h_box.add(username_field)
-        self.v_box.add(username_h_box.with_space_around(bottom=LoginScreenView.BUTTON_SPACING))
+        self.v_box.add(username_h_box.with_border(width=1))
 
         password_h_box = arcade.gui.UIBoxLayout(vertical=False)
         password_label = arcade.gui.UILabel(text="Password: ", width=LoginScreenView.BUTTON_LABEL_WIDTH)
-        password_field = arcade.gui.UIBorder(child=arcade.gui.UIInputText(width=LoginScreenView.BUTTON_WIDTH, height=40))
+        password_field = arcade.gui.UIInputText(width=LoginScreenView.BUTTON_WIDTH, height=60)
         password_h_box.add(password_label)
         password_h_box.add(password_field)
-        self.v_box.add(password_h_box.with_space_around(bottom=LoginScreenView.BUTTON_SPACING))
+        self.v_box.add(password_h_box.with_border(width=1))
 
         quit_button = arcade.gui.UIFlatButton(text="Quit", width=LoginScreenView.BUTTON_WIDTH)
-        self.v_box.add(quit_button.with_space_around(bottom=LoginScreenView.BUTTON_SPACING))
+        self.v_box.add(quit_button.with_border(width=1))
 
         @login_button.event("on_click")
         def on_click_settings(_event):
@@ -57,11 +57,11 @@ class LoginScreenView(arcade.View):
             arcade.exit()
 
         # centers the buttons
-        self.manager.add(
-            arcade.gui.UIAnchorWidget(
+        self.anchor = self.manager.add(arcade.gui.UIAnchorLayout())
+        self.anchor.add(
                 anchor_x="center_x",
                 anchor_y="center_y",
-                child=self.v_box)
+                child=self.v_box
         )
 
     def on_draw(self):

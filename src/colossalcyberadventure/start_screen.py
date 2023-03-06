@@ -26,21 +26,21 @@ class StartScreenView(arcade.View):
         self.v_box = arcade.gui.UIBoxLayout()
         # Create the buttons
         start_button = arcade.gui.UIFlatButton(text="Start Game", width=StartScreenView.BUTTON_WIDTH)
-        self.v_box.add(start_button.with_space_around(bottom=StartScreenView.BUTTON_SPACING))
+        self.v_box.add(start_button.with_padding(bottom=StartScreenView.BUTTON_SPACING))
 
         # Create ip field
         ip_h_box = arcade.gui.UIBoxLayout(vertical=False)
         ip_label = arcade.gui.UILabel(text="IP: ", width=StartScreenView.IP_LABEL_WIDTH)
-        ip_field = arcade.gui.UIBorder(child=arcade.gui.UIInputText(width=StartScreenView.BUTTON_WIDTH, height=20))
+        ip_field = arcade.gui.UIInputText(width=StartScreenView.BUTTON_WIDTH, height=30).with_border(width=1)
         ip_h_box.add(ip_label)
         ip_h_box.add(ip_field)
-        self.v_box.add(ip_h_box.with_space_around(bottom=StartScreenView.BUTTON_SPACING))
+        self.v_box.add(ip_h_box.with_padding(bottom=StartScreenView.BUTTON_SPACING))
 
         settings_button = arcade.gui.UIFlatButton(text="Settings", width=StartScreenView.BUTTON_WIDTH)
-        self.v_box.add(settings_button.with_space_around(bottom=StartScreenView.BUTTON_SPACING))
+        self.v_box.add(settings_button.with_padding(bottom=StartScreenView.BUTTON_SPACING))
 
         quit_button = arcade.gui.UIFlatButton(text="Quit", width=StartScreenView.BUTTON_WIDTH)
-        self.v_box.add(quit_button.with_space_around(bottom=StartScreenView.BUTTON_SPACING))
+        self.v_box.add(quit_button.with_padding(bottom=StartScreenView.BUTTON_SPACING))
 
         @start_button.event("on_click")
         def on_click_settings(_event):
@@ -57,11 +57,11 @@ class StartScreenView(arcade.View):
             arcade.exit()
 
         # centers the buttons
-        self.manager.add(
-            arcade.gui.UIAnchorWidget(
-                anchor_x="center_x",
-                anchor_y="center_y",
-                child=self.v_box)
+        self.anchor = self.manager.add(arcade.gui.UIAnchorLayout())
+        self.anchor.add(
+            anchor_x="center_x",
+            anchor_y="center_y",
+            child=self.v_box
         )
 
     def on_draw(self):
