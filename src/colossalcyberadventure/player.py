@@ -182,6 +182,6 @@ class Player(arcade.Sprite, IEntity):
         elif keyboard_state[arcade.key.D] and not keyboard_state[arcade.key.A]:
             movement_vec.x = 1
 
-        movement_vec = movement_vec.normalize() * Vec2(Player.SPEED, Player.SPEED)
+        movement_vec = movement_vec.normalize() * Player.SPEED
         self.change_x = movement_vec.x
         self.change_y = movement_vec.y

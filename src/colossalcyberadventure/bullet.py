@@ -13,7 +13,7 @@ class Bullet(arcade.Sprite):
 
         self.center_x = origin_x
         self.center_y = origin_y
-        direction = Vec2(target_x - origin_x, target_y - origin_y).normalize() * Vec2(Bullet.SPEED, Bullet.SPEED)
+        direction = Vec2(target_x - origin_x, target_y - origin_y).normalize() * Bullet.SPEED
         self.change_x = direction.x
         self.change_y = direction.y
         self.angle = degrees(atan2(direction.y, direction.x))

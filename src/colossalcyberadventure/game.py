@@ -98,8 +98,8 @@ class GameView(arcade.View):
                     # if not (key in self.non_drawn_scene.name_mapping.keys()):
                     self.maps_in_loading.append(key)
                     t = Thread(target=load_map, args=(self, map_x + x, map_y + y))
-                    t.start()
-        # print(len(self.scene.name_mapping.keys()))
+                    # t.start()
+        # print(len(selfscene.name_mapping.keys()))
         # if len(self.scene.name_mapping.keys()) > 9:
         # for key in self.scene.name_mapping.keys():
                 # print(key[0])
