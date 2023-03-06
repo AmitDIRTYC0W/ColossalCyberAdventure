@@ -96,6 +96,10 @@ class GameView(arcade.View):
     def on_update(self, delta_time: float):
         self.player.update_player_speed(self.keyboard_state, self.enemy_array)
         self.enemy_array.update()
+        if self.keyboard_state[k.Q]:
+            quit()
+        self.bullet_list.update()
+        self.player.update_player_speed(self.keyboard_state)
         self.player.update_animation()
         self.enemy_array.update_animation()
         self.player.update()
