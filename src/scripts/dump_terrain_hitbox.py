@@ -8,10 +8,6 @@ scene = arcade.Scene.from_tilemap(arcade.load_tilemap("../colossalcyberadventure
     }
 }))
 
-# with open("static_hitboxes.txt", "w") as f:
-# for sprite in scene.name_mapping["Trees"]:
-# f.write(str(sprite.get_adjusted_hit_box()) + "\n")
-
 hitboxes = {"Trees": []}
 
 for sprite in scene.name_mapping["Trees"]:
