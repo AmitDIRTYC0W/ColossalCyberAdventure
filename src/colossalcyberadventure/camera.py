@@ -5,13 +5,17 @@ from arcade import SpriteList, Sprite
 from pyglet.math import Vec2
 from pytiled_parser.tiled_object import Point
 
-from globals import *
+from constants import *
+import constants
 
 
 class GameCam(arcade.camera.Camera):
 
-    def __init__(self, width, height, player):
+    def __init__(self, player):
         super().__init__()
+        constants.SCREEN_WIDTH = self.viewport_width
+        constants.SCREEN_HEIGHT = self.viewport_height
+
         self.player = player
 
     def zoom(self):
@@ -28,10 +32,10 @@ class GameCam(arcade.camera.Camera):
             screen_center_x = 0
         if screen_center_y < 0:
             screen_center_y = 0
-        if screen_center_x > map_width - self.viewport_width:
-            screen_center_x = map_width - self.viewport_width
-        if screen_center_y > map_height - self.viewport_height:
-            screen_center_y = map_height - self.viewport_height
+        if screen_center_x > MAP_WIDTH - self.viewport_width:
+            screen_center_x = MAP_WIDTH - self.viewport_width
+        if screen_center_y > MAP_HEIGHT - self.viewport_height:
+            screen_center_y = MAP_HEIGHT - self.viewport_height
 
         player_centered = Vec2(screen_center_x, screen_center_y)
 

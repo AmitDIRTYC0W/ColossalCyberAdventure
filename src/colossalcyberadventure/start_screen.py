@@ -31,7 +31,7 @@ class StartScreenView(arcade.View):
         # Create ip field
         ip_h_box = arcade.gui.UIBoxLayout(vertical=False)
         ip_label = arcade.gui.UILabel(text="IP: ", width=StartScreenView.IP_LABEL_WIDTH)
-        ip_field = arcade.gui.UIInputText(width=StartScreenView.BUTTON_WIDTH, height=30).with_border()
+        ip_field = arcade.gui.UIInputText(width=StartScreenView.BUTTON_WIDTH, height=30).with_border(width=1)
         ip_h_box.add(ip_label)
         ip_h_box.add(ip_field)
         self.v_box.add(ip_h_box.with_padding(bottom=StartScreenView.BUTTON_SPACING))

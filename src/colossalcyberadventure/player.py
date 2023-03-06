@@ -1,16 +1,15 @@
 import time
 from enum import Enum
+from math import floor
 
 import arcade
 import arcade.key as k
 from arcade import SpriteList
 from pyglet.math import Vec2
 
-from constants import *
-from entity import IEntity
 from projectile import Projectile
 from entity import IEntity
-from globals import *
+from constants import *
 
 from src.colossalcyberadventure.healthbar import HealthBar
 from src.colossalcyberadventure.inventory import Inventory
@@ -75,12 +74,12 @@ class Player(arcade.Sprite, IEntity):
 
     SPRITE_SCALE = 2
 
-    SPEED = 7
+    SPEED = 5
     FRAMES_PER_TEXTURE = 5
 
     def __init__(self, enemy_projectile_list: SpriteList, player_projectile_list: SpriteList, item_array: SpriteList,
-                 keyboard_state: dict[int, bool]):
-        super().__init__(scale=Player.SPRITE_SCALE)
+                 keyboard_state: dict[int, bool], scene: arcade.Scene):
+        super().__init__(scale=Player.SPRITE_SCALE, path_or_texture="resources/player/idle/0.png")
         if textures == TEXTURES_BASE:
             load_textures()
         self.center_x = 30
@@ -93,6 +92,7 @@ class Player(arcade.Sprite, IEntity):
         self.enemy_projectile_list = enemy_projectile_list
         self.delta_change_x = 0
         self.delta_change_y = 0
+        self.scene = scene
         self._state = PlayerAnimationState.IDLE
         self.direction = Direction.RIGHT
         self.texture = textures[PlayerAnimationState.IDLE][self.direction][0]
@@ -123,6 +123,7 @@ class Player(arcade.Sprite, IEntity):
     def draw(self, *, draw_filter=None, pixelated=None, blend_function=None):
         super().draw(filter=draw_filter, pixelated=pixelated, blend_function=blend_function)
         self.health_bar.draw()
+        self.draw_hit_box()
 
     def update_animation(self, delta_time: float = 1 / 60):
 
@@ -133,6 +134,7 @@ class Player(arcade.Sprite, IEntity):
                 self.current_texture_index = 0
             self.should_reset_sprite_counter = False
             self.texture = textures[self._state][self.direction][self.current_texture_index]
+            self.set_hit_box(self.texture.hit_box_points)
 
         self.frame_counter += 1
         if self.frame_counter > Player.FRAMES_PER_TEXTURE:
@@ -163,13 +165,22 @@ class Player(arcade.Sprite, IEntity):
 
         if self.left < 0:
             self.left = 0
-        if self.right > map_width - 1:
-            self.right = map_width - 1
+        if self.right > MAP_WIDTH - 1:
+            self.right = MAP_WIDTH - 1
 
         if self.bottom < 0:
             self.bottom = 0
-        if self.top > map_height - 1:
-            self.top = map_height - 1
+        if self.top > MAP_HEIGHT - 1:
+            self.top = MAP_HEIGHT - 1
+
+        # collisions_obstacles = arcade.check_for_collision_with_list(self, self.scene[
+        #     f"{floor(self.center_x / SINGLE_MAP_WIDTH)}-{floor(self.center_y / SINGLE_MAP_HEIGHT)}:obstacles"])
+        # collisions_water = arcade.check_for_collision_with_list(self, self.scene[
+        #     f"{floor(self.center_x / SINGLE_MAP_WIDTH)}-{floor(self.center_y / SINGLE_MAP_HEIGHT)}:water"])
+        #
+        # if len(collisions_obstacles) > 0 or len(collisions_water) > 0:
+        #     self.center_x -= self.change_x
+        #     self.center_x -= self.change_y
 
         self.health_bar.update()
         self.real_time = time.localtime()
