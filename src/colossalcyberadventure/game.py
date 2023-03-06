@@ -22,17 +22,16 @@ class TilemapLoader:
         self.queue_out = mp.Queue()
         self.process = mp.Process(
             target=self.load_maps,
-            args=(self.queue_in, self.queue_out),
+            args=(self.queue_out,),
             daemon=True,
         )
 
     def load_maps(self, queue_out: mp.Queue):
         while True:
             params = self.queue_in.get(block=True)
-            map_loaded = get_scene_from_world(params["x"], params["y"], params["world"],
-                                              params["world_width_in_tilemaps"], params["width_px"],
-                                              params["height_px"])
-            queue_out.put({"scene": map_loaded, "x": params["x"], "y": params["y"]}, block=False)
+            map_loaded = tilemap_from_world(params["x"], params["y"], params["world"],
+                                            params["world_width_in_tilemaps"], params["width_px"], params["height_px"])
+            queue_out.put({"tilemap": map_loaded, "x": params["x"], "y": params["y"]}, block=False)
 
     def start(self):
         self.process.start()
@@ -49,11 +48,9 @@ def load_tilemap(path: str):
     )
 
 
-def get_scene_from_world(x, y, world: World, world_width_in_tilemaps, tilemap_width_px, tilemap_height_px):
-    return arcade.Scene.from_tilemap(
-        arcade.load_tilemap(world.maps[x * world_width_in_tilemaps + y].map_file, use_spatial_hash=True,
-                            offset=Vec2(x * tilemap_width_px, y * tilemap_height_px))
-    )
+def tilemap_from_world(x, y, world: World, world_width_in_tilemaps, tilemap_width_px, tilemap_height_px):
+    return arcade.load_tilemap(world.maps[x * world_width_in_tilemaps + y].map_file, use_spatial_hash=True,
+                               offset=Vec2(x * tilemap_width_px, y * tilemap_height_px))
 
 
 class GameView(arcade.View):
@@ -89,8 +86,9 @@ class GameView(arcade.View):
         map_world_x, map_world_y = floor(self.player.center_x / GameView.TILEMAP_WIDTH_PX), floor(
             self.player.center_y / GameView.TILEMAP_HEIGHT_PX
         )
-        self.connect_scenes(get_scene_from_world(map_world_x, map_world_y, self.world, GameView.WORLD_WIDTH_TILEMAPS,
-                                                 GameView.TILEMAP_WIDTH_PX, GameView.TILEMAP_HEIGHT_PX),
+        self.connect_scenes(arcade.Scene.from_tilemap(
+            tilemap_from_world(map_world_x, map_world_y, self.world, GameView.WORLD_WIDTH_TILEMAPS,
+                               GameView.TILEMAP_WIDTH_PX, GameView.TILEMAP_HEIGHT_PX)),
                             f"{map_world_x}-{map_world_y}")
         self.loader = TilemapLoader()
         self.loader_started = False
@@ -102,8 +100,9 @@ class GameView(arcade.View):
         return self.world.maps[x * GameView.WORLD_WIDTH_TILEMAPS + y].map_file
 
     def connect_scenes(self, other_scene: Scene, key: str):
-        for spritelist in other_scene.sprite_lists:
-            self.scene.add_sprite_list(key, True, spritelist)
+        # for spritelist in other_scene.sprite_lists:
+        #     self.scene.add_sprite_list(key, True, spritelist)
+        pass
 
     def mouse_to_world_position(self, click_x: float, click_y: float) -> Vec2:
         """Converts the position of a click to the actual world position
@@ -148,10 +147,10 @@ class GameView(arcade.View):
         if not len(self.maps_in_loading) == 0:
             try:
                 return_dict = self.loader.queue_out.get(block=False)
-                scene: arcade.Scene = return_dict["scene"]
+                tilemap = return_dict["tilemap"]
                 x = return_dict["x"]
                 y = return_dict["y"]
-                self.connect_scenes(scene, f"{x}-{y}")
+                self.connect_scenes(arcade.Scene.from_tilemap(tilemap), f"{x}-{y}")
                 self.maps_in_loading.remove(f"{x}-{y}")
             except _queue.Empty:
                 pass
