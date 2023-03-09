@@ -1,12 +1,13 @@
+import asyncio
 from typing import cast
 
 import arcade
 import arcade.gui
 from aioquic.asyncio import connect
 
-from colossalcyberadventure.constants import SERVER_PORT
-from colossalcyberadventure.server.connection import CONFIGURATION
-from colossalcyberadventure.server.protocol import IdentificationProtocol
+from src.colossalcyberadventure.constants import SERVER_PORT
+from src.colossalcyberadventure.server.connection import CONFIGURATION
+from src.colossalcyberadventure.server.protocol import IdentificationProtocol
 from src.colossalcyberadventure.login_screen import LoginScreenView
 
 
@@ -46,11 +47,9 @@ class StartScreenView(arcade.View):
 
         @connect_button.event("on_click")
         def on_click_connect(_event):
-            client = connect(self.ip_field.text, SERVER_PORT, configuration=CONFIGURATION,
-                             create_protocol=IdentificationProtocol, wait_connected=True)
-            self.client = cast(IdentificationProtocol, client)
+            asyncio.run(self.handle_server())
             self.manager.clear()
-            start_view = LoginScreenView(self.client)
+            start_view = LoginScreenView()
             self.window.show_view(start_view)
 
         @quit_button.event("on_click")
@@ -68,3 +67,11 @@ class StartScreenView(arcade.View):
     def on_draw(self):
         self.clear()
         self.manager.draw()
+
+    async def handle_server(self):
+        async with connect("10.0.0.11", SERVER_PORT, configuration=CONFIGURATION,
+                           create_protocol=IdentificationProtocol) as client:
+            print("hi")
+            client = cast(IdentificationProtocol, client)
+            await client.send_identification("hi", "hi", False)
+

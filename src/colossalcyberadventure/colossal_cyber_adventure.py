@@ -9,7 +9,7 @@ class ColossalCyberAdventure(arcade.Window):
     BACKGROUND_COLOR = arcade.color.AMAZON
 
     def __init__(self):
-        super().__init__(title=ColossalCyberAdventure.TITLE, fullscreen=True)
+        super().__init__(title=ColossalCyberAdventure.TITLE, fullscreen=False)
 
         arcade.set_background_color(ColossalCyberAdventure.BACKGROUND_COLOR)
 

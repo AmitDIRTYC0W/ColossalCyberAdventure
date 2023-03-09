@@ -15,10 +15,8 @@ class LoginScreenView(arcade.View):
     BUTTON_LABEL_WIDTH = 80
     BUTTON_SPACING = 30
 
-    def __init__(self, client: IdentificationProtocol):
+    def __init__(self):
         super().__init__()
-
-        self.client = client
 
         # --- Required for all code that uses UI element,
         # a UIManager to handle the UI.
@@ -57,7 +55,6 @@ class LoginScreenView(arcade.View):
 
         @login_button.event("on_click")
         def on_click_settings(_event):
-            asyncio.run(self.hello())
             print("hi")
             self.manager.clear()
             game_view = GameView()
@@ -79,11 +76,6 @@ class LoginScreenView(arcade.View):
                 anchor_y="center_y",
                 child=self.v_box
         )
-
-    async def hello(self):
-        with self.client as c:
-            c.send_identification(self.username_field.text, self.password_field.text, False)
-            await Future()
 
     def on_draw(self):
         self.clear()

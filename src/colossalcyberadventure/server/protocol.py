@@ -4,7 +4,7 @@ from aioquic.asyncio import QuicConnectionProtocol
 from aioquic.quic import events
 from aioquic.quic.events import StreamDataReceived
 
-from colossalcyberadventure.server.messages import create_identification_request, read_identification_response
+from src.colossalcyberadventure.server.messages import create_identification_request, read_identification_response
 
 
 class IdentificationProtocol(QuicConnectionProtocol):
@@ -20,7 +20,8 @@ class IdentificationProtocol(QuicConnectionProtocol):
 
     async def send_identification(self, username, password, register):
         stream_id = self._quic.get_next_available_stream_id()
-        data = create_identification_request(username, password, register).to_bytes_packed()
+        # data = create_identification_request(username, password, register).to_bytes_packed()
+        data = b"hi"
         self._quic.send_stream_data(stream_id, data, end_stream=True)
         waiter = self._loop.create_future()
         self._ack_waiter = waiter
