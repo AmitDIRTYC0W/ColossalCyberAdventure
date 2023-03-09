@@ -20,3 +20,6 @@ MARGIN = 5
 # screen settings
 SCREEN_HEIGHT = 0
 SCREEN_WIDTH = 0
+
+# server
+SERVER_PORT = 1354

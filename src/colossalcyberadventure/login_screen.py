@@ -1,8 +1,11 @@
+import asyncio
+from asyncio import Future
+
 import arcade
 import arcade.gui
 
-import server.protocol
-from src.colossalcyberadventure.start_screen import StartScreenView
+from server.protocol import IdentificationProtocol
+from src.colossalcyberadventure.game import GameView
 
 
 class LoginScreenView(arcade.View):
@@ -12,8 +15,10 @@ class LoginScreenView(arcade.View):
     BUTTON_LABEL_WIDTH = 80
     BUTTON_SPACING = 30
 
-    def __init__(self):
+    def __init__(self, client: IdentificationProtocol):
         super().__init__()
+
+        self.client = client
 
         # --- Required for all code that uses UI element,
         # a UIManager to handle the UI.
@@ -29,16 +34,16 @@ class LoginScreenView(arcade.View):
         # Create ip field
         username_h_box = arcade.gui.UIBoxLayout(vertical=False)
         username_label = arcade.gui.UILabel(text="Username: ", width=LoginScreenView.BUTTON_LABEL_WIDTH)
-        username_field = arcade.gui.UIInputText(width=LoginScreenView.BUTTON_WIDTH, height=40)
+        self.username_field = arcade.gui.UIInputText(width=LoginScreenView.BUTTON_WIDTH, height=40)
         username_h_box.add(username_label)
-        username_h_box.add(username_field)
+        username_h_box.add(self.username_field)
         self.v_box.add(username_h_box.with_border(width=1))
 
         password_h_box = arcade.gui.UIBoxLayout(vertical=False)
         password_label = arcade.gui.UILabel(text="Password: ", width=LoginScreenView.BUTTON_LABEL_WIDTH)
-        password_field = arcade.gui.UIInputText(width=LoginScreenView.BUTTON_WIDTH, height=40)
+        self.password_field = arcade.gui.UIInputText(width=LoginScreenView.BUTTON_WIDTH, height=40)
         password_h_box.add(password_label)
-        password_h_box.add(password_field)
+        password_h_box.add(self.password_field)
         self.v_box.add(password_h_box.with_border(width=1))
 
         login_button = arcade.gui.UIFlatButton(text="Login", width=LoginScreenView.BUTTON_WIDTH)
@@ -52,14 +57,16 @@ class LoginScreenView(arcade.View):
 
         @login_button.event("on_click")
         def on_click_settings(_event):
-            server.protocol.create_identification_request(username_field.text, password_field.text, False)
+            asyncio.run(self.hello())
+            print("hi")
             self.manager.clear()
-            start_view = StartScreenView()
-            self.window.show_view(start_view)
+            game_view = GameView()
+            self.window.show_view(game_view)
 
         @register_button.event("on_click")
         def on_click_settings(_event):
-            server.protocol.create_identification_request(username_field.text, password_field.text, True)
+            # server.protocol.create_identification_request(username_field.text, password_field.text, True)
+            pass
 
         @quit_button.event("on_click")
         def on_click_settings(_event):
@@ -72,6 +79,11 @@ class LoginScreenView(arcade.View):
                 anchor_y="center_y",
                 child=self.v_box
         )
+
+    async def hello(self):
+        with self.client as c:
+            c.send_identification(self.username_field.text, self.password_field.text, False)
+            await Future()
 
     def on_draw(self):
         self.clear()

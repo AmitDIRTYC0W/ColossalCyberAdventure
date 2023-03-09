@@ -1,7 +1,13 @@
+from typing import cast
+
 import arcade
 import arcade.gui
+from aioquic.asyncio import connect
 
-from src.colossalcyberadventure.game import GameView
+from colossalcyberadventure.constants import SERVER_PORT
+from colossalcyberadventure.server.connection import CONFIGURATION
+from colossalcyberadventure.server.protocol import IdentificationProtocol
+from src.colossalcyberadventure.login_screen import LoginScreenView
 
 
 class StartScreenView(arcade.View):
@@ -27,9 +33,9 @@ class StartScreenView(arcade.View):
         # Create ip field
         ip_h_box = arcade.gui.UIBoxLayout(vertical=False)
         ip_label = arcade.gui.UILabel(text="IP: ", width=StartScreenView.IP_LABEL_WIDTH)
-        ip_field = arcade.gui.UIInputText(width=StartScreenView.BUTTON_WIDTH, height=40)
+        self.ip_field = arcade.gui.UIInputText(width=StartScreenView.BUTTON_WIDTH, height=40)
         ip_h_box.add(ip_label)
-        ip_h_box.add(ip_field)
+        ip_h_box.add(self.ip_field)
         self.v_box.add(ip_h_box.with_border(width=1))
 
         connect_button = arcade.gui.UIFlatButton(text="Connect", width=StartScreenView.BUTTON_WIDTH)
@@ -39,13 +45,16 @@ class StartScreenView(arcade.View):
         self.v_box.add(quit_button.with_border(width=1))
 
         @connect_button.event("on_click")
-        def on_click_settings(_event):
+        def on_click_connect(_event):
+            client = connect(self.ip_field.text, SERVER_PORT, configuration=CONFIGURATION,
+                             create_protocol=IdentificationProtocol, wait_connected=True)
+            self.client = cast(IdentificationProtocol, client)
             self.manager.clear()
-            game_view = GameView()
-            self.window.show_view(game_view)
+            start_view = LoginScreenView(self.client)
+            self.window.show_view(start_view)
 
         @quit_button.event("on_click")
-        def on_click_settings(_event):
+        def on_click_quit(_event):
             arcade.exit()
 
         # centers the buttons
