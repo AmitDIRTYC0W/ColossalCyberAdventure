@@ -11,7 +11,7 @@ from src.colossalcyberadventure.game import GameView
 class LoginScreenView(arcade.View):
     """shows the view of the starting screen and lets you press the buttons"""
 
-    BUTTON_WIDTH = 200
+    BUTTON_WIDTH = 300
     BUTTON_LABEL_WIDTH = 80
     BUTTON_SPACING = 30
 
@@ -30,6 +30,13 @@ class LoginScreenView(arcade.View):
         self.v_box = arcade.gui.UIBoxLayout()
 
         # Create ip field
+        ip_h_box = arcade.gui.UIBoxLayout(vertical=False)
+        ip_label = arcade.gui.UILabel(text="IP: ", width=LoginScreenView.BUTTON_LABEL_WIDTH)
+        self.ip_field = arcade.gui.UIInputText(width=LoginScreenView.BUTTON_WIDTH, height=40)
+        ip_h_box.add(ip_label)
+        ip_h_box.add(self.ip_field)
+        self.v_box.add(ip_h_box.with_border(width=0.9))
+
         username_h_box = arcade.gui.UIBoxLayout(vertical=False)
         username_label = arcade.gui.UILabel(text="Username: ", width=LoginScreenView.BUTTON_LABEL_WIDTH)
         self.username_field = arcade.gui.UIInputText(width=LoginScreenView.BUTTON_WIDTH, height=40)
