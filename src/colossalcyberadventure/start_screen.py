@@ -24,33 +24,25 @@ class StartScreenView(arcade.View):
 
         # Create a vertical BoxGroup to align buttons
         self.v_box = arcade.gui.UIBoxLayout()
-        # Create the buttons
-        start_button = arcade.gui.UIFlatButton(text="Start Game", width=StartScreenView.BUTTON_WIDTH)
-        self.v_box.add(start_button.with_padding(bottom=StartScreenView.BUTTON_SPACING))
-
         # Create ip field
         ip_h_box = arcade.gui.UIBoxLayout(vertical=False)
         ip_label = arcade.gui.UILabel(text="IP: ", width=StartScreenView.IP_LABEL_WIDTH)
-        ip_field = arcade.gui.UIInputText(width=StartScreenView.BUTTON_WIDTH, height=30).with_border(width=1)
+        ip_field = arcade.gui.UIInputText(width=StartScreenView.BUTTON_WIDTH, height=40)
         ip_h_box.add(ip_label)
         ip_h_box.add(ip_field)
-        self.v_box.add(ip_h_box.with_padding(bottom=StartScreenView.BUTTON_SPACING))
+        self.v_box.add(ip_h_box.with_border(width=1))
 
-        settings_button = arcade.gui.UIFlatButton(text="Settings", width=StartScreenView.BUTTON_WIDTH)
-        self.v_box.add(settings_button.with_padding(bottom=StartScreenView.BUTTON_SPACING))
+        connect_button = arcade.gui.UIFlatButton(text="Connect", width=StartScreenView.BUTTON_WIDTH)
+        self.v_box.add(connect_button.with_border(width=1))
 
         quit_button = arcade.gui.UIFlatButton(text="Quit", width=StartScreenView.BUTTON_WIDTH)
-        self.v_box.add(quit_button.with_padding(bottom=StartScreenView.BUTTON_SPACING))
+        self.v_box.add(quit_button.with_border(width=1))
 
-        @start_button.event("on_click")
+        @connect_button.event("on_click")
         def on_click_settings(_event):
             self.manager.clear()
             game_view = GameView()
             self.window.show_view(game_view)
-
-        @settings_button.event("on_click")
-        def on_click_settings(_event):
-            print("setting - insert here")
 
         @quit_button.event("on_click")
         def on_click_settings(_event):

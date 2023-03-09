@@ -1,7 +1,7 @@
 import capnp
 
 capnp.remove_import_hook()
-identification_capnp = capnp.load("../../../submodules/ColossalCyberAdventureMessages/identification.capnp")
+identification_capnp = capnp.load("../../submodules/ColossalCyberAdventureMessages/src/colossalcyberadventuremessages/identification.capnp")
 
 
 def create_identification_request(username, password, register):
