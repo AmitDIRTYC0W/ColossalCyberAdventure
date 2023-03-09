@@ -1,0 +1,3 @@
+[submodule "submodules/ColossalCyberAdventureMessages"]
+	path = submodules/ColossalCyberAdventureMessages
+	url = https://github.com/AmitDIRTYC0W/ColossalCyberAdventureMessages.git
