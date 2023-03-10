@@ -17,8 +17,10 @@ async def connect_to_server(host: str, port: int, username: str, password: str, 
     try:
         async with c as client:
             client = cast(IdentificationProtocol, client)
-            await client.send_identification(username, password, register)
-            # todo: add return None if username and password wrong
-        return c
+            resp = await client.send_identification(username, password, register)
+            if resp.which() == "success":
+                return c
+            else:
+                return None
     except ConnectionError:
         return None
