@@ -11,4 +11,4 @@ def create_identification_request(username, password, register):
 
 
 def read_identification_response(b: bytes):
-    return identification_capnp.IdentificationRequest.from_bytes_packed(b)
+    return identification_capnp.IdentificationResponse.from_bytes_packed(b)

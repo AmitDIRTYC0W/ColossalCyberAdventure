@@ -1,11 +1,11 @@
 import asyncio
-from asyncio import Future
 
 import arcade
 import arcade.gui
 
-from server.protocol import IdentificationProtocol
+from src.colossalcyberadventure.constants import SERVER_PORT
 from src.colossalcyberadventure.game import GameView
+from src.colossalcyberadventure.server.connection import connect_to_server
 
 
 class LoginScreenView(arcade.View):
@@ -62,15 +62,24 @@ class LoginScreenView(arcade.View):
 
         @login_button.event("on_click")
         def on_click_settings(_event):
-            print("hi")
-            self.manager.clear()
-            game_view = GameView()
-            self.window.show_view(game_view)
+            self.client = asyncio.run(
+                connect_to_server(self.ip_field.text, SERVER_PORT, self.username_field.text, self.password_field.text,
+                                  False)
+            )
+            if self.client:
+                self.manager.clear()
+                game_view = GameView()
+                self.window.show_view(game_view)
 
         @register_button.event("on_click")
-        def on_click_settings(_event):
-            # server.protocol.create_identification_request(username_field.text, password_field.text, True)
-            pass
+        def on_click_register(_event):
+            self.client = asyncio.run(
+                connect_to_server(self.ip_field.text, SERVER_PORT, self.username_field.text, self.password_field.text,
+                                  True))
+            if self.client:
+                self.manager.clear()
+                game_view = GameView()
+                self.window.show_view(game_view)
 
         @quit_button.event("on_click")
         def on_click_settings(_event):
@@ -79,9 +88,9 @@ class LoginScreenView(arcade.View):
         # centers the buttons
         self.anchor = self.manager.add(arcade.gui.UIAnchorLayout())
         self.anchor.add(
-                anchor_x="center_x",
-                anchor_y="center_y",
-                child=self.v_box
+            anchor_x="center_x",
+            anchor_y="center_y",
+            child=self.v_box
         )
 
     def on_draw(self):
