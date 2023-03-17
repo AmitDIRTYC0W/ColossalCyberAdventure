@@ -80,8 +80,8 @@ class GameView(arcade.View):
     """
 
     BACKGROUND_COLOR = arcade.color.JET
-    SKELETON_AMOUNT = 10
-    ARCHER_AMOUNT = 5
+    SKELETON_AMOUNT = 80
+    ARCHER_AMOUNT = 20
     SLIME_AMOUNT = 0
     COIN_AMOUNT = 1000
     HEALTH_SHROOM_AMOUNT = 10
@@ -216,6 +216,7 @@ class GameView(arcade.View):
         if self.keyboard_state[k.Q]:
             self.loader.stop()
             quit()
+        self.remove_maps_outside_player_area()
         self.player.update_player_speed(self.keyboard_state, self.enemy_array)
         self.player.update_animation()
         self.enemy_array.update_animation()
@@ -245,3 +246,11 @@ class GameView(arcade.View):
             bullet_path = "resources/bullet/0.png"
             self.player_projectile_list.append(Projectile(
                 self.weapon.center_x, self.weapon.center_y, world_pos.x, world_pos.y, bullet_path, 1))
+
+    def remove_maps_outside_player_area(self):
+        if len(list(self.scene.name_mapping.keys())) > 9:
+            map_x = floor(self.player.center_x / GameView.TILEMAP_WIDTH_PX)
+            map_y = floor(self.player.center_y / GameView.TILEMAP_HEIGHT_PX)
+            for key in list(self.scene.name_mapping.keys()):
+                if abs(map_x - int(key[0])) >= 1 or abs(int(key[2]) - map_y) >= 1:
+                    self.scene.name_mapping.pop(key)

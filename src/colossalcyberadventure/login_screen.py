@@ -1,11 +1,7 @@
-import asyncio
-
 import arcade
 import arcade.gui
 
-from src.colossalcyberadventure.constants import SERVER_PORT
 from src.colossalcyberadventure.game import GameView
-from src.colossalcyberadventure.server.connection import connect_to_server
 
 
 class LoginScreenView(arcade.View):
@@ -62,24 +58,15 @@ class LoginScreenView(arcade.View):
 
         @login_button.event("on_click")
         def on_click_settings(_event):
-            self.client = asyncio.run(
-                connect_to_server(self.ip_field.text, SERVER_PORT, self.username_field.text, self.password_field.text,
-                                  False)
-            )
-            if self.client:
-                self.manager.clear()
-                game_view = GameView()
-                self.window.show_view(game_view)
+            self.manager.clear()
+            game_view = GameView()
+            self.window.show_view(game_view)
 
         @register_button.event("on_click")
         def on_click_register(_event):
-            self.client = asyncio.run(
-                connect_to_server(self.ip_field.text, SERVER_PORT, self.username_field.text, self.password_field.text,
-                                  True))
-            if self.client:
-                self.manager.clear()
-                game_view = GameView()
-                self.window.show_view(game_view)
+            self.manager.clear()
+            game_view = GameView()
+            self.window.show_view(game_view)
 
         @quit_button.event("on_click")
         def on_click_settings(_event):
