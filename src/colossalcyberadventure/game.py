@@ -1,18 +1,18 @@
 import multiprocessing as mp
 import random
+import time
 from math import floor
 from pathlib import Path
 
 import _queue
 import arcade
-import arcade.gui
-import arcade.gui
 from arcade import Scene
 from arcade import SpriteList
 from arcade import key as k
 from pyglet.math import Vec2
 from pytiled_parser import parse_world, World
 
+from colossalcyberadventure.death_screen import DeathScreenView
 from constants import *
 from src.colossalcyberadventure.camera import GameCam
 from src.colossalcyberadventure.enemies import Archer
@@ -93,7 +93,6 @@ class GameView(arcade.View):
 
     def __init__(self):
         super().__init__()
-
         self.keyboard_state = {k.W: False, k.A: False, k.S: False, k.D: False, k.C: False, k.H: False, k.Q: False,
                                k.I: False}
         self.player_projectile_list = SpriteList(use_spatial_hash=True)
@@ -182,6 +181,10 @@ class GameView(arcade.View):
             self.player.inventory.draw()
 
     def on_update(self, delta_time: float):
+        if self.player.check_death():
+            death_view = DeathScreenView()
+            self.window.show_view(death_view)
+
         self.player.update_player_speed(self.keyboard_state, self.enemy_array)
         self.enemy_array.update()
         if not self.loader_started:

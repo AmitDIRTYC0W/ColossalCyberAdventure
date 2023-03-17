@@ -1,6 +1,7 @@
 import arcade
 import arcade.gui
 
+from colossalcyberadventure.death_screen import DeathScreenView
 from src.colossalcyberadventure.game import GameView
 
 
@@ -17,7 +18,6 @@ class LoginScreenView(arcade.View):
         # --- Required for all code that uses UI element,
         # a UIManager to handle the UI.
         self.manager = arcade.gui.UIManager()
-        self.manager.enable()
 
         # Set background color
         arcade.set_background_color(arcade.color.DARK_BLUE_GRAY)
@@ -65,8 +65,8 @@ class LoginScreenView(arcade.View):
         @register_button.event("on_click")
         def on_click_register(_event):
             self.manager.clear()
-            game_view = GameView()
-            self.window.show_view(game_view)
+            death_view = DeathScreenView()
+            self.window.show_view(death_view)
 
         @quit_button.event("on_click")
         def on_click_settings(_event):
@@ -83,3 +83,9 @@ class LoginScreenView(arcade.View):
     def on_draw(self):
         self.clear()
         self.manager.draw()
+
+    def on_show_view(self):
+        self.manager.enable()
+
+    def on_hide_view(self):
+        self.manager.disable()

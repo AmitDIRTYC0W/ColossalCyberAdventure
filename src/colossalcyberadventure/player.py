@@ -1,16 +1,14 @@
 import time
 from enum import Enum
-from math import floor
 
 import arcade
 import arcade.key as k
 from arcade import SpriteList
 from pyglet.math import Vec2
 
-from projectile import Projectile
-from entity import IEntity
 from constants import *
-
+from entity import IEntity
+from projectile import Projectile
 from src.colossalcyberadventure.healthbar import HealthBar
 from src.colossalcyberadventure.inventory import Inventory
 from src.colossalcyberadventure.item import Coin
@@ -150,7 +148,6 @@ class Player(arcade.Sprite, IEntity):
         for projectile in self.enemy_projectile_list:
             if arcade.check_for_collision(self, projectile):
                 self.reduce_health(1)
-                # ToDo add death
                 projectile.remove_from_sprite_lists()
 
         old_direction = self.direction
@@ -295,3 +292,7 @@ class Player(arcade.Sprite, IEntity):
 
     def get_item_counter(self):
         return self.coin_counter, self.health_shroom_counter
+
+    def check_death(self):
+        if self.health_bar.health_points <= 0:
+            return True
