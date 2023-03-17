@@ -9,12 +9,12 @@ from pyglet.math import Vec2
 
 from projectile import Projectile
 from entity import IEntity
-from constants import *
 
 from src.colossalcyberadventure.healthbar import HealthBar
 from src.colossalcyberadventure.inventory import Inventory
 from src.colossalcyberadventure.item import Coin
 from src.colossalcyberadventure.item import HealthShroom
+from src.common import check_map_bounds
 
 
 class PlayerAnimationState(Enum):
@@ -75,7 +75,9 @@ class Player(arcade.Sprite, IEntity):
     SPRITE_SCALE = 2
 
     SPEED = 5
+    SKILL_3_SPEED_CHANGE = 3
     FRAMES_PER_TEXTURE = 5
+    ALPHA_CHANGE_ON_SKILL_3 = 100
 
     def __init__(self, enemy_projectile_list: SpriteList, player_projectile_list: SpriteList, item_array: SpriteList,
                  keyboard_state: dict[int, bool], scene: arcade.Scene):
@@ -85,8 +87,10 @@ class Player(arcade.Sprite, IEntity):
         self.center_x = 30
         self.center_y = 30
         self.real_time = time.localtime()
-        self.last_skill_1_use = self.real_time
-        self.last_skill_2_use = self.real_time
+        self.last_skill_1_use = time.gmtime(0)
+        self.last_skill_2_use = time.gmtime(0)
+        self.last_skill_3_use = time.gmtime(0)
+        self.using_skill_3 = False
         self.keyboard_state = keyboard_state
         self.player_projectile_list = player_projectile_list
         self.enemy_projectile_list = enemy_projectile_list
@@ -104,6 +108,7 @@ class Player(arcade.Sprite, IEntity):
         self.coin_counter = 0
         self.health_shroom_counter = 0
         self.inventory = Inventory(self.coin_counter, self.health_shroom_counter, self, owner=self)
+        self.left
 
     def update_state(self, new_state: PlayerAnimationState):
         """Update the player state and reset counters
@@ -162,33 +167,23 @@ class Player(arcade.Sprite, IEntity):
         if old_direction != self.direction:
             self.should_reset_sprite_counter = True
 
-        if self.left < 0:
-            self.left = 0
-        if self.right > MAP_WIDTH - 1:
-            self.right = MAP_WIDTH - 1
-
-        if self.bottom < 0:
-            self.bottom = 0
-        if self.top > MAP_HEIGHT - 1:
-            self.top = MAP_HEIGHT - 1
-
-        # collisions_obstacles = arcade.check_for_collision_with_list(self, self.scene[
-        #     f"{floor(self.center_x / SINGLE_MAP_WIDTH)}-{floor(self.center_y / SINGLE_MAP_HEIGHT)}:obstacles"])
-        # collisions_water = arcade.check_for_collision_with_list(self, self.scene[
-        #     f"{floor(self.center_x / SINGLE_MAP_WIDTH)}-{floor(self.center_y / SINGLE_MAP_HEIGHT)}:water"])
-        #
-        # if len(collisions_obstacles) > 0 or len(collisions_water) > 0:
-        #     self.center_x -= self.change_x
-        #     self.center_x -= self.change_y
+        check_map_bounds(self)
 
         self.health_bar.update()
         self.real_time = time.localtime()
+
+        if abs(self.real_time.tm_sec - self.last_skill_3_use.tm_sec) >= 3 and self.using_skill_3:
+            self.using_skill_3 = False
+            self.alpha += Player.ALPHA_CHANGE_ON_SKILL_3
 
         if self.keyboard_state[k.C]:
             self.on_skill_1()
 
         if self.keyboard_state[k.H]:
             self.on_skill_2()
+
+        if self.keyboard_state[k.V]:
+            self.on_skill_3()
 
         self.check_collision_with_items()
 
@@ -239,7 +234,10 @@ class Player(arcade.Sprite, IEntity):
         elif keyboard_state[k.D] and not keyboard_state[k.A]:
             movement_vec.x = 1
 
-        movement_vec = movement_vec.normalize() * Player.SPEED
+        if self.using_skill_3:
+            movement_vec = movement_vec.normalize() * (Player.SPEED + Player.SKILL_3_SPEED_CHANGE)
+        else:
+            movement_vec = movement_vec.normalize() * Player.SPEED
         self.change_x = movement_vec.x
         self.change_y = movement_vec.y
         self.center_x += self.change_x
@@ -257,7 +255,7 @@ class Player(arcade.Sprite, IEntity):
         self.center_y -= self.change_y
 
     def on_skill_1(self):
-        PROJECTILE_PATH = "resources/bullet/0.png"
+        projectile_path = "resources/bullet/0.png"
         if abs(self.real_time.tm_sec - self.last_skill_1_use.tm_sec) >= 2:
             directions = [[self.center_x, self.center_y + 1], [self.center_x + 1, self.center_y + 1],
                           [self.center_x + 1, self.center_y], [self.center_x + 1, self.center_y - 1],
@@ -267,7 +265,7 @@ class Player(arcade.Sprite, IEntity):
 
             for i in range(8):
                 self.player_projectile_list.append(
-                    Projectile(self.center_x, self.center_y, directions[i][0], directions[i][1], PROJECTILE_PATH, 2))
+                    Projectile(self.center_x, self.center_y, directions[i][0], directions[i][1], projectile_path, 2))
             self.last_skill_1_use = self.real_time
 
     def on_skill_2(self):
@@ -280,9 +278,16 @@ class Player(arcade.Sprite, IEntity):
                 return
             self.last_skill_2_use = self.real_time
 
+    def on_skill_3(self):
+        if abs(self.real_time.tm_sec - self.last_skill_3_use.tm_sec) >= 7:
+            self.using_skill_3 = True
+            self.last_skill_3_use = self.real_time
+            self.alpha -= Player.ALPHA_CHANGE_ON_SKILL_3
+
     def reduce_health(self, amount):
         if self.health_bar.health_points > 0:
             self.health_bar.health_points -= amount
+            self.last_skill_3_use = self.real_time
 
     def check_collision_with_items(self):
         item_collided_list = arcade.check_for_collision_with_list(self, self.item_array)
