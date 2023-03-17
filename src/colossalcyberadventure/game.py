@@ -95,7 +95,7 @@ class GameView(arcade.View):
         super().__init__()
 
         self.keyboard_state = {k.W: False, k.A: False, k.S: False, k.D: False, k.C: False, k.H: False, k.Q: False,
-                               k.I: False}
+                               k.I: False, k.V: False}
         self.player_projectile_list = SpriteList(use_spatial_hash=True)
         self.enemy_projectile_list = SpriteList(use_spatial_hash=True)
         self.inventory_state = False
@@ -200,7 +200,7 @@ class GameView(arcade.View):
                         params = {"x": map_x + x_offset, "y": map_y + y_offset, "world": self.world,
                                   "world_width_in_tilemaps": GameView.WORLD_WIDTH_TILEMAPS,
                                   "width_px": GameView.TILEMAP_WIDTH_PX, "height_px": GameView.TILEMAP_HEIGHT_PX}
-                        self.loader.queue_in.put(params)
+                        # self.loader.queue_in.put(params)
 
         if not len(self.maps_in_loading) == 0:
             try:

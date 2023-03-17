@@ -1,5 +1,3 @@
-import asyncio
-
 from src.colossalcyberadventure.colossal_cyber_adventure import ColossalCyberAdventure
 
 
