@@ -7,4 +7,4 @@ Install game::
 
 Run game::
 
-    $ python -m collosalcyberadventure
+    $ python -m colossalcyberadventure
