@@ -4,15 +4,16 @@ from enum import Enum
 import arcade
 import arcade.key as k
 from arcade import SpriteList
+from arcade.hitbox import HitBox
 from pyglet.math import Vec2
 
-from constants import *
-from entity import IEntity
-from projectile import Projectile
-from src.colossalcyberadventure.healthbar import HealthBar
-from src.colossalcyberadventure.inventory import Inventory
-from src.colossalcyberadventure.item import Coin
-from src.colossalcyberadventure.item import HealthShroom
+from . import constants
+from .entity import IEntity
+from .projectile import Projectile
+from .healthbar import HealthBar
+from .inventory import Inventory
+from .item import Coin
+from .item import HealthShroom
 
 
 class PlayerAnimationState(Enum):
@@ -48,7 +49,7 @@ def load_textures():
         textures[state][Direction.RIGHT] = []
         textures[state][Direction.LEFT] = []
         for i in range(state.value[1]):
-            tex_left, tex_right = arcade.load_texture_pair(f"resources/player/{state.value[0]}/{i}.png")
+            tex_left, tex_right = arcade.load_texture_pair(f":data:player/{state.value[0]}/{i}.png")
             textures[state][Direction.RIGHT].append(tex_left)
             textures[state][Direction.LEFT].append(tex_right)
 
@@ -69,15 +70,19 @@ class Player(arcade.Sprite, IEntity):
     current_texture_index: int
         What frame number the animation is in
     """
-
     SPRITE_SCALE = 2
-
     SPEED = 5
     FRAMES_PER_TEXTURE = 5
 
-    def __init__(self, enemy_projectile_list: SpriteList, player_projectile_list: SpriteList, item_array: SpriteList,
-                 keyboard_state: dict[int, bool], scene: arcade.Scene):
-        super().__init__(scale=Player.SPRITE_SCALE, path_or_texture="resources/player/idle/0.png")
+    def __init__(
+        self,
+        enemy_projectile_list: SpriteList,
+        player_projectile_list: SpriteList,
+        item_array: SpriteList,
+        keyboard_state: dict[int, bool],
+        scene: arcade.Scene,
+    ):
+        super().__init__(scale=Player.SPRITE_SCALE, path_or_texture=":data:player/idle/0.png")
         if textures == TEXTURES_BASE:
             load_textures()
         self.center_x = 30
@@ -101,7 +106,12 @@ class Player(arcade.Sprite, IEntity):
         self.item_array = item_array
         self.coin_counter = 0
         self.health_shroom_counter = 0
-        self.inventory = Inventory(self.coin_counter, self.health_shroom_counter, self, owner=self)
+        self.inventory = Inventory(
+            self.coin_counter,
+            self.health_shroom_counter,
+            self,
+            owner=self,
+        )
 
     def update_state(self, new_state: PlayerAnimationState):
         """Update the player state and reset counters
@@ -131,7 +141,11 @@ class Player(arcade.Sprite, IEntity):
                 self.current_texture_index = 0
             self.should_reset_sprite_counter = False
             self.texture = textures[self._state][self.direction][self.current_texture_index]
-            self.set_hit_box(self.texture.hit_box_points)
+            self.hit_box = HitBox(
+                self.texture.hit_box_points,
+                position=self.position,
+                scale=self.scale_xy,
+            )
 
         self.frame_counter += 1
         if self.frame_counter > Player.FRAMES_PER_TEXTURE:
@@ -161,13 +175,13 @@ class Player(arcade.Sprite, IEntity):
 
         if self.left < 0:
             self.left = 0
-        if self.right > MAP_WIDTH - 1:
-            self.right = MAP_WIDTH - 1
+        if self.right > constants.MAP_WIDTH - 1:
+            self.right = constants.MAP_WIDTH - 1
 
         if self.bottom < 0:
             self.bottom = 0
-        if self.top > MAP_HEIGHT - 1:
-            self.top = MAP_HEIGHT - 1
+        if self.top > constants.MAP_HEIGHT - 1:
+            self.top = constants.MAP_HEIGHT - 1
 
         # collisions_obstacles = arcade.check_for_collision_with_list(self, self.scene[
         #     f"{floor(self.center_x / SINGLE_MAP_WIDTH)}-{floor(self.center_y / SINGLE_MAP_HEIGHT)}:obstacles"])
@@ -254,17 +268,26 @@ class Player(arcade.Sprite, IEntity):
         self.center_y -= self.change_y
 
     def on_skill_1(self):
-        PROJECTILE_PATH = "resources/bullet/0.png"
+        PROJECTILE_PATH = ":data:bullet/0.png"
         if abs(self.real_time.tm_sec - self.last_skill_1_use.tm_sec) >= 2:
-            directions = [[self.center_x, self.center_y + 1], [self.center_x + 1, self.center_y + 1],
-                          [self.center_x + 1, self.center_y], [self.center_x + 1, self.center_y - 1],
-                          [self.center_x, self.center_y - 1], [self.center_x - 1, self.center_y - 1],
-                          [self.center_x - 1, self.center_y], [self.center_x - 1, self.center_y + 1]
-                          ]
+            directions = [
+                [self.center_x, self.center_y + 1], [self.center_x + 1, self.center_y + 1],
+                [self.center_x + 1, self.center_y], [self.center_x + 1, self.center_y - 1],
+                [self.center_x, self.center_y - 1], [self.center_x - 1, self.center_y - 1],
+                [self.center_x - 1, self.center_y], [self.center_x - 1, self.center_y + 1],
+            ]
 
             for i in range(8):
                 self.player_projectile_list.append(
-                    Projectile(self.center_x, self.center_y, directions[i][0], directions[i][1], PROJECTILE_PATH, 2))
+                    Projectile(
+                        self.center_x,
+                        self.center_y,
+                        directions[i][0],
+                        directions[i][1],
+                        PROJECTILE_PATH,
+                        2,
+                    )
+                )
             self.last_skill_1_use = self.real_time
 
     def on_skill_2(self):

@@ -1,6 +1,6 @@
 import arcade
 
-from src.colossalcyberadventure.entity import IEntity
+from .entity import IEntity
 
 
 class HealthBar:

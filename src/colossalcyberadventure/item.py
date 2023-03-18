@@ -20,7 +20,7 @@ class AItem(arcade.Sprite):
 
 class Coin(AItem):
     Sprite_Scale = 0.4
-    COIN_PATH = "resources/items/coin.png"
+    COIN_PATH = ":data:items/coin.png"
 
     def __init__(self, x_position: float, y_position: float):
         super().__init__(x_position, y_position)
@@ -37,7 +37,7 @@ class Coin(AItem):
 
 class HealthShroom(AItem):
     Sprite_Scale = 0.4
-    SHROOM_PATH = "resources/items/HPSHROOM.png"
+    SHROOM_PATH = ":data:items/HPSHROOM.png"
 
     def __init__(self, x_position: float, y_position: float):
         super().__init__(x_position, y_position)

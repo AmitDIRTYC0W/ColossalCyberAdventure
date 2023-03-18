@@ -1,13 +1,13 @@
 import arcade
 
-from src.colossalcyberadventure.player import Player, Direction, PlayerAnimationState
+from .player import Player, Direction, PlayerAnimationState
 
 
 class AWeapon(arcade.Sprite):
 
     def __init__(self, player: Player):
         SPRITE_SCALE = 1.5
-        super().__init__("resources/player/skull/0.png", scale=SPRITE_SCALE)
+        super().__init__(":data:player/skull/0.png", scale=SPRITE_SCALE)
         self.player = player
         self.player_direction = self.player.get_direction()
         self.player_x, self.player_y = self.player.get_position()

@@ -1,13 +1,13 @@
 import arcade
 
-import constants
-from item import Coin
-from item import HealthShroom
-from src.colossalcyberadventure.constants import *
+from colossalcyberadventure import constants
+from .item import Coin
+from .item import HealthShroom
+from .constants import *
 
 
 class ItemSlot(arcade.Sprite):
-    ITEM_SLOT_PATH = "resources/inventory/item_slot.png"
+    ITEM_SLOT_PATH = ":data:inventory/item_slot.png"
 
     def __init__(self):
         super().__init__()
@@ -27,7 +27,7 @@ class ItemSlot(arcade.Sprite):
 
 
 class PlayerHead(ItemSlot):
-    PLAYER_HEAD_PATH = "resources/inventory/player_head.png"
+    PLAYER_HEAD_PATH = ":data:inventory/player_head.png"
 
     def __init__(self):
         super().__init__()
