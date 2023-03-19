@@ -1,22 +1,23 @@
 import multiprocessing as mp
 import random
+import time
 from math import floor
 from pathlib import Path
 
 import _queue
 import arcade
-import arcade.gui
-import arcade.gui
 from arcade import Scene
 from arcade import SpriteList
 from arcade import key as k
 from pyglet.math import Vec2
 from pytiled_parser import parse_world, World
 
+from colossalcyberadventure.death_screen import DeathScreenView
 from constants import *
 from src.colossalcyberadventure.camera import GameCam
 from src.colossalcyberadventure.enemies import Archer
 from src.colossalcyberadventure.enemies import Skeleton
+from src.colossalcyberadventure.enemies import Slime
 from src.colossalcyberadventure.item import Coin
 from src.colossalcyberadventure.item import HealthShroom
 from src.colossalcyberadventure.player import Player
@@ -80,9 +81,9 @@ class GameView(arcade.View):
     """
 
     BACKGROUND_COLOR = arcade.color.JET
-    SKELETON_AMOUNT = 10
-    ARCHER_AMOUNT = 5
-    SLIME_AMOUNT = 0
+    SKELETON_AMOUNT = 80
+    ARCHER_AMOUNT = 20
+    SLIME_AMOUNT = 200
     COIN_AMOUNT = 1000
     HEALTH_SHROOM_AMOUNT = 10
     WORLD_PATH = "resources/map/map.world"
@@ -93,7 +94,6 @@ class GameView(arcade.View):
 
     def __init__(self):
         super().__init__()
-
         self.keyboard_state = {k.W: False, k.A: False, k.S: False, k.D: False, k.C: False, k.H: False, k.Q: False,
                                k.I: False, k.V: False}
         self.player_projectile_list = SpriteList(use_spatial_hash=True)
@@ -197,6 +197,10 @@ class GameView(arcade.View):
             self.player.inventory.draw()
 
     def on_update(self, delta_time: float):
+        if self.player.check_death():
+            death_view = DeathScreenView()
+            self.window.show_view(death_view)
+
         self.player.update_player_speed(self.keyboard_state, self.enemy_array)
         self.enemy_array.update()
         if not self.loader_started:
@@ -231,6 +235,7 @@ class GameView(arcade.View):
         if self.keyboard_state[k.Q]:
             self.loader.stop()
             quit()
+        self.remove_maps_outside_player_area()
         self.player.update_player_speed(self.keyboard_state, self.enemy_array)
         self.player.update_animation()
         self.enemy_array.update_animation()
@@ -260,3 +265,11 @@ class GameView(arcade.View):
             bullet_path = "resources/bullet/0.png"
             self.player_projectile_list.append(Projectile(
                 self.weapon.center_x, self.weapon.center_y, world_pos.x, world_pos.y, bullet_path, 1))
+
+    def remove_maps_outside_player_area(self):
+        if len(list(self.scene.name_mapping.keys())) > 9:
+            map_x = floor(self.player.center_x / GameView.TILEMAP_WIDTH_PX)
+            map_y = floor(self.player.center_y / GameView.TILEMAP_HEIGHT_PX)
+            for key in list(self.scene.name_mapping.keys()):
+                if abs(map_x - int(key[0])) >= 1 or abs(int(key[2]) - map_y) >= 1:
+                    self.scene.name_mapping.pop(key)

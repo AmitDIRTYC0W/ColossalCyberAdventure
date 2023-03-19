@@ -1,6 +1,7 @@
 import arcade
 
 from src.colossalcyberadventure.login_screen import LoginScreenView
+from src.colossalcyberadventure.death_screen import DeathScreenView
 
 
 class ColossalCyberAdventure(arcade.Window):
@@ -9,7 +10,7 @@ class ColossalCyberAdventure(arcade.Window):
     BACKGROUND_COLOR = arcade.color.AMAZON
 
     def __init__(self):
-        super().__init__(title=ColossalCyberAdventure.TITLE, fullscreen=False)
+        super().__init__(title=ColossalCyberAdventure.TITLE, fullscreen=True)
 
         arcade.set_background_color(ColossalCyberAdventure.BACKGROUND_COLOR)
 
