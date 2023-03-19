@@ -17,6 +17,7 @@ from constants import *
 from src.colossalcyberadventure.camera import GameCam
 from src.colossalcyberadventure.enemies import Archer
 from src.colossalcyberadventure.enemies import Skeleton
+from src.colossalcyberadventure.enemies import Slime
 from src.colossalcyberadventure.item import Coin
 from src.colossalcyberadventure.item import HealthShroom
 from src.colossalcyberadventure.player import Player
@@ -82,7 +83,7 @@ class GameView(arcade.View):
     BACKGROUND_COLOR = arcade.color.JET
     SKELETON_AMOUNT = 80
     ARCHER_AMOUNT = 20
-    SLIME_AMOUNT = 0
+    SLIME_AMOUNT = 200
     COIN_AMOUNT = 1000
     HEALTH_SHROOM_AMOUNT = 10
     WORLD_PATH = "resources/map/map.world"
@@ -122,6 +123,9 @@ class GameView(arcade.View):
                                              self.enemy_projectile_list, self.player_projectile_list))
         for i in range(GameView.ARCHER_AMOUNT):
             self.enemy_array.append(Archer(self.player, self.enemy_array,
+                                           self.enemy_projectile_list, self.player_projectile_list))
+        for i in range(GameView.SLIME_AMOUNT):
+            self.enemy_array.append(Slime(self.player, self.enemy_array,
                                            self.enemy_projectile_list, self.player_projectile_list))
         self.weapon = AWeapon(self.player)
 
