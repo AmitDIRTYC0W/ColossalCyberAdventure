@@ -77,9 +77,10 @@ class Player(arcade.Sprite, IEntity):
     SKILL_3_SPEED_CHANGE = 3
     FRAMES_PER_TEXTURE = 5
     ALPHA_CHANGE_ON_SKILL_3 = 100
+    XP_PER_LEVEL = 5
 
     def __init__(self, enemy_projectile_list: SpriteList, player_projectile_list: SpriteList, item_array: SpriteList,
-                 keyboard_state: dict[int, bool], scene: arcade.Scene):
+                 keyboard_state: dict[int, bool], scene: arcade.Scene, xp_list: SpriteList):
         super().__init__(scale=Player.SPRITE_SCALE, path_or_texture="resources/player/idle/0.png")
         if textures == TEXTURES_BASE:
             load_textures()
@@ -101,13 +102,15 @@ class Player(arcade.Sprite, IEntity):
         self.texture = textures[PlayerAnimationState.IDLE][self.direction][0]
         self.frame_counter = 0
         self.current_texture_index = 0
+        self.xp = 0
+        self.level = 1
+        self.xp_list = xp_list
         self.health_bar = HealthBar(self, 70, 5, 1, arcade.color.BLACK, arcade.color.RED)
         self.should_reset_sprite_counter = False
         self.item_array = item_array
         self.coin_counter = 0
         self.health_shroom_counter = 0
         self.inventory = Inventory(self.coin_counter, self.health_shroom_counter, self, owner=self)
-        self.left
 
     def update_state(self, new_state: PlayerAnimationState):
         """Update the player state and reset counters
@@ -255,7 +258,7 @@ class Player(arcade.Sprite, IEntity):
 
     def on_skill_1(self):
         projectile_path = "resources/bullet/0.png"
-        if abs(self.real_time.tm_sec - self.last_skill_1_use.tm_sec) >= 2:
+        if abs(self.real_time.tm_sec - self.last_skill_1_use.tm_sec) >= 2 and self.level >= 2:
             directions = [[self.center_x, self.center_y + 1], [self.center_x + 1, self.center_y + 1],
                           [self.center_x + 1, self.center_y], [self.center_x + 1, self.center_y - 1],
                           [self.center_x, self.center_y - 1], [self.center_x - 1, self.center_y - 1],
@@ -268,7 +271,7 @@ class Player(arcade.Sprite, IEntity):
             self.last_skill_1_use = self.real_time
 
     def on_skill_2(self):
-        if abs(self.real_time.tm_sec - self.last_skill_2_use.tm_sec) >= 5:
+        if abs(self.real_time.tm_sec - self.last_skill_2_use.tm_sec) >= 5 and self.level >= 2:
             if self.health_bar.health_points <= 80:
                 self.health_bar.health_points += 20
             elif self.health_bar.health_points <= 100:
@@ -278,7 +281,7 @@ class Player(arcade.Sprite, IEntity):
             self.last_skill_2_use = self.real_time
 
     def on_skill_3(self):
-        if abs(self.real_time.tm_sec - self.last_skill_3_use.tm_sec) >= 7:
+        if abs(self.real_time.tm_sec - self.last_skill_3_use.tm_sec) >= 7 and self.level >= 3:
             self.using_skill_3 = True
             self.last_skill_3_use = self.real_time
             self.alpha -= Player.ALPHA_CHANGE_ON_SKILL_3
@@ -296,6 +299,12 @@ class Player(arcade.Sprite, IEntity):
             if isinstance(item, HealthShroom):
                 self.health_shroom_counter += 1
             item.remove_from_sprite_lists()
+
+        xp_collision_list = arcade.check_for_collision_with_list(self, self.xp_list)
+        for xp in xp_collision_list:
+            self.xp += 1
+            self.level = self.xp // Player.XP_PER_LEVEL + 1
+            xp.remove_from_sprite_lists()
 
     def get_item_counter(self):
         return self.coin_counter, self.health_shroom_counter

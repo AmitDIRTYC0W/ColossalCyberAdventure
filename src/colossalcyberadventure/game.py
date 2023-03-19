@@ -102,6 +102,7 @@ class GameView(arcade.View):
         self.player_projectile_list = SpriteList()
         self.enemy_projectile_list = SpriteList()
         self.item_array = arcade.SpriteList()
+        self.xp_list = arcade.SpriteList()
 
         for i in range(GameView.COIN_AMOUNT):
             x = random.randrange(MAP_WIDTH)
@@ -115,16 +116,29 @@ class GameView(arcade.View):
             self.item_array.append(healthshroom)
         self.scene = arcade.Scene()
         self.player = Player(self.enemy_projectile_list, self.player_projectile_list, self.item_array,
-                             self.keyboard_state, self.scene)
+                             self.keyboard_state, self.scene, self.xp_list)
         #
         self.enemy_array = SpriteList(use_spatial_hash=True)
         for i in range(GameView.SKELETON_AMOUNT):
-            self.enemy_array.append(Skeleton(self.player, self.enemy_array,
-                                             self.enemy_projectile_list, self.player_projectile_list))
+            skeleton = Skeleton(random.randint(0, 1000), random.randint(0, 1000), self.player,
+                                self.enemy_array, self.enemy_projectile_list, self.player_projectile_list,
+                                self.xp_list)
+            # noinspection PyTypeChecker
+            while not (len(arcade.check_for_collision_with_list(skeleton, self.enemy_array)) == 0 and
+                       not arcade.check_for_collision(skeleton, self.player)):
+                skeleton.center_x = random.randint(0, 1000)
+                skeleton.center_y = random.randint(0, 1000)
+            self.enemy_array.append(skeleton)
         for i in range(GameView.ARCHER_AMOUNT):
-            self.enemy_array.append(Archer(self.player, self.enemy_array,
-                                           self.enemy_projectile_list, self.player_projectile_list))
-        self.weapon = AWeapon(self.player)
+            archer = Archer(random.randint(0, 1000), random.randint(0, 1000), self.player, self.enemy_array,
+                            self.enemy_projectile_list, self.player_projectile_list, self.xp_list)
+            # noinspection PyTypeChecker
+            while not (len(arcade.check_for_collision_with_list(archer, self.enemy_array)) == 0 and
+                       not arcade.check_for_collision(archer, self.player)):
+                archer.center_x = random.randint(0, 1000)
+                archer.center_y = random.randint(0, 1000)
+            self.enemy_array.append(archer)
+        self.weapon = AWeapon(self.player)  # TODO: fix, you don't initialize an abstract class
 
         self.camera = GameCam(self.player)
         self.world = parse_world(Path(GameView.WORLD_PATH))
@@ -178,6 +192,7 @@ class GameView(arcade.View):
         self.enemy_projectile_list.draw()
         self.weapon.draw()
         self.item_array.draw()
+        self.xp_list.draw()
         if self.inventory_state:
             self.player.inventory.draw()
 
