@@ -106,7 +106,7 @@ class Player(arcade.Sprite, IEntity):
         self.frame_counter = 0
         self.current_texture_index = 0
         self.xp = 0
-        self.level = 1
+        self.level = 3
         self.xp_list = xp_list
         self.health_bar = HealthBar(self, 70, 5, 1, arcade.color.BLACK, arcade.color.RED)
         self.should_reset_sprite_counter = False

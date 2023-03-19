@@ -1,6 +1,5 @@
 import multiprocessing as mp
 import random
-import time
 from math import floor
 from pathlib import Path
 
@@ -15,9 +14,8 @@ from pytiled_parser import parse_world, World
 from colossalcyberadventure.death_screen import DeathScreenView
 from constants import *
 from src.colossalcyberadventure.camera import GameCam
-from src.colossalcyberadventure.enemies import Archer
+from src.colossalcyberadventure.enemies import Archer, Slime
 from src.colossalcyberadventure.enemies import Skeleton
-from src.colossalcyberadventure.enemies import Slime
 from src.colossalcyberadventure.item import Coin
 from src.colossalcyberadventure.item import HealthShroom
 from src.colossalcyberadventure.player import Player
@@ -120,24 +118,21 @@ class GameView(arcade.View):
         #
         self.enemy_array = SpriteList(use_spatial_hash=True)
         for i in range(GameView.SKELETON_AMOUNT):
-            skeleton = Skeleton(random.randint(0, 1000), random.randint(0, 1000), self.player,
-                                self.enemy_array, self.enemy_projectile_list, self.player_projectile_list,
-                                self.xp_list)
-            # noinspection PyTypeChecker
-            while not (len(arcade.check_for_collision_with_list(skeleton, self.enemy_array)) == 0 and
-                       not arcade.check_for_collision(skeleton, self.player)):
-                skeleton.center_x = random.randint(0, 1000)
-                skeleton.center_y = random.randint(0, 1000)
-            self.enemy_array.append(skeleton)
+            self.enemy_array.append(Skeleton(self.player,
+                                             self.enemy_array, self.enemy_projectile_list, self.player_projectile_list,
+                                             self.xp_list))
+
         for i in range(GameView.ARCHER_AMOUNT):
-            archer = Archer(random.randint(0, 1000), random.randint(0, 1000), self.player, self.enemy_array,
-                            self.enemy_projectile_list, self.player_projectile_list, self.xp_list)
+            self.enemy_array.append(
+                Archer(self.player, self.enemy_array,
+                       self.enemy_projectile_list, self.player_projectile_list, self.xp_list))
+
+        for i in range(GameView.SLIME_AMOUNT):
+            self.enemy_array.append(Slime(self.player,
+                                             self.enemy_array, self.enemy_projectile_list,
+                                             self.player_projectile_list,
+                                             self.xp_list))
             # noinspection PyTypeChecker
-            while not (len(arcade.check_for_collision_with_list(archer, self.enemy_array)) == 0 and
-                       not arcade.check_for_collision(archer, self.player)):
-                archer.center_x = random.randint(0, 1000)
-                archer.center_y = random.randint(0, 1000)
-            self.enemy_array.append(archer)
         self.weapon = AWeapon(self.player)  # TODO: fix, you don't initialize an abstract class
 
         self.camera = GameCam(self.player)

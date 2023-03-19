@@ -97,15 +97,13 @@ def load_textures(base_path: str, state_enum) -> dict:
 # noinspection PyTypeChecker
 class AEnemy(arcade.Sprite, IEntity):
 
-    def __init__(self, x, y, player: Player, enemy_array: SpriteList, enemy_projectile_list: SpriteList,
+    def __init__(self, player: Player, enemy_array: SpriteList, enemy_projectile_list: SpriteList,
                  player_projectile_list: SpriteList, xp_list: SpriteList, speed: float, frames_per_texture: int,
                  initial_state,
                  initial_direction: Direction, animation_state,
                  sprite_scale=1.0, starting_x=random.randint(0, MAP_WIDTH), starting_y=random.randint(0, MAP_HEIGHT)):
         super().__init__(scale=sprite_scale)
 
-        self.center_x = x
-        self.center_y = y
         self.sprite_scale = sprite_scale
         self.player_projectile_list = player_projectile_list
         self.enemy_projectile_list = enemy_projectile_list
@@ -132,7 +130,6 @@ class AEnemy(arcade.Sprite, IEntity):
                     arcade.check_for_collision(self, self.player):
                 collided = False
             else:
-                print("hi")
                 self.center_x = random.randint(0, MAP_WIDTH)
                 self.center_y = random.randint(0, MAP_HEIGHT)
 
@@ -196,7 +193,7 @@ class AEnemy(arcade.Sprite, IEntity):
                 self.remove_from_sprite_lists()
 
                 self.enemy_array.append(
-                    enemy_to_spawn(random.randint(0, MAP_WIDTH), random.randint(0, MAP_HEIGHT), self.player,
+                    enemy_to_spawn(self.player,
                                    self.enemy_array, self.enemy_projectile_list, self.player_projectile_list,
                                    self.xp_list))
 
@@ -275,9 +272,9 @@ class Skeleton(AEnemy):
 
     TEXTURES = SKELETON_TEXTURES_BASE
 
-    def __init__(self, x, y, player: Player, enemy_array: SpriteList, enemy_projectile_list: SpriteList,
+    def __init__(self, player: Player, enemy_array: SpriteList, enemy_projectile_list: SpriteList,
                  player_projectile_list: SpriteList, xp_list):
-        super().__init__(x, y, player, enemy_array, enemy_projectile_list, player_projectile_list, xp_list,
+        super().__init__(player, enemy_array, enemy_projectile_list, player_projectile_list, xp_list,
                          Skeleton.SPEED, 5,
                          SkeletonAnimationState.IDLE, Direction.RIGHT,
                          SkeletonAnimationState,
@@ -361,9 +358,9 @@ class Archer(AEnemy):
 
     TEXTURES = ARCHER_TEXTURES_BASE
 
-    def __init__(self, x, y, player: Player, enemy_array: SpriteList, enemy_projectile_list: SpriteList,
+    def __init__(self, player: Player, enemy_array: SpriteList, enemy_projectile_list: SpriteList,
                  player_projectile_list: SpriteList, xp_list: SpriteList):
-        super().__init__(x, y, player, enemy_array, enemy_projectile_list, player_projectile_list, xp_list,
+        super().__init__(player, enemy_array, enemy_projectile_list, player_projectile_list, xp_list,
                          Archer.SPEED, 5,
                          ArcherAnimationState.IDLE, Direction.RIGHT,
                          ArcherAnimationState,
@@ -471,11 +468,12 @@ class Slime(AEnemy):
                  player_projectile_list: SpriteList, xp_list: SpriteList, sprite_scale=5, parent=True,
                  starting_x=random.randint(0, MAP_WIDTH), starting_y=random.randint(0, MAP_HEIGHT)):
         self.sprite_scale = sprite_scale
-        super().__init__(player, enemy_array, enemy_projectile_list, player_projectile_list, Slime.SPEED, 5,
+        super().__init__(player, enemy_array, enemy_projectile_list, player_projectile_list, xp_list, Slime.SPEED, 5,
                          SlimeAnimationState.IDLE, Direction.RIGHT,
                          SlimeAnimationState,
                          self.sprite_scale, starting_x, starting_y)
         self.parent = parent
+        self.xp_list = xp_list
 
     def load_textures(self) -> dict:
         """loads the right textures of the sprite
@@ -566,13 +564,14 @@ class Slime(AEnemy):
             if self.current_texture_index + 1 >= self._state.value[1] and \
                     self.frame_counter + 1 > self.frames_per_texture:
                 if self.parent:
-                    places = [[-40, -40], [-40, 40], [40, 40], [40, -40]]
+                    places = [[-30, -30], [-30, 30], [30, 30], [30, -30]]
                     for place in places:
                         self.enemy_array.append(Slime(self.player, self.enemy_array,
-                                                      self.enemy_projectile_list, self.player_projectile_list, 2, False,
+                                                      self.enemy_projectile_list, self.player_projectile_list,
+                                                      self.xp_list, 2, False,
                                                       floor(self.center_x) + place[0], floor(self.center_y) + place[1]))
                         self.enemy_array.append(enemy_to_spawn(self.player, self.enemy_array,
-                                                               self.enemy_projectile_list, self.player_projectile_list))
+                                                               self.enemy_projectile_list, self.player_projectile_list,
+                                                               self.xp_list))
 
                 self.remove_from_sprite_lists()
-
