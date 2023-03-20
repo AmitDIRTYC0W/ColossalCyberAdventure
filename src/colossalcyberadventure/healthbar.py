@@ -49,7 +49,7 @@ class HealthBar:
     def calculate_inner_values(self):
         self.inner_width = self.health_points / HealthBar.FULL_HEALTH * (self.width - 2 * self.border_width)
         self.inner_center_x = self.center_x - (self.width - self.inner_width) / 2 + self.border_width
-
+                    #  TODO kill self
     def update(self):
         self.level = self.owner.level
         self.owner_x = self.owner.get_position()[0]

@@ -21,3 +21,5 @@ class ColossalCyberAdventure(arcade.Window):
         """
 
         self.show_view(LoginScreenView())
+
+        #  TODO die

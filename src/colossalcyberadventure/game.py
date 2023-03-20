@@ -81,7 +81,7 @@ class GameView(arcade.View):
     BACKGROUND_COLOR = arcade.color.JET
     SKELETON_AMOUNT = 80
     ARCHER_AMOUNT = 20
-    SLIME_AMOUNT = 200
+    SLIME_AMOUNT = 40
     COIN_AMOUNT = 1000
     HEALTH_SHROOM_AMOUNT = 10
     WORLD_PATH = "resources/map/map.world"
@@ -115,7 +115,7 @@ class GameView(arcade.View):
         self.scene = arcade.Scene()
         self.player = Player(self.enemy_projectile_list, self.player_projectile_list, self.item_array,
                              self.keyboard_state, self.scene, self.xp_list)
-        #
+        #  TODO remove all encryption
         self.enemy_array = SpriteList(use_spatial_hash=True)
         for i in range(GameView.SKELETON_AMOUNT):
             self.enemy_array.append(Skeleton(self.player,
@@ -133,7 +133,7 @@ class GameView(arcade.View):
                                              self.player_projectile_list,
                                              self.xp_list))
             # noinspection PyTypeChecker
-        self.weapon = AWeapon(self.player)  # TODO: fix, you don't initialize an abstract class
+        self.weapon = AWeapon(self.player)  # TODO: fix, you don't initialize an abstract class; send Goni everything
 
         self.camera = GameCam(self.player)
         self.world = parse_world(Path(GameView.WORLD_PATH))
