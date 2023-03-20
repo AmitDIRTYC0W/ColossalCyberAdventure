@@ -1,6 +1,6 @@
 import queue
 import random
-from math import floor
+from math import floor, ceil
 
 import arcade
 from arcade import Scene
@@ -87,12 +87,12 @@ class GameView(arcade.View):
         for i in range(GameView.SKELETON_AMOUNT):
             self.enemy_array.append(
                 Skeleton(
-                self.player,
-                self.enemy_array,
-                self.enemy_projectile_list,
-                self.player_projectile_list,
+                    self.player,
+                    self.enemy_array,
+                    self.enemy_projectile_list,
+                    self.player_projectile_list,
+                )
             )
-        )
         for i in range(GameView.ARCHER_AMOUNT):
             self.enemy_array.append(
                 Archer(
@@ -168,34 +168,58 @@ class GameView(arcade.View):
         if self.inventory_state:
             self.player.inventory.draw()
 
+
+    def num_sprites(self):
+        n = 0
+        for key in self.scene.name_mapping.keys():
+            n += len(self.scene[key])
+        return n
+
     def on_update(self, delta_time: float):
+        if delta_time > 0.03:
+            print("drop")
+
         if self.player.check_death():
             self.window.show_view(DeathScreenView())
 
         self.player.update_player_speed(self.keyboard_state, self.enemy_array)
         self.enemy_array.update()
 
-        map_x = floor(self.player.center_x / GameView.TILEMAP_WIDTH_PX)
-        map_y = floor(self.player.center_y / GameView.TILEMAP_HEIGHT_PX)
-        for y_offset in range(-1, 2):
-            for x_offset in range(-1, 2):
-                if not (map_x + x_offset < 0 or map_x + x_offset >= 40) and not (
-                        map_y + y_offset < 0 or map_y + y_offset >= 40) and not (x_offset == 0 and y_offset == 0):
-                    key = f"{map_x + x_offset}-{map_y + y_offset}"
-                    if not (key in self.maps_in_loading or key in self.scene.name_mapping.keys()):
-                        self.maps_in_loading.append(key)
-                        x = map_x + x_offset
-                        y = map_y + y_offset
-                        map_index = x * GameView.WORLD_WIDTH_TILEMAPS + y
-                        params = {
-                            "x": x,
-                            "y": y,
-                            "map_file": self.world.maps[map_index].map_file,
-                            "world_width_in_tilemaps": GameView.WORLD_WIDTH_TILEMAPS,
-                            "width_px": GameView.TILEMAP_WIDTH_PX,
-                            "height_px": GameView.TILEMAP_HEIGHT_PX,
-                        }
-                        self.loader.queue_in.put(params)
+        # for y_offset in self.get_maps_surrounding_player()[2:]:
+        #     for x_offset in self.get_maps_surrounding_player()[:2]:
+        #         if not (map_x + x_offset < 0 or map_x + x_offset >= 40) and not (
+        #                 map_y + y_offset < 0 or map_y + y_offset >= 40) and not (x_offset == 0 and y_offset == 0):
+        #             key = f"{map_x + x_offset}-{map_y + y_offset}"
+        #             if not (key in self.maps_in_loading or key in self.scene.name_mapping.keys()):
+        #                 self.maps_in_loading.append(key)
+        #                 x = map_x + x_offset
+        #                 y = map_y + y_offset
+        #                 map_index = x * GameView.WORLD_WIDTH_TILEMAPS + y
+        #                 params = {
+        #                     "x": x,
+        #                     "y": y,
+        #                     "map_file": self.world.maps[map_index].map_file,
+        #                     "world_width_in_tilemaps": GameView.WORLD_WIDTH_TILEMAPS,
+        #                     "width_px": GameView.TILEMAP_WIDTH_PX,
+        #                     "height_px": GameView.TILEMAP_HEIGHT_PX,
+        #                 }
+        #                 self.loader.queue_in.put(params)
+        print(len(self.scene.name_mapping.keys()))
+        for x, y in self.get_maps_surrounding_player():
+            if x >= 0 and y >= 0:
+                key = f"{x}-{y}"
+                if not (key in self.maps_in_loading or key in self.scene.name_mapping.keys()):
+                    print(key)
+                    self.maps_in_loading.append(key)
+                    params = {
+                        "x": x,
+                        "y": y,
+                        "map_file": self.world.maps[x * GameView.WORLD_WIDTH_TILEMAPS + y].map_file,
+                        "world_width_in_tilemaps": GameView.WORLD_WIDTH_TILEMAPS,
+                        "width_px": GameView.TILEMAP_WIDTH_PX,
+                        "height_px": GameView.TILEMAP_HEIGHT_PX,
+                    }
+                    self.loader.queue_in.put(params)
 
         if not len(self.maps_in_loading) == 0:
             try:
@@ -249,10 +273,20 @@ class GameView(arcade.View):
                 )
             )
 
+    def get_maps_surrounding_player(self):
+        min_x = floor((self.player.center_x - GameView.TILEMAP_WIDTH_PX // 2) // GameView.TILEMAP_WIDTH_PX)
+        min_y = floor((self.player.center_y - GameView.TILEMAP_HEIGHT_PX // 2) // GameView.TILEMAP_HEIGHT_PX)
+        max_x = floor((self.player.center_x + GameView.TILEMAP_WIDTH_PX // 2) // GameView.TILEMAP_WIDTH_PX)
+        max_y = floor((self.player.center_y + GameView.TILEMAP_HEIGHT_PX // 2) // GameView.TILEMAP_HEIGHT_PX)
+        return (min_x, min_y), (min_x, max_y), (max_x, max_y), (max_x, min_y)
+
     def remove_maps_outside_player_area(self):
-        if len(list(self.scene.name_mapping.keys())) > 9:
-            map_x = floor(self.player.center_x / GameView.TILEMAP_WIDTH_PX)
-            map_y = floor(self.player.center_y / GameView.TILEMAP_HEIGHT_PX)
-            for key in list(self.scene.name_mapping.keys()):
-                if abs(map_x - int(key[0])) >= 1 or abs(int(key[2]) - map_y) >= 1:
-                    self.scene.name_mapping.pop(key)
+        keys_to_remove = []
+        maps = self.get_maps_surrounding_player()
+        for key in self.scene.name_mapping.keys():
+            x, y = map(lambda x: int(x), key.split("-"))
+            if not (x, y) in maps:
+                keys_to_remove.append(key)
+                print("removing", key)
+        for key in keys_to_remove:
+            self.scene.name_mapping.pop(key)

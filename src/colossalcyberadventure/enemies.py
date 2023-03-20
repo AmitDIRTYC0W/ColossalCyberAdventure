@@ -4,8 +4,8 @@ from math import sqrt
 
 import arcade
 from arcade import SpriteList
-from pyglet.math import Vec2
 from arcade.hitbox import HitBox
+from pyglet.math import Vec2
 
 from . import constants
 from .entity import IEntity
@@ -567,6 +567,6 @@ class Slime(AEnemy):
 
         self.center_x = origin_x
         self.center_y = origin_y
-        direction = Vec2(target_x - origin_x, target_y - origin_y).normalize() * Vec2(self.speed, self.speed)
+        direction = Vec2(target_x - origin_x, target_y - origin_y).normalize() * self.speed
         self.change_x = direction.x
         self.change_y = direction.y

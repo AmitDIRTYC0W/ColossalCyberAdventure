@@ -2,15 +2,13 @@
 
 [[package]]
 name = "arcade"
-version = "3.0.0.dev18"
+version = "3.0.0.dev19"
 description = "Arcade Game Development Library"
 category = "main"
 optional = false
 python-versions = ">=3.8"
-files = [
-    {file = "arcade-3.0.0.dev18-py2.py3-none-any.whl", hash = "sha256:7d0537b7245b7046e4480e2e394babcbadc5ef6285e6f2102a33eff062f56122"},
-    {file = "arcade-3.0.0.dev18.tar.gz", hash = "sha256:afc9a20e7b52c25543443a810d29b4acd2f3f7647c551479854ad55cac451408"},
-]
+files = []
+develop = false
 
 [package.dependencies]
 pillow = ">=9.4.0,<9.5.0"
@@ -21,6 +19,12 @@ pytiled-parser = ">=2.2.0,<2.3.0"
 [package.extras]
 dev = ["coverage", "coveralls", "docutils (==0.19)", "furo", "mypy", "pygments (==2.14.0)", "pytest", "pytest-cov", "pytest-mock", "pyyaml (==6.0)", "ruff", "sphinx (==6.1.3)", "sphinx-copybutton (==0.5.1)", "sphinx-sitemap (==2.5.0)", "wheel"]
 docs = ["docutils (==0.19)", "furo", "pygments (==2.14.0)", "pyyaml (==6.0)", "sphinx (==6.1.3)", "sphinx-copybutton (==0.5.1)", "sphinx-sitemap (==2.5.0)", "wheel"]
+
+[package.source]
+type = "git"
+url = "https://github.com/pythonarcade/arcade.git"
+reference = "HEAD"
+resolved_reference = "b9010e3a9107ff25d7af089d0cc3aa7bc8d109a5"
 
 [[package]]
 name = "attrs"
@@ -451,4 +455,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "691a27c7a3eb4e029d6396395095d591ed338a74e65b263c004e53c88169977a"
+content-hash = "8ecd81a1ceac8679af98da6d3f81ed6668e17a3574eed04f38095e5ce55b6616"

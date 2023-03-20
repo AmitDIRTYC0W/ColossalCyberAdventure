@@ -6,9 +6,7 @@ authors = ["Your Name <you@example.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-arcade = "^3.0.0dev18"
-# Bug in poetry prevents this from working
-# arcade = { git = "https://github.com/pythonarcade/arcade.git", rev="2482fb8f1b3d573c3f1f27c5b62a0401b5017567"}
+arcade = { git = "https://github.com/pythonarcade/arcade.git" }
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.2.1"

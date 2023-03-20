@@ -85,8 +85,8 @@ class Player(arcade.Sprite, IEntity):
         super().__init__(scale=Player.SPRITE_SCALE, path_or_texture=":data:player/idle/0.png")
         if textures == TEXTURES_BASE:
             load_textures()
-        self.center_x = 30
-        self.center_y = 30
+        self.center_x = 1000
+        self.center_y = 1000
         self.real_time = time.localtime()
         self.last_skill_1_use = self.real_time
         self.last_skill_2_use = self.real_time
