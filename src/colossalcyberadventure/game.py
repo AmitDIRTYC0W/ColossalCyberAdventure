@@ -1,6 +1,6 @@
 import queue
 import random
-from math import floor, ceil
+from math import floor
 
 import arcade
 from arcade import Scene
@@ -132,8 +132,10 @@ class GameView(arcade.View):
         return self.world.maps[x * GameView.WORLD_WIDTH_TILEMAPS + y].map_file
 
     def connect_scenes(self, other_scene: Scene, key: str):
+        tmp_spritelist = SpriteList()
         for spritelist in other_scene.sprite_lists:
-            self.scene.add_sprite_list(key, True, spritelist)
+            tmp_spritelist.extend(spritelist)
+        self.scene.add_sprite_list(key, True, tmp_spritelist)
 
     def mouse_to_world_position(self, click_x: float, click_y: float) -> Vec2:
         """Converts the position of a click to the actual world position
@@ -176,40 +178,16 @@ class GameView(arcade.View):
         return n
 
     def on_update(self, delta_time: float):
-        if delta_time > 0.03:
-            print("drop")
-
         if self.player.check_death():
             self.window.show_view(DeathScreenView())
 
         self.player.update_player_speed(self.keyboard_state, self.enemy_array)
         self.enemy_array.update()
 
-        # for y_offset in self.get_maps_surrounding_player()[2:]:
-        #     for x_offset in self.get_maps_surrounding_player()[:2]:
-        #         if not (map_x + x_offset < 0 or map_x + x_offset >= 40) and not (
-        #                 map_y + y_offset < 0 or map_y + y_offset >= 40) and not (x_offset == 0 and y_offset == 0):
-        #             key = f"{map_x + x_offset}-{map_y + y_offset}"
-        #             if not (key in self.maps_in_loading or key in self.scene.name_mapping.keys()):
-        #                 self.maps_in_loading.append(key)
-        #                 x = map_x + x_offset
-        #                 y = map_y + y_offset
-        #                 map_index = x * GameView.WORLD_WIDTH_TILEMAPS + y
-        #                 params = {
-        #                     "x": x,
-        #                     "y": y,
-        #                     "map_file": self.world.maps[map_index].map_file,
-        #                     "world_width_in_tilemaps": GameView.WORLD_WIDTH_TILEMAPS,
-        #                     "width_px": GameView.TILEMAP_WIDTH_PX,
-        #                     "height_px": GameView.TILEMAP_HEIGHT_PX,
-        #                 }
-        #                 self.loader.queue_in.put(params)
-        print(len(self.scene.name_mapping.keys()))
         for x, y in self.get_maps_surrounding_player():
             if x >= 0 and y >= 0:
                 key = f"{x}-{y}"
                 if not (key in self.maps_in_loading or key in self.scene.name_mapping.keys()):
-                    print(key)
                     self.maps_in_loading.append(key)
                     params = {
                         "x": x,
@@ -284,9 +262,8 @@ class GameView(arcade.View):
         keys_to_remove = []
         maps = self.get_maps_surrounding_player()
         for key in self.scene.name_mapping.keys():
-            x, y = map(lambda x: int(x), key.split("-"))
+            x, y = map(lambda num: int(num), key.split("-"))
             if not (x, y) in maps:
                 keys_to_remove.append(key)
-                print("removing", key)
         for key in keys_to_remove:
-            self.scene.name_mapping.pop(key)
+            self.scene.remove_sprite_list_by_name(key)
