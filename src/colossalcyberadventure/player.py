@@ -7,6 +7,8 @@ from arcade import SpriteList
 from arcade.hitbox import HitBox
 from pyglet.math import Vec2
 
+from .projectile import Projectile
+from .common import check_map_bounds
 from . import constants
 from .entity import IEntity
 from .projectile import Projectile
@@ -72,24 +74,23 @@ class Player(arcade.Sprite, IEntity):
     """
     SPRITE_SCALE = 2
     SPEED = 5
+    SKILL_3_SPEED_CHANGE = 3
     FRAMES_PER_TEXTURE = 5
+    ALPHA_CHANGE_ON_SKILL_3 = 100
+    XP_PER_LEVEL = 5
 
-    def __init__(
-        self,
-        enemy_projectile_list: SpriteList,
-        player_projectile_list: SpriteList,
-        item_array: SpriteList,
-        keyboard_state: dict[int, bool],
-        scene: arcade.Scene,
-    ):
-        super().__init__(scale=Player.SPRITE_SCALE, path_or_texture=":data:player/idle/0.png")
+    def __init__(self, enemy_projectile_list: SpriteList, player_projectile_list: SpriteList, item_array: SpriteList,
+                 keyboard_state: dict[int, bool], scene: arcade.Scene, xp_list: SpriteList):
+        super().__init__(scale=Player.SPRITE_SCALE, path_or_texture="resources/player/idle/0.png")
         if textures == TEXTURES_BASE:
             load_textures()
         self.center_x = 1000
         self.center_y = 1000
         self.real_time = time.localtime()
-        self.last_skill_1_use = self.real_time
-        self.last_skill_2_use = self.real_time
+        self.last_skill_1_use = time.gmtime(0)
+        self.last_skill_2_use = time.gmtime(0)
+        self.last_skill_3_use = time.gmtime(0)
+        self.using_skill_3 = False
         self.keyboard_state = keyboard_state
         self.player_projectile_list = player_projectile_list
         self.enemy_projectile_list = enemy_projectile_list
@@ -101,6 +102,9 @@ class Player(arcade.Sprite, IEntity):
         self.texture = textures[PlayerAnimationState.IDLE][self.direction][0]
         self.frame_counter = 0
         self.current_texture_index = 0
+        self.xp = 0
+        self.level = 3
+        self.xp_list = xp_list
         self.health_bar = HealthBar(self, 70, 5, 1, arcade.color.BLACK, arcade.color.RED)
         self.should_reset_sprite_counter = False
         self.item_array = item_array
@@ -173,33 +177,23 @@ class Player(arcade.Sprite, IEntity):
         if old_direction != self.direction:
             self.should_reset_sprite_counter = True
 
-        if self.left < 0:
-            self.left = 0
-        if self.right > constants.MAP_WIDTH - 1:
-            self.right = constants.MAP_WIDTH - 1
-
-        if self.bottom < 0:
-            self.bottom = 0
-        if self.top > constants.MAP_HEIGHT - 1:
-            self.top = constants.MAP_HEIGHT - 1
-
-        # collisions_obstacles = arcade.check_for_collision_with_list(self, self.scene[
-        #     f"{floor(self.center_x / SINGLE_MAP_WIDTH)}-{floor(self.center_y / SINGLE_MAP_HEIGHT)}:obstacles"])
-        # collisions_water = arcade.check_for_collision_with_list(self, self.scene[
-        #     f"{floor(self.center_x / SINGLE_MAP_WIDTH)}-{floor(self.center_y / SINGLE_MAP_HEIGHT)}:water"])
-        #
-        # if len(collisions_obstacles) > 0 or len(collisions_water) > 0:
-        #     self.center_x -= self.change_x
-        #     self.center_x -= self.change_y
+        check_map_bounds(self)
 
         self.health_bar.update()
         self.real_time = time.localtime()
+
+        if abs(self.real_time.tm_sec - self.last_skill_3_use.tm_sec) >= 3 and self.using_skill_3:
+            self.using_skill_3 = False
+            self.alpha += Player.ALPHA_CHANGE_ON_SKILL_3
 
         if self.keyboard_state[k.C]:
             self.on_skill_1()
 
         if self.keyboard_state[k.H]:
             self.on_skill_2()
+
+        if self.keyboard_state[k.V]:
+            self.on_skill_3()
 
         self.check_collision_with_items()
 
@@ -250,7 +244,10 @@ class Player(arcade.Sprite, IEntity):
         elif keyboard_state[k.D] and not keyboard_state[k.A]:
             movement_vec.x = 1
 
-        movement_vec = movement_vec.normalize() * Player.SPEED
+        if self.using_skill_3:
+            movement_vec = movement_vec.normalize() * (Player.SPEED + Player.SKILL_3_SPEED_CHANGE)
+        else:
+            movement_vec = movement_vec.normalize() * Player.SPEED
         self.change_x = movement_vec.x
         self.change_y = movement_vec.y
         self.center_x += self.change_x
@@ -268,30 +265,22 @@ class Player(arcade.Sprite, IEntity):
         self.center_y -= self.change_y
 
     def on_skill_1(self):
-        PROJECTILE_PATH = ":data:bullet/0.png"
-        if abs(self.real_time.tm_sec - self.last_skill_1_use.tm_sec) >= 2:
+        projectile_path = ":data:bullet/0.png"
+        if abs(self.real_time.tm_sec - self.last_skill_1_use.tm_sec) >= 2 and self.level >= 2:
             directions = [
                 [self.center_x, self.center_y + 1], [self.center_x + 1, self.center_y + 1],
-                [self.center_x + 1, self.center_y], [self.center_x + 1, self.center_y - 1],
-                [self.center_x, self.center_y - 1], [self.center_x - 1, self.center_y - 1],
-                [self.center_x - 1, self.center_y], [self.center_x - 1, self.center_y + 1],
-            ]
+                          [self.center_x + 1, self.center_y], [self.center_x + 1, self.center_y - 1],
+                          [self.center_x, self.center_y - 1], [self.center_x - 1, self.center_y - 1],
+                          [self.center_x - 1, self.center_y], [self.center_x - 1, self.center_y + 1]
+                          ]
 
             for i in range(8):
                 self.player_projectile_list.append(
-                    Projectile(
-                        self.center_x,
-                        self.center_y,
-                        directions[i][0],
-                        directions[i][1],
-                        PROJECTILE_PATH,
-                        2,
-                    )
-                )
+                    Projectile(self.center_x, self.center_y, directions[i][0], directions[i][1], projectile_path, 2))
             self.last_skill_1_use = self.real_time
 
     def on_skill_2(self):
-        if abs(self.real_time.tm_sec - self.last_skill_2_use.tm_sec) >= 5:
+        if abs(self.real_time.tm_sec - self.last_skill_2_use.tm_sec) >= 5 and self.level >= 2:
             if self.health_bar.health_points <= 80:
                 self.health_bar.health_points += 20
             elif self.health_bar.health_points <= 100:
@@ -300,9 +289,16 @@ class Player(arcade.Sprite, IEntity):
                 return
             self.last_skill_2_use = self.real_time
 
+    def on_skill_3(self):
+        if abs(self.real_time.tm_sec - self.last_skill_3_use.tm_sec) >= 7 and self.level >= 3:
+            self.using_skill_3 = True
+            self.last_skill_3_use = self.real_time
+            self.alpha -= Player.ALPHA_CHANGE_ON_SKILL_3
+
     def reduce_health(self, amount):
         if self.health_bar.health_points > 0:
             self.health_bar.health_points -= amount
+            self.last_skill_3_use = self.real_time
 
     def check_collision_with_items(self):
         item_collided_list = arcade.check_for_collision_with_list(self, self.item_array)
@@ -312,6 +308,12 @@ class Player(arcade.Sprite, IEntity):
             if isinstance(item, HealthShroom):
                 self.health_shroom_counter += 1
             item.remove_from_sprite_lists()
+
+        xp_collision_list = arcade.check_for_collision_with_list(self, self.xp_list)
+        for xp in xp_collision_list:
+            self.xp += 1
+            self.level = self.xp // Player.XP_PER_LEVEL + 1
+            xp.remove_from_sprite_lists()
 
     def get_item_counter(self):
         return self.coin_counter, self.health_shroom_counter

@@ -12,7 +12,7 @@ from pytiled_parser import parse_world
 from colossalcyberadventure import constants
 from .death_screen import DeathScreenView
 from .camera import GameCam
-from .enemies import Archer
+from .enemies import Archer, Slime
 from .enemies import Skeleton
 from .item import Coin
 from .item import HealthShroom
@@ -37,7 +37,7 @@ class GameView(arcade.View):
     BACKGROUND_COLOR = arcade.color.JET
     SKELETON_AMOUNT = 80
     ARCHER_AMOUNT = 20
-    SLIME_AMOUNT = 0
+    SLIME_AMOUNT = 200
     COIN_AMOUNT = 1000
     HEALTH_SHROOM_AMOUNT = 10
     WORLD_PATH = arcade.resources.resolve_resource_path(":data:map/map.world")
@@ -48,22 +48,15 @@ class GameView(arcade.View):
 
     def __init__(self):
         super().__init__()
-        self.keyboard_state = {
-            k.W: False,
-            k.A: False,
-            k.S: False,
-            k.D: False,
-            k.C: False,
-            k.H: False,
-            k.Q: False,
-            k.I: False,
-        }
+        self.keyboard_state = {k.W: False, k.A: False, k.S: False, k.D: False, k.C: False, k.H: False, k.Q: False,
+                               k.I: False, k.V: False}
         self.player_projectile_list = SpriteList(use_spatial_hash=True)
         self.enemy_projectile_list = SpriteList(use_spatial_hash=True)
         self.inventory_state = False
         self.player_projectile_list = SpriteList()
         self.enemy_projectile_list = SpriteList()
         self.item_array = arcade.SpriteList()
+        self.xp_list = arcade.SpriteList()
 
         for i in range(GameView.COIN_AMOUNT):
             x = random.randrange(constants.MAP_WIDTH)
@@ -76,33 +69,31 @@ class GameView(arcade.View):
             health_shroom = HealthShroom(x, y)
             self.item_array.append(health_shroom)
         self.scene = arcade.Scene()
-        self.player = Player(
-            self.enemy_projectile_list,
-            self.player_projectile_list,
-            self.item_array,
-            self.keyboard_state, self.scene
-        )
+        self.player = Player(self.enemy_projectile_list, self.player_projectile_list, self.item_array,
+                             self.keyboard_state, self.scene, self.xp_list)
         #
         self.enemy_array = SpriteList(use_spatial_hash=True)
         for i in range(GameView.SKELETON_AMOUNT):
-            self.enemy_array.append(
-                Skeleton(
-                    self.player,
-                    self.enemy_array,
-                    self.enemy_projectile_list,
-                    self.player_projectile_list,
-                )
-            )
+            self.enemy_array.append(Skeleton(self.player,
+                                             self.enemy_array, self.enemy_projectile_list, self.player_projectile_list,
+                                             self.xp_list))
+
         for i in range(GameView.ARCHER_AMOUNT):
             self.enemy_array.append(
                 Archer(
                     self.player,
                     self.enemy_array,
                     self.enemy_projectile_list,
-                    self.player_projectile_list
-                )
-            )
-        self.weapon = AWeapon(self.player)
+                   self.player_projectile_list,
+                    self.xp_list))
+
+        for i in range(GameView.SLIME_AMOUNT):
+            self.enemy_array.append(Slime(self.player,
+                                             self.enemy_array, self.enemy_projectile_list, self.player_projectile_list
+                ,
+                                             self.xp_list))
+            # noinspection PyTypeChecker
+        self.weapon = AWeapon(self.player)  # TODO: fix, you don't initialize an abstract class
 
         self.camera = GameCam(self.player)
         self.world = parse_world(GameView.WORLD_PATH)
@@ -167,6 +158,7 @@ class GameView(arcade.View):
         self.enemy_projectile_list.draw(pixelated=True)
         self.weapon.draw(pixelated=True)
         self.item_array.draw(pixelated=True)
+        self.xp_list.draw(pixelated=True)
         if self.inventory_state:
             self.player.inventory.draw()
 
