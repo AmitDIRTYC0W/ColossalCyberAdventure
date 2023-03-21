@@ -37,8 +37,8 @@ class GameView(arcade.View):
     BACKGROUND_COLOR = arcade.color.JET
     SKELETON_AMOUNT = 80
     ARCHER_AMOUNT = 20
-    SLIME_AMOUNT = 200
-    COIN_AMOUNT = 1000
+    SLIME_AMOUNT = 100
+    COIN_AMOUNT = 100
     HEALTH_SHROOM_AMOUNT = 10
     WORLD_PATH = arcade.resources.resolve_resource_path(":data:map/map.world")
     TILEMAP_WIDTH_PX = 1920
