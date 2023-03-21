@@ -84,14 +84,13 @@ class GameView(arcade.View):
                     self.player,
                     self.enemy_array,
                     self.enemy_projectile_list,
-                   self.player_projectile_list,
+                    self.player_projectile_list,
                     self.xp_list))
 
         for i in range(GameView.SLIME_AMOUNT):
             self.enemy_array.append(Slime(self.player,
-                                             self.enemy_array, self.enemy_projectile_list, self.player_projectile_list
-                ,
-                                             self.xp_list))
+                                          self.enemy_array, self.enemy_projectile_list, self.player_projectile_list,
+                                          self.xp_list))
             # noinspection PyTypeChecker
         self.weapon = AWeapon(self.player)  # TODO: fix, you don't initialize an abstract class
 
@@ -161,7 +160,6 @@ class GameView(arcade.View):
         self.xp_list.draw(pixelated=True)
         if self.inventory_state:
             self.player.inventory.draw()
-
 
     def num_sprites(self):
         n = 0

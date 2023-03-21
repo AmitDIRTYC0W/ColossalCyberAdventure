@@ -473,13 +473,12 @@ class Slime(AEnemy):
     TEXTURES = SLIME_TEXTURES_BASE
 
     def __init__(self, player: Player, enemy_array: SpriteList, enemy_projectile_list: SpriteList,
-                 player_projectile_list: SpriteList, xp_list: SpriteList, sprite_scale=5, parent=True,
-                 starting_x=random.randint(0, MAP_WIDTH), starting_y=random.randint(0, MAP_HEIGHT)):
+                 player_projectile_list: SpriteList, xp_list: SpriteList, sprite_scale=5, parent=True):
         self.sprite_scale = sprite_scale
         super().__init__(player, enemy_array, enemy_projectile_list, player_projectile_list, xp_list, Slime.SPEED, 5,
                          SlimeAnimationState.IDLE, Direction.RIGHT,
                          SlimeAnimationState,
-                         self.sprite_scale, starting_x, starting_y)
+                         self.sprite_scale)
         self.parent = parent
         self.xp_list = xp_list
 
@@ -498,9 +497,9 @@ class Slime(AEnemy):
         Run this function every update of the window
 
         """
-        DISTANCE_OF_ATTACK = 50
-        TOP_Y_DISTANCE_OF_ATTACK = 15
-        BOTTOM_Y_DISTANCE_OF_ATTACK = -130
+        distance_of_attack = 50
+        top_y_distance_of_attack = 15
+        bottom_y_distance_of_attack = -130
 
         self.update_enemy_speed()
 
@@ -510,46 +509,23 @@ class Slime(AEnemy):
         self.check_death(Slime)
 
         if self._state != self.animation_state.DEATH:
-            enemy_collisions = arcade.check_for_collision_with_list(self, self.enemy_array)
-
-            if len(enemy_collisions) >= 1 or arcade.check_for_collision(self, self.player):
-                self.center_x -= self.change_x
-                self.center_y -= self.change_y
-                self.change_x = 0
-                self.change_y = 0
-                self._state = self.animation_state.IDLE
+            self.check_collisions()
 
             if self.change_x != 0 or self.change_y != 0:
                 self._state = self.animation_state.WALK
             else:
-                if (abs(self.player.center_x - self.left) <= DISTANCE_OF_ATTACK or
-                    abs(self.right - self.player.center_x) <= DISTANCE_OF_ATTACK) and \
-                        BOTTOM_Y_DISTANCE_OF_ATTACK <= self.center_y - \
-                        self.player.center_y <= TOP_Y_DISTANCE_OF_ATTACK and \
+                if (abs(self.player.center_x - self.left) <= distance_of_attack or
+                    abs(self.right - self.player.center_x) <= distance_of_attack) and \
+                        bottom_y_distance_of_attack <= self.center_y - \
+                        self.player.center_y <= top_y_distance_of_attack and \
                         (self._state == self.animation_state.IDLE):
                     if self.current_texture_index + 1 >= self._state.value[1] and \
                             self.frame_counter + 1 > self.frames_per_texture:
                         self.player.reduce_health(2)
 
-            if self.change_x < 0:
-                self.direction = Direction.RIGHT
-            elif self.change_x > 0:
-                self.direction = Direction.LEFT
-            else:
-                if self.center_x > self.player.center_x:
-                    self.direction = Direction.RIGHT
-                elif self.center_x < self.player.center_x:
-                    self.direction = Direction.LEFT
+            self.check_collisions()
 
-        if self.left < 0:
-            self.left = 0
-        if self.right > MAP_WIDTH - 1:
-            self.right = MAP_WIDTH - 1
-
-        if self.bottom < 0:
-            self.bottom = 0
-        if self.top > MAP_HEIGHT - 1:
-            self.top = MAP_HEIGHT - 1
+        check_map_bounds(self)
 
     def update_enemy_speed(self):
         """Updates slimes change_x and change_y
@@ -576,8 +552,7 @@ class Slime(AEnemy):
                     for place in places:
                         self.enemy_array.append(Slime(self.player, self.enemy_array,
                                                       self.enemy_projectile_list, self.player_projectile_list,
-                                                      self.xp_list, 2, False,
-                                                      floor(self.center_x) + place[0], floor(self.center_y) + place[1]))
+                                                      self.xp_list, 2, False))
                         self.enemy_array.append(enemy_to_spawn(self.player, self.enemy_array,
                                                                self.enemy_projectile_list, self.player_projectile_list,
                                                                self.xp_list))

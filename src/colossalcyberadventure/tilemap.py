@@ -1,6 +1,5 @@
 import multiprocessing as mp
 import arcade
-from pytiled_parser import World
 from colossalcyberadventure import constants
 from pyglet.math import Vec2
 
@@ -36,14 +35,11 @@ class TilemapLoader:
             daemon=True,
         )
 
-    def load_maps(self, queue_in: mp.Queue, queue_out: mp.Queue):
+    @staticmethod
+    def load_maps(queue_in: mp.Queue, queue_out: mp.Queue):
         command_count = 0
         while True:
             command = queue_in.get(block=True)
-            print(
-                f"TilemapLoader: command[{command_count}]: {command}",
-                # f"size={command.__sizeof__()} type={type(command)}",
-            )
             # Handle string commands
             if isinstance(command, str):
                 if command == "start":
@@ -71,13 +67,11 @@ class TilemapLoader:
 
     def start(self):
         """Start the loader process and wait for the process to start"""
-        print("Starting tilemap loader process ..")
         self.process.start()
         self.queue_in.put("start")
         response = self.queue_out.get(block=True)
         if response != "started":
             raise RuntimeError("TilemapLoader did not start")
-        print("TilemapLoader started (pid: %d)" % self.process.pid)
 
     def stop(self):
         self.process.terminate()

@@ -2,6 +2,7 @@ from multiprocessing import freeze_support
 from colossalcyberadventure.colossal_cyber_adventure import ColossalCyberAdventure
 from colossalcyberadventure.tilemap import init_loader
 
+
 def main():
     # Start the tilemap loader process
     init_loader()

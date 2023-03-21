@@ -7,9 +7,7 @@ from arcade import SpriteList
 from arcade.hitbox import HitBox
 from pyglet.math import Vec2
 
-from .projectile import Projectile
 from .common import check_map_bounds
-from . import constants
 from .entity import IEntity
 from .projectile import Projectile
 from .healthbar import HealthBar
@@ -269,10 +267,10 @@ class Player(arcade.Sprite, IEntity):
         if abs(self.real_time.tm_sec - self.last_skill_1_use.tm_sec) >= 2 and self.level >= 2:
             directions = [
                 [self.center_x, self.center_y + 1], [self.center_x + 1, self.center_y + 1],
-                          [self.center_x + 1, self.center_y], [self.center_x + 1, self.center_y - 1],
-                          [self.center_x, self.center_y - 1], [self.center_x - 1, self.center_y - 1],
-                          [self.center_x - 1, self.center_y], [self.center_x - 1, self.center_y + 1]
-                          ]
+                [self.center_x + 1, self.center_y], [self.center_x + 1, self.center_y - 1],
+                [self.center_x, self.center_y - 1], [self.center_x - 1, self.center_y - 1],
+                [self.center_x - 1, self.center_y], [self.center_x - 1, self.center_y + 1]
+            ]
 
             for i in range(8):
                 self.player_projectile_list.append(
