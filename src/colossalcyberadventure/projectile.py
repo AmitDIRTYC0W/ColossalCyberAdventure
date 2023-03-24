@@ -7,7 +7,7 @@ from pyglet.math import Vec2
 
 class Projectile(arcade.Sprite):
     Sprite_Path = None
-    SPEED = 15
+    SPEED = 750
 
     def __init__(self, origin_x: float, origin_y: float, target_x: float, target_y: float, sprite_path: str,
                  sprite_scale=2.5, distance=700):
@@ -24,9 +24,9 @@ class Projectile(arcade.Sprite):
         self.change_y = direction.y
         self.angle = -degrees(atan2(direction.y, direction.x))
 
-    def update(self):
+    def on_update(self, delta_time: float = 1 / 60):
         self.distance = sqrt(abs(self.origin_x - self.center_x) ** 2 + abs(self.origin_y - self.center_y) ** 2)
-        self.center_x += self.change_x
-        self.center_y += self.change_y
+        self.center_x += self.change_x * delta_time
+        self.center_y += self.change_y * delta_time
         if self.distance >= self.max_distance:
             self.remove_from_sprite_lists()

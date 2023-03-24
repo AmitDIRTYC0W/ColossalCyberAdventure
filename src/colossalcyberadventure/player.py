@@ -71,7 +71,7 @@ class Player(arcade.Sprite, IEntity):
         What frame number the animation is in
     """
     SPRITE_SCALE = 2
-    SPEED = 5
+    SPEED = 250
     SKILL_3_SPEED_CHANGE = 3
     FRAMES_PER_TEXTURE = 5
     ALPHA_CHANGE_ON_SKILL_3 = 100
@@ -153,7 +153,7 @@ class Player(arcade.Sprite, IEntity):
         if self.frame_counter > Player.FRAMES_PER_TEXTURE:
             self.frame_counter = 0
 
-    def update(self):
+    def on_update(self, delta_time: float = 1 / 60):
         """Updates player position and checks for collision
         Run this function every update of the window
 
@@ -217,7 +217,7 @@ class Player(arcade.Sprite, IEntity):
         """
         return self.center_x, self.center_y
 
-    def update_player_speed(self, keyboard_state: dict[int, bool], enemy_array):
+    def update_player_speed(self, keyboard_state: dict[int, bool], enemy_array, delta_time):
         """Updates player change_x and change_y values and the player state
 
         Changes these values in accordance to the currently pressed keys.
@@ -246,6 +246,7 @@ class Player(arcade.Sprite, IEntity):
             movement_vec = movement_vec.normalize() * (Player.SPEED + Player.SKILL_3_SPEED_CHANGE)
         else:
             movement_vec = movement_vec.normalize() * Player.SPEED
+        movement_vec = movement_vec * delta_time
         self.change_x = movement_vec.x
         self.change_y = movement_vec.y
         self.center_x += self.change_x

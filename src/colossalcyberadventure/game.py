@@ -171,8 +171,8 @@ class GameView(arcade.View):
         if self.player.check_death():
             self.window.show_view(DeathScreenView())
 
-        self.player.update_player_speed(self.keyboard_state, self.enemy_array)
-        self.enemy_array.update()
+        self.player.update_player_speed(self.keyboard_state, self.enemy_array, delta_time)
+        self.enemy_array.on_update(delta_time)
 
         for x, y in self.get_maps_surrounding_player():
             if x >= 0 and y >= 0:
@@ -203,13 +203,13 @@ class GameView(arcade.View):
         if self.keyboard_state[k.Q]:
             quit()
         self.remove_maps_outside_player_area()
-        self.player.update_player_speed(self.keyboard_state, self.enemy_array)
+        # self.player.update_player_speed(self.keyboard_state, self.enemy_array, delta_time)
         self.player.update_animation()
         self.enemy_array.update_animation()
-        self.player.update()
+        self.player.on_update(delta_time)
         self.camera.center_camera_on_player()
-        self.player_projectile_list.update()
-        self.enemy_projectile_list.update()
+        self.player_projectile_list.on_update(delta_time)
+        self.enemy_projectile_list.on_update(delta_time)
         self.weapon.update()
         self.player.inventory.update(self.camera.position.x, self.camera.position.y)
 

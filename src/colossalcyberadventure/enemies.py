@@ -236,14 +236,14 @@ class AEnemy(arcade.Sprite, IEntity):
             elif self.center_x < self.player.center_x:
                 self.direction = Direction.LEFT
 
-    def set_direction_to_player(self):
+    def set_direction_to_player(self, delta_time: float):
         target_x = self.player.center_x
         target_y = self.player.center_y
         origin_x, origin_y = self.get_position()
 
         self.center_x = origin_x
         self.center_y = origin_y
-        direction = Vec2(target_x - origin_x, target_y - origin_y).normalize() * self.speed
+        direction = Vec2(target_x - origin_x, target_y - origin_y).normalize() * self.speed * delta_time
         self.change_x = direction.x
         self.change_y = direction.y
 
@@ -256,7 +256,7 @@ class AEnemy(arcade.Sprite, IEntity):
     def update(self):
         pass
 
-    def update_enemy_speed(self):
+    def update_enemy_speed(self, delta_time: float):
         pass
 
     def shoot(self):
@@ -304,7 +304,7 @@ class Skeleton(AEnemy):
 
         return textures
 
-    def update(self):
+    def on_update(self, delta_time: float = 1 / 60):
         """Updates player position and checks for collision
         Run this function every update of the window
 
@@ -313,7 +313,7 @@ class Skeleton(AEnemy):
         top_y_distance_of_attack = 15
         bottom_y_distance_of_attack = -130
 
-        self.update_enemy_speed()
+        self.update_enemy_speed(delta_time)
 
         self.center_x += self.change_x
         self.center_y += self.change_y
@@ -340,13 +340,13 @@ class Skeleton(AEnemy):
 
         check_map_bounds(self)
 
-    def update_enemy_speed(self):
+    def update_enemy_speed(self, delta_time: float):
         """Updates slimes change_x and change_y
 
         Changes these values in accordance to the location of the player
         """
 
-        self.set_direction_to_player()
+        self.set_direction_to_player(delta_time)
 
 
 class Archer(AEnemy):
@@ -435,7 +435,7 @@ class Archer(AEnemy):
 
         check_map_bounds(self)
 
-    def update_enemy_speed(self):
+    def update_enemy_speed(self, delta_time: float):
         """Updates slimes change_x and change_y
 
         Changes these values in accordance to the location of the player
@@ -445,7 +445,7 @@ class Archer(AEnemy):
         target_x = self.player.center_x
         target_y = self.player.center_y
 
-        self.set_direction_to_player()
+        self.set_direction_to_player(delta_time)
 
         distance_to_player = sqrt(abs(target_x - self.center_x) ** 2 + abs(target_y - self.center_y) ** 2)
         if distance_to_player < min_distance_to_player:
@@ -539,13 +539,13 @@ class Slime(AEnemy):
 
         check_map_bounds(self)
 
-    def update_enemy_speed(self):
+    def update_enemy_speed(self, delta_time: float):
         """Updates slimes change_x and change_y
 
         Changes these values in accordance to the location of the player
         """
 
-        self.set_direction_to_player()
+        self.set_direction_to_player(delta_time)
 
     def check_death(self, enemy_to_spawn):
         if self._state != self.animation_state.DEATH:
