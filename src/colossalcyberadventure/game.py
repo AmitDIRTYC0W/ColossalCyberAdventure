@@ -10,16 +10,15 @@ from pyglet.math import Vec2
 from pytiled_parser import parse_world
 
 from colossalcyberadventure import constants
-from .death_screen import DeathScreenView
 from .camera import GameCam
+from .death_screen import DeathScreenView
 from .enemies import Archer, Slime
 from .enemies import Skeleton
 from .item import Coin
 from .item import HealthShroom
 from .player import Player
-from .projectile import Projectile
-from .weapon import AWeapon
 from .tilemap import tilemap_from_world, get_loader
+from .weapon import Skull
 
 
 class GameView(arcade.View):
@@ -92,7 +91,8 @@ class GameView(arcade.View):
                                           self.enemy_array, self.enemy_projectile_list, self.player_projectile_list,
                                           self.xp_list))
             # noinspection PyTypeChecker
-        self.weapon = AWeapon(self.player)  # TODO: fix, you don't initialize an abstract class
+        self.weapon = Skull(self.player,
+                            self.player_projectile_list)
 
         self.camera = GameCam(self.player)
         self.world = parse_world(GameView.WORLD_PATH)
@@ -229,17 +229,7 @@ class GameView(arcade.View):
             return
 
         else:
-            bullet_path = ":data:bullet/0.png"
-            self.player_projectile_list.append(
-                Projectile(
-                    self.weapon.center_x,
-                    self.weapon.center_y,
-                    world_pos.x,
-                    world_pos.y,
-                    bullet_path,
-                    1,
-                )
-            )
+            self.weapon.shoot(world_pos.x, world_pos.y)
 
     def get_maps_surrounding_player(self):
         min_x = floor((self.player.center_x - GameView.TILEMAP_WIDTH_PX // 2) // GameView.TILEMAP_WIDTH_PX)

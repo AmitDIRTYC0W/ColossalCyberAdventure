@@ -23,3 +23,5 @@ class ColossalCyberAdventure(arcade.Window):
         Sets up window. Call this again to restart game.
         """
         self.show_view(LoginScreenView())
+
+        #  TODO die

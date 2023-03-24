@@ -62,4 +62,3 @@ class HealthBar:
         self.owner_y = self.owner.get_position()[1]
         self.calculate_center_x_y()
         self.calculate_inner_values()
-        self.update_text_x_y()

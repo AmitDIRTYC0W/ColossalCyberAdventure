@@ -560,7 +560,7 @@ class Slime(AEnemy):
             if self.current_texture_index + 1 >= self._state.value[1] and \
                     self.frame_counter + 1 > self.frames_per_texture:
                 if self.parent:
-                    places = [[-30, -30], [-30, 30], [30, 30], [30, -30]]
+                    places = [[-40, -40], [-40, 40], [40, 40], [40, -40]]
                     for place in places:
                         self.enemy_array.append(Slime(self.player, self.enemy_array,
                                                       self.enemy_projectile_list, self.player_projectile_list,
