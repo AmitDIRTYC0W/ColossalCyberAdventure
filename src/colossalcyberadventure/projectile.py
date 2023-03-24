@@ -1,4 +1,3 @@
-import math
 from math import atan2, degrees
 from math import sqrt
 
