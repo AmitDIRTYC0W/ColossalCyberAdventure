@@ -103,7 +103,10 @@ class AEnemy(arcade.Sprite, IEntity):
                  player_projectile_list: SpriteList, xp_list: SpriteList, speed: float, frames_per_texture: int,
                  initial_state,
                  initial_direction: Direction, animation_state,
-                 sprite_scale=1.0):
+                 sprite_scale=1.0,
+                 starting_x=random.randint(0, constants.MAP_WIDTH),
+                 starting_y=random.randint(0, constants.MAP_HEIGHT),
+                 do_start_collision_checking=True):
         super().__init__(scale=sprite_scale)
 
         self.sprite_scale = sprite_scale
@@ -120,12 +123,15 @@ class AEnemy(arcade.Sprite, IEntity):
         self._state = initial_state
         self.direction = initial_direction
         self.textures_array = self.load_textures()
-        self.texture = self.textures_array[initial_state][Direction.RIGHT][0]
+        self.texture = self.textures_array[initial_state][self.direction][0]
         self.delta_change_x = 0
         self.delta_change_y = 0
+        self.center_x = starting_x
+        self.center_y = starting_y
 
-        collided = True
-        while collided:
+        collided = len(arcade.check_for_collision_with_list(self, self.enemy_array)) != 0 or arcade.check_for_collision(
+            self, self.player)
+        while collided and do_start_collision_checking:
             self.center_x = random.randint(0, constants.MAP_WIDTH)
             self.center_y = random.randint(0, constants.MAP_HEIGHT)
             self.delta_change_x = 0
@@ -219,7 +225,7 @@ class AEnemy(arcade.Sprite, IEntity):
             self.change_y = 0
             self._state = self.animation_state.IDLE
 
-    def check_bounds(self):
+    def set_animation_direction(self):
         if self.change_x < 0:
             self.direction = Direction.RIGHT
         elif self.change_x > 0:
@@ -330,7 +336,7 @@ class Skeleton(AEnemy):
                             self.frame_counter + 1 > self.frames_per_texture:
                         self.player.reduce_health(2)
 
-            self.check_bounds()
+            self.set_animation_direction()
 
         check_map_bounds(self)
 
@@ -425,7 +431,7 @@ class Archer(AEnemy):
             else:
                 self._state = self.animation_state.IDLE
 
-            self.check_bounds()
+            self.set_animation_direction()
 
         check_map_bounds(self)
 
@@ -473,12 +479,17 @@ class Slime(AEnemy):
     TEXTURES = SLIME_TEXTURES_BASE
 
     def __init__(self, player: Player, enemy_array: SpriteList, enemy_projectile_list: SpriteList,
-                 player_projectile_list: SpriteList, xp_list: SpriteList, sprite_scale=5, parent=True):
+                 player_projectile_list: SpriteList, xp_list: SpriteList, sprite_scale=5, parent=True,
+                 starting_x=random.randint(0, constants.MAP_WIDTH), starting_y=random.randint(0, constants.MAP_HEIGHT),
+                 do_start_collision_checking=True):
         self.sprite_scale = sprite_scale
         super().__init__(player, enemy_array, enemy_projectile_list, player_projectile_list, xp_list, Slime.SPEED, 5,
-                         SlimeAnimationState.IDLE, Direction.RIGHT,
+                         SlimeAnimationState.IDLE, Direction.LEFT,
                          SlimeAnimationState,
-                         self.sprite_scale)
+                         self.sprite_scale,
+                         starting_x,
+                         starting_y,
+                         do_start_collision_checking=do_start_collision_checking)
         self.parent = parent
         self.xp_list = xp_list
 
@@ -502,6 +513,7 @@ class Slime(AEnemy):
         bottom_y_distance_of_attack = -130
 
         self.update_enemy_speed()
+        self.set_animation_direction()
 
         self.center_x += self.change_x
         self.center_y += self.change_y
@@ -552,7 +564,9 @@ class Slime(AEnemy):
                     for place in places:
                         self.enemy_array.append(Slime(self.player, self.enemy_array,
                                                       self.enemy_projectile_list, self.player_projectile_list,
-                                                      self.xp_list, 2, False))
+                                                      self.xp_list, 2, False, starting_x=int(self.center_x + place[0]),
+                                                      starting_y=int(self.center_y + place[1]),
+                                                      do_start_collision_checking=False))
                         self.enemy_array.append(enemy_to_spawn(self.player, self.enemy_array,
                                                                self.enemy_projectile_list, self.player_projectile_list,
                                                                self.xp_list))
