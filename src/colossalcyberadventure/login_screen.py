@@ -1,8 +1,6 @@
 import arcade
 import arcade.gui
-
-from colossalcyberadventure.death_screen import DeathScreenView
-from src.colossalcyberadventure.game import GameView
+from colossalcyberadventure.game import GameView
 
 
 class LoginScreenView(arcade.View):

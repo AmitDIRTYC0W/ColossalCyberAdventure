@@ -1,6 +1,3 @@
-import os
-import sys
-
 import arcade
 import arcade.gui
 
@@ -18,23 +15,25 @@ class DeathScreenView(arcade.View):
         # --- Required for all code that uses UI element,
         # a UIManager to handle the UI.
         self.manager = arcade.gui.UIManager()
-
-        # Set background color
-        arcade.set_background_color(arcade.color.DARK_BLUE_GRAY)
-
         # Create a vertical BoxGroup to align buttons
         self.v_box = arcade.gui.UIBoxLayout()
 
-        restart_button = arcade.gui.UIFlatButton(text="restart", width=DeathScreenView.BUTTON_WIDTH)
+        restart_button = arcade.gui.UIFlatButton(
+            text="restart",
+            width=DeathScreenView.BUTTON_WIDTH
+        )
         self.v_box.add(restart_button.with_border(width=1))
 
-        quit_button = arcade.gui.UIFlatButton(text="Quit", width=DeathScreenView.BUTTON_WIDTH)
+        quit_button = arcade.gui.UIFlatButton(
+            text="Quit",
+            width=DeathScreenView.BUTTON_WIDTH
+        )
         self.v_box.add(quit_button.with_border(width=1))
 
         @restart_button.event("on_click")
         def on_click_settings(_event):
-            self.manager.clear()
-            os.execl(sys.executable, sys.executable, *sys.argv)
+            from .game import GameView
+            self.window.show_view(GameView())
 
         @quit_button.event("on_click")
         def on_click_settings(_event):
@@ -53,6 +52,7 @@ class DeathScreenView(arcade.View):
         self.manager.draw()
 
     def on_show_view(self):
+        self.window.background_color = arcade.color.DARK_BLUE_GRAY
         self.manager.enable()
 
     def on_hide_view(self):

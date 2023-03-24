@@ -1,12 +1,12 @@
 [tool.poetry]
-name = "CollosalCyberAdventure"
+name = "colossalcyberadventure"
 version = "0.1.0"
 description = ""
 authors = ["Your Name <you@example.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-arcade = "^3.0.0dev17"
+arcade = { git = "https://github.com/pythonarcade/arcade.git" }
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.2.1"

@@ -4,14 +4,16 @@ from math import sqrt, floor
 
 import arcade
 from arcade import SpriteList
+from arcade.hitbox import HitBox
 from pyglet.math import Vec2
 
-from constants import *
-from entity import IEntity
-from player import Player
-from projectile import Projectile
-from src.colossalcyberadventure.xp import XP
-from src.common import check_map_bounds
+from . import constants
+from .entity import IEntity
+from .player import Player
+from .projectile import Projectile
+from .constants import *
+from .xp import XP
+from .common import check_map_bounds
 
 
 class SkeletonAnimationState(Enum):
@@ -101,7 +103,7 @@ class AEnemy(arcade.Sprite, IEntity):
                  player_projectile_list: SpriteList, xp_list: SpriteList, speed: float, frames_per_texture: int,
                  initial_state,
                  initial_direction: Direction, animation_state,
-                 sprite_scale=1.0, starting_x=random.randint(0, MAP_WIDTH), starting_y=random.randint(0, MAP_HEIGHT)):
+                 sprite_scale=1.0):
         super().__init__(scale=sprite_scale)
 
         self.sprite_scale = sprite_scale
@@ -119,13 +121,15 @@ class AEnemy(arcade.Sprite, IEntity):
         self.direction = initial_direction
         self.textures_array = self.load_textures()
         self.texture = self.textures_array[initial_state][Direction.RIGHT][0]
-        self.center_x = starting_x
-        self.center_y = starting_y
         self.delta_change_x = 0
         self.delta_change_y = 0
 
         collided = True
         while collided:
+            self.center_x = random.randint(0, constants.MAP_WIDTH)
+            self.center_y = random.randint(0, constants.MAP_HEIGHT)
+            self.delta_change_x = 0
+            self.delta_change_y = 0
             if len(arcade.check_for_collision_with_list(self, self.enemy_array)) == 0 and not \
                     arcade.check_for_collision(self, self.player):
                 collided = False
@@ -143,7 +147,11 @@ class AEnemy(arcade.Sprite, IEntity):
             if self.current_texture_index >= self._state.value[1]:
                 self.current_texture_index = 0
             self.texture = self.textures_array[self._state][self.direction][self.current_texture_index]
-            self.set_hit_box(self.texture.hit_box_points)
+            self.hit_box = HitBox(
+                self.texture.hit_box_points,
+                position=self.position,
+                scale=self.scale_xy,
+            )
             self.frame_counter = 0
 
     def get_position(self) -> tuple[float, float]:
@@ -151,7 +159,7 @@ class AEnemy(arcade.Sprite, IEntity):
 
         See Also
         --------
-        src.colossalcyberadventure.game.ColossalCyberAdventure: main window class
+        colossalcyberadventure.game.ColossalCyberAdventure: main window class
 
         Returns
         -------
@@ -284,7 +292,7 @@ class Skeleton(AEnemy):
         """loads the right textures of the sprite
         """
         if Skeleton.TEXTURES == SKELETON_TEXTURES_BASE:
-            textures = load_textures("resources/enemies/skeleton", SkeletonAnimationState)
+            textures = load_textures(":data:enemies/skeleton", SkeletonAnimationState)
         else:
             textures = Skeleton.TEXTURES
 
@@ -370,14 +378,14 @@ class Archer(AEnemy):
         """loads the right textures of the sprite
         """
         if Archer.TEXTURES == ARCHER_TEXTURES_BASE:
-            textures = load_textures("resources/enemies/archer", ArcherAnimationState)
+            textures = load_textures(":data:enemies/archer", ArcherAnimationState)
         else:
             textures = Archer.TEXTURES
 
         return textures
 
     def shoot(self):
-        arrow_path = "resources/enemies/archer/arrow/0.png"
+        arrow_path = ":data:enemies/archer/arrow/0.png"
         if self.direction == Direction.LEFT:
             source_x = self.center_x + 30
         else:
@@ -465,13 +473,12 @@ class Slime(AEnemy):
     TEXTURES = SLIME_TEXTURES_BASE
 
     def __init__(self, player: Player, enemy_array: SpriteList, enemy_projectile_list: SpriteList,
-                 player_projectile_list: SpriteList, xp_list: SpriteList, sprite_scale=5, parent=True,
-                 starting_x=random.randint(0, MAP_WIDTH), starting_y=random.randint(0, MAP_HEIGHT)):
+                 player_projectile_list: SpriteList, xp_list: SpriteList, sprite_scale=5, parent=True):
         self.sprite_scale = sprite_scale
         super().__init__(player, enemy_array, enemy_projectile_list, player_projectile_list, xp_list, Slime.SPEED, 5,
                          SlimeAnimationState.IDLE, Direction.RIGHT,
                          SlimeAnimationState,
-                         self.sprite_scale, starting_x, starting_y)
+                         self.sprite_scale)
         self.parent = parent
         self.xp_list = xp_list
 
@@ -479,7 +486,7 @@ class Slime(AEnemy):
         """loads the right textures of the sprite
         """
         if Slime.TEXTURES == SKELETON_TEXTURES_BASE:
-            textures = load_textures("resources/enemies/slime", SlimeAnimationState)
+            textures = load_textures(":data:enemies/slime", SlimeAnimationState)
         else:
             textures = Slime.TEXTURES
 
@@ -490,9 +497,9 @@ class Slime(AEnemy):
         Run this function every update of the window
 
         """
-        DISTANCE_OF_ATTACK = 50
-        TOP_Y_DISTANCE_OF_ATTACK = 15
-        BOTTOM_Y_DISTANCE_OF_ATTACK = -130
+        distance_of_attack = 50
+        top_y_distance_of_attack = 15
+        bottom_y_distance_of_attack = -130
 
         self.update_enemy_speed()
 
@@ -502,46 +509,23 @@ class Slime(AEnemy):
         self.check_death(Slime)
 
         if self._state != self.animation_state.DEATH:
-            enemy_collisions = arcade.check_for_collision_with_list(self, self.enemy_array)
-
-            if len(enemy_collisions) >= 1 or arcade.check_for_collision(self, self.player):
-                self.center_x -= self.change_x
-                self.center_y -= self.change_y
-                self.change_x = 0
-                self.change_y = 0
-                self._state = self.animation_state.IDLE
+            self.check_collisions()
 
             if self.change_x != 0 or self.change_y != 0:
                 self._state = self.animation_state.WALK
             else:
-                if (abs(self.player.center_x - self.left) <= DISTANCE_OF_ATTACK or
-                    abs(self.right - self.player.center_x) <= DISTANCE_OF_ATTACK) and \
-                        BOTTOM_Y_DISTANCE_OF_ATTACK <= self.center_y - \
-                        self.player.center_y <= TOP_Y_DISTANCE_OF_ATTACK and \
+                if (abs(self.player.center_x - self.left) <= distance_of_attack or
+                    abs(self.right - self.player.center_x) <= distance_of_attack) and \
+                        bottom_y_distance_of_attack <= self.center_y - \
+                        self.player.center_y <= top_y_distance_of_attack and \
                         (self._state == self.animation_state.IDLE):
                     if self.current_texture_index + 1 >= self._state.value[1] and \
                             self.frame_counter + 1 > self.frames_per_texture:
                         self.player.reduce_health(2)
 
-            if self.change_x < 0:
-                self.direction = Direction.RIGHT
-            elif self.change_x > 0:
-                self.direction = Direction.LEFT
-            else:
-                if self.center_x > self.player.center_x:
-                    self.direction = Direction.RIGHT
-                elif self.center_x < self.player.center_x:
-                    self.direction = Direction.LEFT
+            self.check_collisions()
 
-        if self.left < 0:
-            self.left = 0
-        if self.right > MAP_WIDTH - 1:
-            self.right = MAP_WIDTH - 1
-
-        if self.bottom < 0:
-            self.bottom = 0
-        if self.top > MAP_HEIGHT - 1:
-            self.top = MAP_HEIGHT - 1
+        check_map_bounds(self)
 
     def update_enemy_speed(self):
         """Updates slimes change_x and change_y
@@ -568,8 +552,7 @@ class Slime(AEnemy):
                     for place in places:
                         self.enemy_array.append(Slime(self.player, self.enemy_array,
                                                       self.enemy_projectile_list, self.player_projectile_list,
-                                                      self.xp_list, 2, False,
-                                                      floor(self.center_x) + place[0], floor(self.center_y) + place[1]))
+                                                      self.xp_list, 2, False))
                         self.enemy_array.append(enemy_to_spawn(self.player, self.enemy_array,
                                                                self.enemy_projectile_list, self.player_projectile_list,
                                                                self.xp_list))

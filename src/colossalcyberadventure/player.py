@@ -4,19 +4,16 @@ from enum import Enum
 import arcade
 import arcade.key as k
 from arcade import SpriteList
+from arcade.hitbox import HitBox
 from pyglet.math import Vec2
 
-from projectile import Projectile
-from entity import IEntity
-
-from constants import *
-from entity import IEntity
-from projectile import Projectile
-from src.colossalcyberadventure.healthbar import HealthBar
-from src.colossalcyberadventure.inventory import Inventory
-from src.colossalcyberadventure.item import Coin
-from src.colossalcyberadventure.item import HealthShroom
-from src.common import check_map_bounds
+from .common import check_map_bounds
+from .entity import IEntity
+from .projectile import Projectile
+from .healthbar import HealthBar
+from .inventory import Inventory
+from .item import Coin
+from .item import HealthShroom
 
 
 class PlayerAnimationState(Enum):
@@ -52,7 +49,7 @@ def load_textures():
         textures[state][Direction.RIGHT] = []
         textures[state][Direction.LEFT] = []
         for i in range(state.value[1]):
-            tex_left, tex_right = arcade.load_texture_pair(f"resources/player/{state.value[0]}/{i}.png")
+            tex_left, tex_right = arcade.load_texture_pair(f":data:player/{state.value[0]}/{i}.png")
             textures[state][Direction.RIGHT].append(tex_left)
             textures[state][Direction.LEFT].append(tex_right)
 
@@ -73,9 +70,7 @@ class Player(arcade.Sprite, IEntity):
     current_texture_index: int
         What frame number the animation is in
     """
-
     SPRITE_SCALE = 2
-
     SPEED = 5
     SKILL_3_SPEED_CHANGE = 3
     FRAMES_PER_TEXTURE = 5
@@ -87,8 +82,8 @@ class Player(arcade.Sprite, IEntity):
         super().__init__(scale=Player.SPRITE_SCALE, path_or_texture="resources/player/idle/0.png")
         if textures == TEXTURES_BASE:
             load_textures()
-        self.center_x = 30
-        self.center_y = 30
+        self.center_x = 1000
+        self.center_y = 1000
         self.real_time = time.localtime()
         self.last_skill_1_use = time.gmtime(0)
         self.last_skill_2_use = time.gmtime(0)
@@ -113,7 +108,12 @@ class Player(arcade.Sprite, IEntity):
         self.item_array = item_array
         self.coin_counter = 0
         self.health_shroom_counter = 0
-        self.inventory = Inventory(self.coin_counter, self.health_shroom_counter, self, owner=self)
+        self.inventory = Inventory(
+            self.coin_counter,
+            self.health_shroom_counter,
+            self,
+            owner=self,
+        )
 
     def update_state(self, new_state: PlayerAnimationState):
         """Update the player state and reset counters
@@ -143,7 +143,11 @@ class Player(arcade.Sprite, IEntity):
                 self.current_texture_index = 0
             self.should_reset_sprite_counter = False
             self.texture = textures[self._state][self.direction][self.current_texture_index]
-            self.set_hit_box(self.texture.hit_box_points)
+            self.hit_box = HitBox(
+                self.texture.hit_box_points,
+                position=self.position,
+                scale=self.scale_xy,
+            )
 
         self.frame_counter += 1
         if self.frame_counter > Player.FRAMES_PER_TEXTURE:
@@ -259,13 +263,14 @@ class Player(arcade.Sprite, IEntity):
         self.center_y -= self.change_y
 
     def on_skill_1(self):
-        projectile_path = "resources/bullet/0.png"
+        projectile_path = ":data:bullet/0.png"
         if abs(self.real_time.tm_sec - self.last_skill_1_use.tm_sec) >= 2 and self.level >= 2:
-            directions = [[self.center_x, self.center_y + 1], [self.center_x + 1, self.center_y + 1],
-                          [self.center_x + 1, self.center_y], [self.center_x + 1, self.center_y - 1],
-                          [self.center_x, self.center_y - 1], [self.center_x - 1, self.center_y - 1],
-                          [self.center_x - 1, self.center_y], [self.center_x - 1, self.center_y + 1]
-                          ]
+            directions = [
+                [self.center_x, self.center_y + 1], [self.center_x + 1, self.center_y + 1],
+                [self.center_x + 1, self.center_y], [self.center_x + 1, self.center_y - 1],
+                [self.center_x, self.center_y - 1], [self.center_x - 1, self.center_y - 1],
+                [self.center_x - 1, self.center_y], [self.center_x - 1, self.center_y + 1]
+            ]
 
             for i in range(8):
                 self.player_projectile_list.append(

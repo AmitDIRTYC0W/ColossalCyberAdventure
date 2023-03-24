@@ -1,69 +1,25 @@
-import multiprocessing as mp
+import queue
 import random
 from math import floor
-from pathlib import Path
 
-import _queue
 import arcade
 from arcade import Scene
 from arcade import SpriteList
 from arcade import key as k
 from pyglet.math import Vec2
-from pytiled_parser import parse_world, World
+from pytiled_parser import parse_world
 
-from colossalcyberadventure.death_screen import DeathScreenView
-from constants import *
-from src.colossalcyberadventure.camera import GameCam
-from src.colossalcyberadventure.enemies import Archer, Slime
-from src.colossalcyberadventure.enemies import Skeleton
-from src.colossalcyberadventure.item import Coin
-from src.colossalcyberadventure.item import HealthShroom
-from src.colossalcyberadventure.player import Player
-from src.colossalcyberadventure.projectile import Projectile
-from src.colossalcyberadventure.weapon import AWeapon
-
-
-class TilemapLoader:
-    def __init__(self):
-        self.queue_in = mp.Queue()
-        self.queue_out = mp.Queue()
-        self.process = mp.Process(
-            target=self.load_maps,
-            args=(self.queue_out,),
-            daemon=True,
-        )
-
-    def load_maps(self, queue_out: mp.Queue):
-        while True:
-            params = self.queue_in.get(block=True)
-            map_loaded = tilemap_from_world(params["x"], params["y"], params["world"],
-                                            params["world_width_in_tilemaps"], params["width_px"], params["height_px"])
-            queue_out.put({"tilemap": map_loaded, "x": params["x"], "y": params["y"]}, block=False)
-
-    def start(self):
-        self.process.start()
-
-    def stop(self):
-        self.process.terminate()
-
-
-def load_tilemap(path: str):
-    return arcade.load_tilemap(
-        path,
-        use_spatial_hash=True,
-        lazy=True,
-    )
-
-
-def tilemap_from_world(x, y, world: World, world_width_in_tilemaps, tilemap_width_px, tilemap_height_px):
-    return arcade.load_tilemap(world.maps[x * world_width_in_tilemaps + y].map_file, layer_options={
-        "water": {
-            "use_spatial_hash": True,
-        },
-        "obstacles": {
-            "use_spatial_hash": True,
-        }
-    }, offset=Vec2(x * tilemap_width_px, y * tilemap_height_px), scaling=TILE_SCALING)
+from colossalcyberadventure import constants
+from .death_screen import DeathScreenView
+from .camera import GameCam
+from .enemies import Archer, Slime
+from .enemies import Skeleton
+from .item import Coin
+from .item import HealthShroom
+from .player import Player
+from .projectile import Projectile
+from .weapon import AWeapon
+from .tilemap import tilemap_from_world, get_loader
 
 
 class GameView(arcade.View):
@@ -81,10 +37,10 @@ class GameView(arcade.View):
     BACKGROUND_COLOR = arcade.color.JET
     SKELETON_AMOUNT = 80
     ARCHER_AMOUNT = 20
-    SLIME_AMOUNT = 40
-    COIN_AMOUNT = 1000
+    SLIME_AMOUNT = 100
+    COIN_AMOUNT = 100
     HEALTH_SHROOM_AMOUNT = 10
-    WORLD_PATH = "resources/map/map.world"
+    WORLD_PATH = arcade.resources.resolve_resource_path(":data:map/map.world")
     TILEMAP_WIDTH_PX = 1920
     TILEMAP_HEIGHT_PX = 1080
     WORLD_WIDTH_TILEMAPS = 40
@@ -103,19 +59,19 @@ class GameView(arcade.View):
         self.xp_list = arcade.SpriteList()
 
         for i in range(GameView.COIN_AMOUNT):
-            x = random.randrange(MAP_WIDTH)
-            y = random.randrange(MAP_HEIGHT)
+            x = random.randrange(constants.MAP_WIDTH)
+            y = random.randrange(constants.MAP_HEIGHT)
             coin = Coin(x, y)
             self.item_array.append(coin)
         for i in range(GameView.HEALTH_SHROOM_AMOUNT):
-            x = random.randrange(MAP_WIDTH)
-            y = random.randrange(MAP_HEIGHT)
-            healthshroom = HealthShroom(x, y)
-            self.item_array.append(healthshroom)
+            x = random.randrange(constants.MAP_WIDTH)
+            y = random.randrange(constants.MAP_HEIGHT)
+            health_shroom = HealthShroom(x, y)
+            self.item_array.append(health_shroom)
         self.scene = arcade.Scene()
         self.player = Player(self.enemy_projectile_list, self.player_projectile_list, self.item_array,
                              self.keyboard_state, self.scene, self.xp_list)
-        #  TODO remove all encryption
+        #
         self.enemy_array = SpriteList(use_spatial_hash=True)
         for i in range(GameView.SKELETON_AMOUNT):
             self.enemy_array.append(Skeleton(self.player,
@@ -124,28 +80,40 @@ class GameView(arcade.View):
 
         for i in range(GameView.ARCHER_AMOUNT):
             self.enemy_array.append(
-                Archer(self.player, self.enemy_array,
-                       self.enemy_projectile_list, self.player_projectile_list, self.xp_list))
+                Archer(
+                    self.player,
+                    self.enemy_array,
+                    self.enemy_projectile_list,
+                    self.player_projectile_list,
+                    self.xp_list))
 
         for i in range(GameView.SLIME_AMOUNT):
             self.enemy_array.append(Slime(self.player,
-                                             self.enemy_array, self.enemy_projectile_list,
-                                             self.player_projectile_list,
-                                             self.xp_list))
+                                          self.enemy_array, self.enemy_projectile_list, self.player_projectile_list,
+                                          self.xp_list))
             # noinspection PyTypeChecker
-        self.weapon = AWeapon(self.player)  # TODO: fix, you don't initialize an abstract class; send Goni everything
+        self.weapon = AWeapon(self.player)  # TODO: fix, you don't initialize an abstract class
 
         self.camera = GameCam(self.player)
-        self.world = parse_world(Path(GameView.WORLD_PATH))
+        self.world = parse_world(GameView.WORLD_PATH)
         self.non_drawn_scene = arcade.Scene()
-        map_world_x, map_world_y = floor(self.player.center_x / GameView.TILEMAP_WIDTH_PX), floor(
-            self.player.center_y / GameView.TILEMAP_HEIGHT_PX
+        map_world_x, map_world_y = (
+            floor(self.player.center_x / GameView.TILEMAP_WIDTH_PX),
+            floor(self.player.center_y / GameView.TILEMAP_HEIGHT_PX),
         )
-        self.connect_scenes(arcade.Scene.from_tilemap(
-            tilemap_from_world(map_world_x, map_world_y, self.world, GameView.WORLD_WIDTH_TILEMAPS,
-                               GameView.TILEMAP_WIDTH_PX, GameView.TILEMAP_HEIGHT_PX)), "0-0")
-        self.loader = TilemapLoader()
-        self.loader_started = False
+        self.connect_scenes(
+            arcade.Scene.from_tilemap(
+                tilemap_from_world(
+                    map_world_x,
+                    map_world_y,
+                    self.world.maps[map_world_x * GameView.WORLD_WIDTH_TILEMAPS + map_world_y].map_file,
+                    GameView.TILEMAP_WIDTH_PX,
+                    GameView.TILEMAP_HEIGHT_PX,
+                )
+            ),
+            "0-0",
+        )
+        self.loader = get_loader()
         self.maps_in_loading = []
 
         arcade.set_background_color(GameView.BACKGROUND_COLOR)
@@ -154,8 +122,10 @@ class GameView(arcade.View):
         return self.world.maps[x * GameView.WORLD_WIDTH_TILEMAPS + y].map_file
 
     def connect_scenes(self, other_scene: Scene, key: str):
+        tmp_spritelist = SpriteList()
         for spritelist in other_scene.sprite_lists:
-            self.scene.add_sprite_list(key, True, spritelist)
+            tmp_spritelist.extend(spritelist)
+        self.scene.add_sprite_list(key, True, tmp_spritelist)
 
     def mouse_to_world_position(self, click_x: float, click_y: float) -> Vec2:
         """Converts the position of a click to the actual world position
@@ -180,41 +150,44 @@ class GameView(arcade.View):
 
         self.camera.use()
 
-        self.scene.draw()
-        self.player.draw()
-        self.enemy_array.draw()
-        self.player_projectile_list.draw()
-        self.enemy_projectile_list.draw()
-        self.weapon.draw()
-        self.item_array.draw()
-        self.xp_list.draw()
+        self.scene.draw(pixelated=True)
+        self.player.draw(pixelated=True)
+        self.enemy_array.draw(pixelated=True)
+        self.player_projectile_list.draw(pixelated=True)
+        self.enemy_projectile_list.draw(pixelated=True)
+        self.weapon.draw(pixelated=True)
+        self.item_array.draw(pixelated=True)
+        self.xp_list.draw(pixelated=True)
         if self.inventory_state:
             self.player.inventory.draw()
 
+    def num_sprites(self):
+        n = 0
+        for key in self.scene.name_mapping.keys():
+            n += len(self.scene[key])
+        return n
+
     def on_update(self, delta_time: float):
         if self.player.check_death():
-            death_view = DeathScreenView()
-            self.window.show_view(death_view)
+            self.window.show_view(DeathScreenView())
 
         self.player.update_player_speed(self.keyboard_state, self.enemy_array)
         self.enemy_array.update()
-        if not self.loader_started:
-            self.loader.start()
-            self.loader_started = True
 
-        map_x = floor(self.player.center_x / GameView.TILEMAP_WIDTH_PX)
-        map_y = floor(self.player.center_y / GameView.TILEMAP_HEIGHT_PX)
-        for y_offset in range(-1, 2):
-            for x_offset in range(-1, 2):
-                if not (map_x + x_offset < 0 or map_x + x_offset >= 40) and not (
-                        map_y + y_offset < 0 or map_y + y_offset >= 40) and not (x_offset == 0 and y_offset == 0):
-                    key = f"{map_x + x_offset}-{map_y + y_offset}"
-                    if not (key in self.maps_in_loading or key in self.scene.name_mapping.keys()):
-                        self.maps_in_loading.append(key)
-                        params = {"x": map_x + x_offset, "y": map_y + y_offset, "world": self.world,
-                                  "world_width_in_tilemaps": GameView.WORLD_WIDTH_TILEMAPS,
-                                  "width_px": GameView.TILEMAP_WIDTH_PX, "height_px": GameView.TILEMAP_HEIGHT_PX}
-                        # self.loader.queue_in.put(params)
+        for x, y in self.get_maps_surrounding_player():
+            if x >= 0 and y >= 0:
+                key = f"{x}-{y}"
+                if not (key in self.maps_in_loading or key in self.scene.name_mapping.keys()):
+                    self.maps_in_loading.append(key)
+                    params = {
+                        "x": x,
+                        "y": y,
+                        "map_file": self.world.maps[x * GameView.WORLD_WIDTH_TILEMAPS + y].map_file,
+                        "world_width_in_tilemaps": GameView.WORLD_WIDTH_TILEMAPS,
+                        "width_px": GameView.TILEMAP_WIDTH_PX,
+                        "height_px": GameView.TILEMAP_HEIGHT_PX,
+                    }
+                    self.loader.queue_in.put(params)
 
         if not len(self.maps_in_loading) == 0:
             try:
@@ -224,11 +197,10 @@ class GameView(arcade.View):
                 y_offset = return_dict["y"]
                 self.connect_scenes(arcade.Scene.from_tilemap(tilemap), f"{x_offset}-{y_offset}")
                 self.maps_in_loading.remove(f"{x_offset}-{y_offset}")
-            except _queue.Empty:
+            except queue.Empty:
                 pass
 
         if self.keyboard_state[k.Q]:
-            self.loader.stop()
             quit()
         self.remove_maps_outside_player_area()
         self.player.update_player_speed(self.keyboard_state, self.enemy_array)
@@ -257,14 +229,31 @@ class GameView(arcade.View):
             return
 
         else:
-            bullet_path = "resources/bullet/0.png"
-            self.player_projectile_list.append(Projectile(
-                self.weapon.center_x, self.weapon.center_y, world_pos.x, world_pos.y, bullet_path, 1))
+            bullet_path = ":data:bullet/0.png"
+            self.player_projectile_list.append(
+                Projectile(
+                    self.weapon.center_x,
+                    self.weapon.center_y,
+                    world_pos.x,
+                    world_pos.y,
+                    bullet_path,
+                    1,
+                )
+            )
+
+    def get_maps_surrounding_player(self):
+        min_x = floor((self.player.center_x - GameView.TILEMAP_WIDTH_PX // 2) // GameView.TILEMAP_WIDTH_PX)
+        min_y = floor((self.player.center_y - GameView.TILEMAP_HEIGHT_PX // 2) // GameView.TILEMAP_HEIGHT_PX)
+        max_x = floor((self.player.center_x + GameView.TILEMAP_WIDTH_PX // 2) // GameView.TILEMAP_WIDTH_PX)
+        max_y = floor((self.player.center_y + GameView.TILEMAP_HEIGHT_PX // 2) // GameView.TILEMAP_HEIGHT_PX)
+        return (min_x, min_y), (min_x, max_y), (max_x, max_y), (max_x, min_y)
 
     def remove_maps_outside_player_area(self):
-        if len(list(self.scene.name_mapping.keys())) > 9:
-            map_x = floor(self.player.center_x / GameView.TILEMAP_WIDTH_PX)
-            map_y = floor(self.player.center_y / GameView.TILEMAP_HEIGHT_PX)
-            for key in list(self.scene.name_mapping.keys()):
-                if abs(map_x - int(key[0])) >= 1 or abs(int(key[2]) - map_y) >= 1:
-                    self.scene.name_mapping.pop(key)
+        keys_to_remove = []
+        maps = self.get_maps_surrounding_player()
+        for key in self.scene.name_mapping.keys():
+            x, y = map(lambda num: int(num), key.split("-"))
+            if not (x, y) in maps:
+                keys_to_remove.append(key)
+        for key in keys_to_remove:
+            self.scene.remove_sprite_list_by_name(key)

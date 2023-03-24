@@ -11,7 +11,7 @@ for i in range(6):
 
 
 def create_file(name):
-    with open(f"resources/map/{name}.tmx", "w") as f:
+    with open(f":data:map/{name}.tmx", "w") as f:
         f.write(texts[random.randint(0, 5)])
 
 
@@ -21,6 +21,6 @@ for y in range(40):
         j["maps"].append({"fileName": f"{x}-{y}.tmx", "height": 544, "width": 960, "x": y * 960, "y": -x * 544})
         create_file(f"{x}-{y}")
 
-world = open("resources/map/map.world", "w")
+world = open(":data:map/map.world", "w")
 json.dump(j, world, indent=4)
 world.close()
