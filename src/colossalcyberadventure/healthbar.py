@@ -1,4 +1,5 @@
 import arcade
+from arcade import Text
 
 
 class HealthBar:
@@ -32,6 +33,8 @@ class HealthBar:
         self.inner_center_x = -1  # placeholder
         self.calculate_inner_values()
         self.level = owner.level
+        self.level_text = Text(f"Level: {self.level}", self.center_x - self.width // 2,
+                               self.center_y + HealthBar.LEVEL_TEXT_OFFSET, arcade.color.JET)
 
     def draw(self):
         self.calculate_inner_values()
@@ -39,8 +42,7 @@ class HealthBar:
                                      self.inner_color)
         arcade.draw_rectangle_outline(self.center_x, self.center_y, self.width, self.height, self.outer_color,
                                       self.border_width)
-        arcade.draw_text(f"Level: {self.level}", self.center_x - self.width // 2,
-                         self.center_y + HealthBar.LEVEL_TEXT_OFFSET, arcade.color.JET)
+        self.level_text.draw()
 
     def calculate_center_x_y(self):
         self.center_x = self.owner_x
@@ -50,9 +52,14 @@ class HealthBar:
         self.inner_width = self.health_points / HealthBar.FULL_HEALTH * (self.width - 2 * self.border_width)
         self.inner_center_x = self.center_x - (self.width - self.inner_width) / 2 + self.border_width
 
+    def update_text_x_y(self):
+        self.level_text.x = self.center_x - self.width // 2
+        self.level_text.y = self.center_y + HealthBar.LEVEL_TEXT_OFFSET
+
     def update(self):
         self.level = self.owner.level
         self.owner_x = self.owner.get_position()[0]
         self.owner_y = self.owner.get_position()[1]
         self.calculate_center_x_y()
         self.calculate_inner_values()
+        self.update_text_x_y()
