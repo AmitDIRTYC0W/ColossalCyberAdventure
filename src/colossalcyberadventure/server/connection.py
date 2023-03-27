@@ -24,5 +24,3 @@ async def connect_to_server(host: str, port: int, username: str, password: str, 
                 return None
     except ConnectionError:
         return None
-
-    # TODO do stuff
