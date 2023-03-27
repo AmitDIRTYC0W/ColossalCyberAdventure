@@ -12,14 +12,17 @@ class IdentificationProtocol(QuicConnectionProtocol):
         super().__init__(*args, **kwargs)
         self._ack_waiter = None
         self.response = None
+        self.registered = False
 
     def quic_event_received(self, event: events.QuicEvent) -> None:
         if self._ack_waiter is not None:
             if isinstance(event, StreamDataReceived):
-                self.response = read_identification_response(event.data)
-                waiter = self._ack_waiter
-                self._ack_waiter = None
-                waiter.set_result(self.response)
+                if not self.registered:
+                    self.response = read_identification_response(event.data)
+                    waiter = self._ack_waiter
+                    self._ack_waiter = None
+                    waiter.set_result(self.response)
+                    self.registered = True
 
     async def send_identification(self, username, password, register):
         stream_id = self._quic.get_next_available_stream_id()

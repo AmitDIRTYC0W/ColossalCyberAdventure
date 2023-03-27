@@ -1,4 +1,3 @@
-import os
 from typing import cast
 
 from aioquic.asyncio import connect
