@@ -22,7 +22,7 @@ class Projectile(arcade.Sprite):
         direction = Vec2(target_x - origin_x, target_y - origin_y).normalize() * Projectile.SPEED
         self.change_x = direction.x
         self.change_y = direction.y
-        self.angle = -degrees(atan2(direction.y, direction.x))
+        self.angle = degrees(atan2(direction.y, direction.x))
 
     def on_update(self, delta_time: float = 1 / 60):
         self.distance = sqrt(abs(self.origin_x - self.center_x) ** 2 + abs(self.origin_y - self.center_y) ** 2)

@@ -399,14 +399,14 @@ class Archer(AEnemy):
         self.enemy_projectile_list.append(
             Projectile(source_x, self.center_y, self.player.center_x, self.player.center_y, arrow_path))
 
-    def update(self):
+    def on_update(self, delta_time: float = 1 / 60):
         """Updates player position and checks for collision
         Run this function every update of the window
 
         """
         max_distance_of_attack = 700
 
-        self.update_enemy_speed()
+        self.update_enemy_speed(delta_time)
 
         self.center_x += self.change_x
         self.center_y += self.change_y
@@ -503,7 +503,7 @@ class Slime(AEnemy):
 
         return textures
 
-    def update(self):
+    def on_update(self, delta_time: float = 1 / 60):
         """Updates player position and checks for collision
         Run this function every update of the window
 
@@ -512,7 +512,7 @@ class Slime(AEnemy):
         top_y_distance_of_attack = 15
         bottom_y_distance_of_attack = -130
 
-        self.update_enemy_speed()
+        self.update_enemy_speed(delta_time)
         self.set_animation_direction()
 
         self.center_x += self.change_x
