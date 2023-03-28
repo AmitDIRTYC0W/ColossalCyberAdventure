@@ -1,3 +1,5 @@
+import socket
+
 import arcade
 import arcade.gui
 from colossalcyberadventure.game import GameView
@@ -55,26 +57,19 @@ class LoginScreenView(arcade.View):
         self.v_box.add(quit_button.with_border(width=1))
 
         @login_button.event("on_click")
-        def on_click_settings(_event):
+        def on_click_login(_event):
             self.manager.clear()
             game_view = GameView()
             self.window.show_view(game_view)
-            # self.client = asyncio.run(
-            #     connect_to_server(self.ip_field.text, SERVER_PORT, self.username_field.text, self.password_field.text,
-            #                       False)
-            # )
-            # if self.client:
 
         @register_button.event("on_click")
         def on_click_register(_event):
-            # self.client = asyncio.run( connect_to_server(self.ip_field.text, SERVER_PORT, self.username_field.text,
-            # self.password_field.text, True)) if self.client:
             self.manager.clear()
             game_view = GameView()
             self.window.show_view(game_view)
 
         @quit_button.event("on_click")
-        def on_click_settings(_event):
+        def on_click_quit(_event):
             arcade.exit()
 
         # centers the buttons
