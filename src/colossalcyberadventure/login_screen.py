@@ -2,7 +2,10 @@ import socket
 
 import arcade
 import arcade.gui
+
+from colossalcyberadventure import constants
 from colossalcyberadventure.game import GameView
+from colossalcyberadventure.server_game_view import ServerGameView
 
 
 class LoginScreenView(arcade.View):
@@ -20,7 +23,7 @@ class LoginScreenView(arcade.View):
         self.manager = arcade.gui.UIManager()
 
         # Set background color
-        arcade.set_background_color(arcade.color.DARK_BLUE_GRAY)
+        arcade.set_background_color(arcade.color.AMAZON)
 
         # Create a vertical BoxGroup to align buttons
         self.v_box = arcade.gui.UIBoxLayout()
@@ -59,7 +62,9 @@ class LoginScreenView(arcade.View):
         @login_button.event("on_click")
         def on_click_login(_event):
             self.manager.clear()
-            game_view = GameView()
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect(("localhost", constants.SERVER_PORT))
+            game_view = ServerGameView(s)
             self.window.show_view(game_view)
 
         @register_button.event("on_click")

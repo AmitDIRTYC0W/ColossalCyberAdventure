@@ -82,8 +82,6 @@ class Player(arcade.Sprite, IEntity):
         super().__init__(scale=Player.SPRITE_SCALE, path_or_texture="resources/player/idle/0.png")
         if textures == TEXTURES_BASE:
             load_textures()
-        self.center_x = 1000
-        self.center_y = 1000
         self.real_time = time.localtime()
         self.last_skill_1_use = time.gmtime(0)
         self.last_skill_2_use = time.gmtime(0)
@@ -320,3 +318,8 @@ class Player(arcade.Sprite, IEntity):
     def check_death(self):
         if self.health_bar.health_points <= 0:
             return True
+
+
+class AdditionRequest:
+    def __init__(self, addition_type):
+        self.type = addition_type
