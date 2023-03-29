@@ -50,7 +50,6 @@ class ServerGameView(arcade.View):
         for entity in self.server_entity_list:
             match entity.type:
                 case "player":
-                    # TODO VERY IMPORTANT!!! Make it so the entities are not recreated each time - use sets for O(n)
                     try:
                         p = self.entity_ids[entity.id]
                         p.center_x = entity.x
@@ -77,9 +76,8 @@ class ServerGameView(arcade.View):
                         temp_dict = {entity.id: skeleton}
                         self.entity_ids.update(temp_dict)
 
-        self.player.center_x += (self.movement_vec.normalize() * 5).x
-        self.player.center_y += (self.movement_vec.normalize() * 5).y
-        movement_request = create_movement_request(self.player.center_x, self.player.center_y)
+        update_vec = self.movement_vec.normalize() * 5
+        movement_request = create_movement_request(update_vec.x, update_vec.y)
         self.conn.send(movement_request.to_bytes_packed())
 
     def on_key_press(self, symbol: int, modifiers: int):

@@ -62,7 +62,6 @@ class LoginScreenView(arcade.View):
 
         @login_button.event("on_click")
         def on_click_login(_event):
-            self.manager.clear()
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect(("localhost", constants.SERVER_PORT))
             s.send(
@@ -70,9 +69,10 @@ class LoginScreenView(arcade.View):
                 .to_bytes_packed()
             )
             response = read_identification_response(s.recv(constants.BUFFER_SIZE))
-            print(response)
+            print("Got login response", response)
             match response.which():
                 case "success":
+                    self.manager.clear()
                     game_view = ServerGameView(s)
                     self.window.show_view(game_view)
                 case "failure":
@@ -80,15 +80,15 @@ class LoginScreenView(arcade.View):
 
         @register_button.event("on_click")
         def on_click_register(_event):
-            self.manager.clear()
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect(("localhost", constants.SERVER_PORT))
-            s.send(create_identification_request(self.username_field.text, self.password_field.text,
-                                                 True).to_bytes_packed())
+            request = create_identification_request(self.username_field.text, self.password_field.text, True)
+            s.send(request.to_bytes_packed())
             response = read_identification_response(s.recv(constants.BUFFER_SIZE))
-            print(response)
+            print("Got register response", response)
             match response.which():
                 case "success":
+                    self.manager.clear()
                     game_view = ServerGameView(s)
                     self.window.show_view(game_view)
                 case "failure":
