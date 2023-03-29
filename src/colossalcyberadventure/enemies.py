@@ -282,7 +282,7 @@ class Skeleton(AEnemy):
 
     SPRITE_SCALE = 2
     FRAMES_PER_TEXTURE = 10
-    SPEED = 3
+    SPEED = 200
 
     TEXTURES = SKELETON_TEXTURES_BASE
 
@@ -368,7 +368,7 @@ class Archer(AEnemy):
 
     SPRITE_SCALE = 2
     FRAMES_PER_TEXTURE = 10
-    SPEED = 4
+    SPEED = 300
 
     TEXTURES = ARCHER_TEXTURES_BASE
 
@@ -474,7 +474,7 @@ class Slime(AEnemy):
     """
 
     FRAMES_PER_TEXTURE = 10
-    SPEED = 3
+    SPEED = 200
 
     TEXTURES = SLIME_TEXTURES_BASE
 
