@@ -3,9 +3,9 @@ import socket
 import arcade
 import arcade.gui
 
-from colossalcyberadventure import constants
-from colossalcyberadventure.game import GameView
-from colossalcyberadventure.server_game_view import ServerGameView
+from src.colossalcyberadventure import constants
+from src.colossalcyberadventure.game import GameView
+from src.colossalcyberadventure.server_game_view import ServerGameView
 
 
 class LoginScreenView(arcade.View):
