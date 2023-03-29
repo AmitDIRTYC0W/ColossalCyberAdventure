@@ -60,7 +60,6 @@ class ServerGameView(arcade.View):
                                         self.player_projectile_list, self.xp_list)
                     skeleton.center_x = entity.x
                     skeleton.center_y = entity.y
-                    print("drawing sdkeleton")
                     self.entities.append(skeleton)
         self.player.center_x += (self.movement_vec.normalize() * 5).x
         self.player.center_y += (self.movement_vec.normalize() * 5).y

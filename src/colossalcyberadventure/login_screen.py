@@ -5,6 +5,7 @@ import arcade.gui
 
 from colossalcyberadventure import constants
 from colossalcyberadventure.game import GameView
+from colossalcyberadventure.server.messages import create_identification_request, read_identification_response
 from colossalcyberadventure.server_game_view import ServerGameView
 
 
@@ -64,14 +65,34 @@ class LoginScreenView(arcade.View):
             self.manager.clear()
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect(("localhost", constants.SERVER_PORT))
-            game_view = ServerGameView(s)
-            self.window.show_view(game_view)
+            s.send(
+                create_identification_request(self.username_field.text, self.password_field.text, False)
+                .to_bytes_packed()
+            )
+            response = read_identification_response(s.recv(constants.BUFFER_SIZE))
+            print(response)
+            match response.which():
+                case "success":
+                    game_view = ServerGameView(s)
+                    self.window.show_view(game_view)
+                case "failure":
+                    pass
 
         @register_button.event("on_click")
         def on_click_register(_event):
             self.manager.clear()
-            game_view = GameView()
-            self.window.show_view(game_view)
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect(("localhost", constants.SERVER_PORT))
+            s.send(create_identification_request(self.username_field.text, self.password_field.text,
+                                                 True).to_bytes_packed())
+            response = read_identification_response(s.recv(constants.BUFFER_SIZE))
+            print(response)
+            match response.which():
+                case "success":
+                    game_view = ServerGameView(s)
+                    self.window.show_view(game_view)
+                case "failure":
+                    pass
 
         @quit_button.event("on_click")
         def on_click_quit(_event):
