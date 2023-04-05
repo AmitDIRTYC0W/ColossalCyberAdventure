@@ -9,7 +9,7 @@ from arcade import key as k
 from pyglet.math import Vec2
 from pytiled_parser import parse_world
 
-from colossalcyberadventure import constants
+from src.colossalcyberadventure import constants
 from .camera import GameCam
 from .death_screen import DeathScreenView
 from .enemies import Archer, Slime

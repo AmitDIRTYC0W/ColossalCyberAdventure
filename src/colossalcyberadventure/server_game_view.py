@@ -32,6 +32,8 @@ class ServerGameView(arcade.View):
         self.entities = arcade.SpriteList()
         self.scene.add_sprite_list("entities", True, self.entities)
 
+        self.entity_ids = dict()
+
         self.server_entity_list = []
         self.movement_vec = Vec2(0.0, 0.0)
 
@@ -45,26 +47,37 @@ class ServerGameView(arcade.View):
         self.scene.draw()
 
     def on_update(self, delta_time: float):
-        self.entities.clear()
         for entity in self.server_entity_list:
             match entity.type:
                 case "player":
-                    # TODO VERY IMPORTANT!!! Make it so the entities are not recreated each time - use sets for O(n)
-                    p = Player(self.enemy_projectile_list, self.player_projectile_list, self.item_list,
-                               self.keyboard_state, self.scene, self.xp_list)
-                    p.center_x = entity.x
-                    p.center_y = entity.y
-                    self.entities.append(p)
+                    try:
+                        p = self.entity_ids[entity.id]
+                        p.center_x = entity.x
+                        p.center_y = entity.y
+                    except:
+                        p = Player(self.enemy_projectile_list, self.player_projectile_list, self.item_list,
+                                   self.keyboard_state, self.scene, self.xp_list)
+                        p.center_x = entity.x
+                        p.center_y = entity.y
+                        self.entities.append(p)
+                        temp_dict = {entity.id: p}
+                        self.entity_ids.update(temp_dict)
                 case "skeleton":
-                    skeleton = Skeleton(self.player, self.enemy_list, self.enemy_projectile_list,
-                                        self.player_projectile_list, self.xp_list)
-                    skeleton.center_x = entity.x
-                    skeleton.center_y = entity.y
-                    print("drawing sdkeleton")
-                    self.entities.append(skeleton)
-        self.player.center_x += (self.movement_vec.normalize() * 5).x
-        self.player.center_y += (self.movement_vec.normalize() * 5).y
-        movement_request = create_movement_request(self.player.center_x, self.player.center_y)
+                    try:
+                        skeleton = self.entity_ids[entity.id]
+                        skeleton.center_x = entity.x
+                        skeleton.center_y = entity.y
+                    except:
+                        skeleton = Skeleton(self.player, self.enemy_list, self.enemy_projectile_list,
+                                            self.player_projectile_list, self.xp_list)
+                        skeleton.center_x = entity.x
+                        skeleton.center_y = entity.y
+                        self.entities.append(skeleton)
+                        temp_dict = {entity.id: skeleton}
+                        self.entity_ids.update(temp_dict)
+
+        update_vec = self.movement_vec.normalize() * 5
+        movement_request = create_movement_request(update_vec.x, update_vec.y)
         self.conn.send(movement_request.to_bytes_packed())
 
     def on_key_press(self, symbol: int, modifiers: int):
