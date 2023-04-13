@@ -1,5 +1,4 @@
 import queue
-import random
 from math import floor
 
 import arcade
@@ -8,8 +7,6 @@ from arcade import SpriteList
 from arcade import key as k
 from pyglet.math import Vec2
 from pytiled_parser import parse_world
-
-from src.colossalcyberadventure import constants
 from .camera import GameCam
 from .death_screen import DeathScreenView
 from .enemies import Archer, Slime
@@ -52,21 +49,14 @@ class GameView(arcade.View):
         self.player_projectile_list = SpriteList(use_spatial_hash=True)
         self.enemy_projectile_list = SpriteList(use_spatial_hash=True)
         self.inventory_state = False
+        self.bot_on = False
         self.player_projectile_list = SpriteList()
         self.enemy_projectile_list = SpriteList()
         self.item_array = arcade.SpriteList()
         self.xp_list = arcade.SpriteList()
+        #creating the items moved to server
 
-        for i in range(GameView.COIN_AMOUNT):
-            x = random.randrange(constants.MAP_WIDTH)
-            y = random.randrange(constants.MAP_HEIGHT)
-            coin = Coin(x, y)
-            self.item_array.append(coin)
-        for i in range(GameView.HEALTH_SHROOM_AMOUNT):
-            x = random.randrange(constants.MAP_WIDTH)
-            y = random.randrange(constants.MAP_HEIGHT)
-            health_shroom = HealthShroom(x, y)
-            self.item_array.append(health_shroom)
+            #----------------
         self.scene = arcade.Scene()
         self.player = Player(self.enemy_projectile_list, self.player_projectile_list, self.item_array,
                              self.keyboard_state, self.scene, self.xp_list)
@@ -160,6 +150,8 @@ class GameView(arcade.View):
         self.xp_list.draw(pixelated=True)
         if self.inventory_state:
             self.player.inventory.draw()
+        if self.bot_on:
+            self.player.bot()
 
     def num_sprites(self):
         n = 0
@@ -212,12 +204,15 @@ class GameView(arcade.View):
         self.enemy_projectile_list.on_update(delta_time)
         self.weapon.update()
         self.player.inventory.update(self.camera.position.x, self.camera.position.y)
+        #TODO update items
 
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol in self.keyboard_state.keys():
             self.keyboard_state[symbol] = True
         if symbol == arcade.key.I:
             self.inventory_state = not self.inventory_state
+        if symbol == arcade.key.B:
+            self.bot_on = not self.bot_on
 
     def on_key_release(self, symbol: int, _modifiers: int):
         if symbol in self.keyboard_state.keys():
