@@ -13,7 +13,6 @@ hitboxes = {"obstacles": []}
 
 for file in dirs:
     file_name = "../colossalcyberadventure/resources/map/" + file
-    print(file_name)
     scene = arcade.Scene.from_tilemap(
         arcade.load_tilemap(file_name, layer_options={
             "obstacles": {

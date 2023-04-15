@@ -4,8 +4,9 @@ import threading
 import arcade
 from pyglet.math import Vec2
 
-from .enemies import Skeleton
-from .player import Player
+from . import enemies, player
+from .enemies import Skeleton, SkeletonAnimationState
+from .player import Player, PlayerAnimationState, Direction
 from .server import messages
 from .server.messages import create_movement_request
 
@@ -47,38 +48,61 @@ class ServerGameView(arcade.View):
         self.scene.draw()
 
     def on_update(self, delta_time: float):
-        for entity in self.server_entity_list:
-            match entity.type:
-                case "player":
-                    try:
-                        p = self.entity_ids[entity.id]
-                        p.center_x = entity.x
-                        p.center_y = entity.y
-                    except:
-                        p = Player(self.enemy_projectile_list, self.player_projectile_list, self.item_list,
-                                   self.keyboard_state, self.scene, self.xp_list)
-                        p.center_x = entity.x
-                        p.center_y = entity.y
-                        self.entities.append(p)
-                        temp_dict = {entity.id: p}
-                        self.entity_ids.update(temp_dict)
-                case "skeleton":
-                    try:
-                        skeleton = self.entity_ids[entity.id]
-                        skeleton.center_x = entity.x
-                        skeleton.center_y = entity.y
-                    except:
-                        skeleton = Skeleton(self.player, self.enemy_list, self.enemy_projectile_list,
-                                            self.player_projectile_list, self.xp_list)
-                        skeleton.center_x = entity.x
-                        skeleton.center_y = entity.y
-                        self.entities.append(skeleton)
-                        temp_dict = {entity.id: skeleton}
-                        self.entity_ids.update(temp_dict)
+        self.update_entities()
 
+        # player movement request:
         update_vec = self.movement_vec.normalize() * 5
         movement_request = create_movement_request(update_vec.x, update_vec.y)
         self.conn.send(movement_request.to_bytes_packed())
+
+        # updating the state and direction of all the entities:
+        self.entities.update_animation()
+        self.entities.on_update()
+
+    def update_entities(self):
+        for entity in self.server_entity_list:  # ToDO make it so the entity gets deleated when it is no longer given to you...
+            print(entity.x, entity.y)
+            animation_state = None
+            direction = None
+            match entity.type:
+                case "player":
+                    try:
+                        self.c = self.entity_ids[entity.id]
+                    except:
+                        self.c = Player(self.enemy_projectile_list, self.player_projectile_list, self.item_list,
+                                        self.keyboard_state, self.scene, self.xp_list)
+                        self.entities.append(self.c)
+                        temp_dict = {entity.id: self.c}
+                        self.entity_ids.update(temp_dict)
+                    animation_state = PlayerAnimationState
+                    direction = player.Direction
+                case "skeleton":
+                    try:
+                        self.c = self.entity_ids[entity.id]
+                    except:
+                        self.c = Skeleton(self.player, self.enemy_list, self.enemy_projectile_list,
+                                          self.player_projectile_list, self.xp_list)
+                        self.entities.append(self.c)
+                        temp_dict = {entity.id: self.c}
+                        self.entity_ids.update(temp_dict)
+                    animation_state = SkeletonAnimationState
+                    direction = enemies.Direction
+            self.c.center_x = entity.x
+            self.c.center_y = entity.y
+            match entity.animationstate:
+                case "idle":
+                    self.c.animation_state = animation_state.IDLE
+                case "walk":
+                    self.c.animation_state = animation_state.WALK
+                case "attack":
+                    self.c.animation_state = animation_state.ATTACK
+                case "death":
+                    self.c.animation_state = animation_state.DEATH
+            match entity.direction:
+                case "left":
+                    self.c.direction = direction.LEFT
+                case "right":
+                    self.c.direction = direction.RIGHT
 
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol == arcade.key.W:
@@ -104,4 +128,5 @@ class ServerGameView(arcade.View):
 def handle_server(conn: socket.socket, view: ServerGameView):
     while True:
         server_update = messages.read_server_update(conn.recv(2048))
+        print(server_update)
         view.server_entity_list = server_update.entitiesUpdate

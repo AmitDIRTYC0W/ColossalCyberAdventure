@@ -80,6 +80,7 @@ class Player(arcade.Sprite, IEntity):
     def __init__(self, enemy_projectile_list: SpriteList, player_projectile_list: SpriteList, item_array: SpriteList,
                  keyboard_state: dict[int, bool], scene: arcade.Scene, xp_list: SpriteList):
         super().__init__(scale=Player.SPRITE_SCALE, path_or_texture="resources/player/idle/0.png")
+        self.animation_state = PlayerAnimationState.IDLE
         if textures == TEXTURES_BASE:
             load_textures()
         self.real_time = time.localtime()
@@ -151,47 +152,51 @@ class Player(arcade.Sprite, IEntity):
         if self.frame_counter > Player.FRAMES_PER_TEXTURE:
             self.frame_counter = 0
 
-    def on_update(self, delta_time: float = 1 / 60):
-        """Updates player position and checks for collision
-        Run this function every update of the window
-
-        """
-        self.center_x += self.change_x
-        self.center_y += self.change_y
-
-        for projectile in self.enemy_projectile_list:
-            if arcade.check_for_collision(self, projectile):
-                self.reduce_health(1)
-                projectile.remove_from_sprite_lists()
-
+    def update_direction(self):
         old_direction = self.direction
         if self.change_x < 0:
             self.direction = Direction.LEFT
         elif self.change_x > 0:
             self.direction = Direction.RIGHT
-
+        #
         if old_direction != self.direction:
             self.should_reset_sprite_counter = True
 
-        check_map_bounds(self)
+    def on_update(self, delta_time: float = 1 / 60):
+        """Updates player position and checks for collision
+        Run this function every update of the window
 
-        self.health_bar.update()
-        self.real_time = time.localtime()
-
-        if abs(self.real_time.tm_sec - self.last_skill_3_use.tm_sec) >= 3 and self.using_skill_3:
-            self.using_skill_3 = False
-            self.alpha += Player.ALPHA_CHANGE_ON_SKILL_3
-
-        if self.keyboard_state[k.C]:
-            self.on_skill_1()
-
-        if self.keyboard_state[k.H]:
-            self.on_skill_2()
-
-        if self.keyboard_state[k.V]:
-            self.on_skill_3()
-
-        self.check_collision_with_items()
+        """
+        if self._state.value[0] != self.animation_state.value[0]:
+            self.update_state(self.animation_state)
+        self.update_direction()
+        # self.center_x += self.change_x
+        # self.center_y += self.change_y
+        #
+        # for projectile in self.enemy_projectile_list:
+        #     if arcade.check_for_collision(self, projectile):
+        #         self.reduce_health(1)
+        #         projectile.remove_from_sprite_lists()
+        #
+        # check_map_bounds(self)
+        #
+        # self.health_bar.update()
+        # self.real_time = time.localtime()
+        #
+        # if abs(self.real_time.tm_sec - self.last_skill_3_use.tm_sec) >= 3 and self.using_skill_3:
+        #     self.using_skill_3 = False
+        #     self.alpha += Player.ALPHA_CHANGE_ON_SKILL_3
+        #
+        # if self.keyboard_state[k.C]:
+        #     self.on_skill_1()
+        #
+        # if self.keyboard_state[k.H]:
+        #     self.on_skill_2()
+        #
+        # if self.keyboard_state[k.V]:
+        #     self.on_skill_3()
+        #
+        # self.check_collision_with_items()
 
     def get_state(self):
         return self._state

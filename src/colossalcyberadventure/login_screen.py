@@ -69,7 +69,6 @@ class LoginScreenView(arcade.View):
                 .to_bytes_packed()
             )
             response = read_identification_response(s.recv(constants.BUFFER_SIZE))
-            print("Got login response", response)
             match response.which():
                 case "success":
                     self.manager.clear()
@@ -85,7 +84,6 @@ class LoginScreenView(arcade.View):
             request = create_identification_request(self.username_field.text, self.password_field.text, True)
             s.send(request.to_bytes_packed())
             response = read_identification_response(s.recv(constants.BUFFER_SIZE))
-            print("Got register response", response)
             match response.which():
                 case "success":
                     self.manager.clear()

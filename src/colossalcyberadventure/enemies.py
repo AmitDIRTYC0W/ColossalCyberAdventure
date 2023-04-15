@@ -160,6 +160,12 @@ class AEnemy(arcade.Sprite, IEntity):
             )
             self.frame_counter = 0
 
+    def update_direction(self):
+        if self.change_x < 0:
+            self.direction = Direction.LEFT
+        elif self.change_x > 0:
+            self.direction = Direction.RIGHT
+
     def get_position(self) -> tuple[float, float]:
         """Returns the enemy position relative to the map in px
 
@@ -225,16 +231,8 @@ class AEnemy(arcade.Sprite, IEntity):
             self.change_y = 0
             self._state = self.animation_state.IDLE
 
-    def set_animation_direction(self):
-        if self.change_x < 0:
-            self.direction = Direction.RIGHT
-        elif self.change_x > 0:
-            self.direction = Direction.LEFT
-        else:
-            if self.center_x > self.player.center_x:
-                self.direction = Direction.RIGHT
-            elif self.center_x < self.player.center_x:
-                self.direction = Direction.LEFT
+    def set_animation_direction(self, direction):
+        self.direction = Direction.direction
 
     def set_direction_to_player(self, delta_time: float):
         target_x = self.player.center_x
@@ -254,7 +252,7 @@ class AEnemy(arcade.Sprite, IEntity):
         return self._state
 
     def update(self):
-        pass
+        self.update_direction()
 
     def update_enemy_speed(self, delta_time: float):
         pass
@@ -309,36 +307,37 @@ class Skeleton(AEnemy):
         Run this function every update of the window
 
         """
-        distance_of_attack = 50
-        top_y_distance_of_attack = 15
-        bottom_y_distance_of_attack = -130
+        # distance_of_attack = 50
+        # top_y_distance_of_attack = 15
+        # bottom_y_distance_of_attack = -130
+        #
+        # self.update_enemy_speed(delta_time)
+        #
+        # self.center_x += self.change_x
+        # self.center_y += self.change_y
+        #
+        # self.check_death(Skeleton)
+        #
+        # if self._state != self.animation_state.DEATH:
+        #     self.check_collisions()
+        #
+        #     if self.change_x != 0 or self.change_y != 0:
+        #         self._state = self.animation_state.WALK
+        #     else:
+        #         if (abs(self.player.center_x - self.left) <= distance_of_attack or
+        #             abs(self.right - self.player.center_x) <= distance_of_attack) and \
+        #                 bottom_y_distance_of_attack <= self.center_y - \
+        #                 self.player.center_y <= top_y_distance_of_attack and \
+        #                 (self._state == self.animation_state.IDLE or self._state == self.animation_state.ATTACK):
+        #             self._state = self.animation_state.ATTACK
+        #             if self.current_texture_index + 1 >= self._state.value[1] and \
+        #                     self.frame_counter + 1 > self.frames_per_texture:
+        #                 self.player.reduce_health(2)
 
-        self.update_enemy_speed(delta_time)
+        self.set_animation_direction(self.direction)
+        self.update_state(self.animation_state)
 
-        self.center_x += self.change_x
-        self.center_y += self.change_y
-
-        self.check_death(Skeleton)
-
-        if self._state != self.animation_state.DEATH:
-            self.check_collisions()
-
-            if self.change_x != 0 or self.change_y != 0:
-                self._state = self.animation_state.WALK
-            else:
-                if (abs(self.player.center_x - self.left) <= distance_of_attack or
-                    abs(self.right - self.player.center_x) <= distance_of_attack) and \
-                        bottom_y_distance_of_attack <= self.center_y - \
-                        self.player.center_y <= top_y_distance_of_attack and \
-                        (self._state == self.animation_state.IDLE or self._state == self.animation_state.ATTACK):
-                    self._state = self.animation_state.ATTACK
-                    if self.current_texture_index + 1 >= self._state.value[1] and \
-                            self.frame_counter + 1 > self.frames_per_texture:
-                        self.player.reduce_health(2)
-
-            self.set_animation_direction()
-
-        check_map_bounds(self)
+        # check_map_bounds(self)
 
     def update_enemy_speed(self, delta_time: float):
         """Updates slimes change_x and change_y
@@ -431,7 +430,7 @@ class Archer(AEnemy):
             else:
                 self._state = self.animation_state.IDLE
 
-            self.set_animation_direction()
+            self.set_animation_direction(self.direction)
 
         check_map_bounds(self)
 
@@ -513,7 +512,7 @@ class Slime(AEnemy):
         bottom_y_distance_of_attack = -130
 
         self.update_enemy_speed(delta_time)
-        self.set_animation_direction()
+        self.set_animation_direction(self.direction)
 
         self.center_x += self.change_x
         self.center_y += self.change_y
