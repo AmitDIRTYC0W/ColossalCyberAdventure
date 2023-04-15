@@ -232,7 +232,7 @@ class AEnemy(arcade.Sprite, IEntity):
             self._state = self.animation_state.IDLE
 
     def set_animation_direction(self, direction):
-        self.direction = Direction.direction
+        self.direction = direction
 
     def set_direction_to_player(self, delta_time: float):
         target_x = self.player.center_x
