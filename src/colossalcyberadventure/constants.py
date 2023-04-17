@@ -16,7 +16,7 @@ HEIGHT = 130
 MARGIN = 5
 
 # screen settings
-FULLSCREEN = True
+FULLSCREEN = False
 VSYNC = True
 SCREEN_HEIGHT = 0
 SCREEN_WIDTH = 0
