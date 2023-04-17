@@ -26,7 +26,7 @@ class ServerGameView(arcade.View):
     WORLD_WIDTH_TILEMAPS = 40
     WORLD_HEIGHT_TILEMAPS = 40
 
-    def __init__(self, conn: socket.socket):
+    def __init__(self, conn: socket.socket, player_id):
         super().__init__()
 
         # ------------------------------------------------------------
@@ -34,6 +34,7 @@ class ServerGameView(arcade.View):
 
         self.window.conn = conn
         self.conn = conn
+        self.player_id = player_id
 
         self.scene = arcade.Scene()
         # This whole part is just for the player and will be switched out eventually
@@ -78,8 +79,8 @@ class ServerGameView(arcade.View):
         self.loader = get_loader()
         self.maps_in_loading = []
 
-        # add entities to scene:
-        self.scene.add_sprite_list("entities", True, self.entities)
+        # # add entities to scene:
+        # self.scene.add_sprite_list("entities", True, self.entities)
 
         # client stuff:
         server_handler = threading.Thread(target=handle_server, args=(conn, self))
@@ -114,10 +115,14 @@ class ServerGameView(arcade.View):
     def on_draw(self):
         self.clear()
         self.scene.draw()
+        self.entities.draw()
 
         self.camera.use()
 
     def on_update(self, delta_time: float):
+        # updates entities:
+        self.update_entities()
+
         for x, y in self.get_maps_surrounding_player():
             if x >= 0 and y >= 0:
                 key = f"{x}-{y}"
@@ -144,9 +149,6 @@ class ServerGameView(arcade.View):
             except queue.Empty:
                 pass
 
-        # updates entities:
-        self.update_entities()
-
         # player movement request:
         update_vec = self.movement_vec.normalize() * 5
         movement_request = create_movement_request(update_vec.x, update_vec.y)
@@ -168,6 +170,10 @@ class ServerGameView(arcade.View):
             direction = None
             match entity.type:
                 case "player":
+                    # update current player x, y in ghost player class (yay legacy code)
+                    if entity.id == self.player_id:
+                        self.player.center_x = entity.x
+                        self.player.center_y = entity.y
                     try:
                         self.c = self.entity_ids[entity.id]
                     except:
