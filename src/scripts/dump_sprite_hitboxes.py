@@ -19,23 +19,23 @@ player_left, player_right = arcade.Sprite(player_left), arcade.Sprite(player_rig
 
 hitboxes = {
     "slime": {
-        "left": slime_left.hit_box.get_adjusted_points(),
-        "right": slime_right.hit_box.get_adjusted_points(),
+        "left": slime_left.hit_box.points,
+        "right": slime_right.hit_box.points,
     },
     "skeleton": {
-        "left": skeleton_left.hit_box.get_adjusted_points(),
-        "right": skeleton_right.hit_box.get_adjusted_points(),
+        "left": skeleton_left.hit_box.points,
+        "right": skeleton_right.hit_box.points,
     },
     "archer": {
-        "left": archer_left.hit_box.get_adjusted_points(),
-        "right": archer_right.hit_box.get_adjusted_points(),
+        "left": archer_left.hit_box.points,
+        "right": archer_right.hit_box.points,
     },
     "player": {
-        "left": player_left.hit_box.get_adjusted_points(),
-        "right": player_right.hit_box.get_adjusted_points(),
+        "left": player_left.hit_box.points,
+        "right": player_right.hit_box.points,
     },
 }
 
 
-with open("hitboxes.json", "w") as f:
+with open("../../../NewServer/hitboxes.json", "w") as f:
     json.dump(hitboxes, f, indent=4)
