@@ -334,9 +334,8 @@ class Skeleton(AEnemy):
         #                     self.frame_counter + 1 > self.frames_per_texture:
         #                 self.player.reduce_health(2)
 
-        if self._state.value[0] != self.animation_state.value[0]:
-            self.update_state(self.animation_state)
-        self.update_direction()
+        self.set_animation_direction(self.direction)
+        self.update_state(self.animation_state)
 
         # check_map_bounds(self)
 
