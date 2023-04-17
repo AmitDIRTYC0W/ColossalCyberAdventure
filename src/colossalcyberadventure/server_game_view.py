@@ -6,6 +6,7 @@ from math import floor
 import arcade
 from arcade import Scene
 from arcade import SpriteList
+from arcade import key as k
 from pyglet.math import Vec2
 from pytiled_parser import parse_world
 
@@ -35,6 +36,8 @@ class ServerGameView(arcade.View):
         self.window.conn = conn
         self.conn = conn
         self.player_id = player_id
+        self.keyboard_state = {k.W: False, k.A: False, k.S: False, k.D: False, k.C: False, k.H: False, k.Q: False,
+                               k.I: False, k.V: False}
 
         self.scene = arcade.Scene()
         # This whole part is just for the player and will be switched out eventually
@@ -45,7 +48,6 @@ class ServerGameView(arcade.View):
         self.player_projectile_list = arcade.SpriteList()
         self.item_list = arcade.SpriteList()
         self.xp_list = arcade.SpriteList()
-        self.keyboard_state = {}
         # ------------------------------------------------------------------------------------------
         self.player = Player(self.enemy_projectile_list, self.player_projectile_list, self.item_list,
                              self.keyboard_state, self.scene, self.xp_list)
@@ -148,7 +150,11 @@ class ServerGameView(arcade.View):
             except queue.Empty:
                 pass
 
+        # if self.keyboard_state[k.Q]:
+        #     quit()
+
         # player movement request:
+        self.calculate_movement_vec()
         update_vec = self.movement_vec.normalize() * 5
         movement_request = create_movement_request(update_vec.x, update_vec.y)
         self.conn.send(movement_request.to_bytes_packed())
@@ -217,24 +223,28 @@ class ServerGameView(arcade.View):
                 self.entity_ids.pop(entity_id)
 
     def on_key_press(self, symbol: int, modifiers: int):
-        if symbol == arcade.key.W:
-            self.movement_vec.y += 1
-        elif symbol == arcade.key.S:
-            self.movement_vec.y += -1
-        elif symbol == arcade.key.A:
-            self.movement_vec.x += -1
-        elif symbol == arcade.key.D:
-            self.movement_vec.x += 1
+        if symbol in self.keyboard_state.keys():
+            self.keyboard_state[symbol] = True
+        # if symbol == arcade.key.I:
+        #     self.inventory_state = not self.inventory_state
+        # if symbol == arcade.key.B:
+        #     self.bot_on = not self.bot_on
 
     def on_key_release(self, symbol: int, _modifiers: int):
-        if symbol == arcade.key.W:
-            self.movement_vec.y -= 1
-        elif symbol == arcade.key.S:
-            self.movement_vec.y -= -1
-        elif symbol == arcade.key.A:
-            self.movement_vec.x -= -1
-        elif symbol == arcade.key.D:
-            self.movement_vec.x -= 1
+        if symbol in self.keyboard_state.keys():
+            self.keyboard_state[symbol] = False
+
+    def calculate_movement_vec(self):
+        self.movement_vec.x = 0
+        self.movement_vec.y = 0
+        if self.keyboard_state[k.W]:
+            self.movement_vec.y += 1
+        if self.keyboard_state[k.S]:
+            self.movement_vec.y += -1
+        if self.keyboard_state[k.A]:
+            self.movement_vec.x += -1
+        if self.keyboard_state[k.D]:
+            self.movement_vec.x += 1
 
     def get_maps_surrounding_player(self):
         min_x = floor((self.player.center_x - ServerGameView.TILEMAP_WIDTH_PX // 2) // ServerGameView.TILEMAP_WIDTH_PX)
