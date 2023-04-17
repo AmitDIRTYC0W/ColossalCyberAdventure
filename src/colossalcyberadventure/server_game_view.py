@@ -153,7 +153,6 @@ class ServerGameView(arcade.View):
 
         # camera shit:
         self.camera.center_camera_on_player()
-        print(self.camera.position.x, self.camera.position.y)
 
         # updating the state and direction of all the entities:
         self.entities.update_animation()
@@ -161,7 +160,6 @@ class ServerGameView(arcade.View):
 
     def update_entities(self):
         for entity in self.server_entity_list:  # ToDO make it so the entity gets deleated when it is no longer given to you...
-            # print(entity.x, entity.y)
             animation_state = None
             direction = None
             match entity.type:
@@ -206,23 +204,23 @@ class ServerGameView(arcade.View):
 
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol == arcade.key.W:
-            self.movement_vec.y = 1
+            self.movement_vec.y += 1
         elif symbol == arcade.key.S:
-            self.movement_vec.y = -1
+            self.movement_vec.y += -1
         elif symbol == arcade.key.A:
-            self.movement_vec.x = -1
+            self.movement_vec.x += -1
         elif symbol == arcade.key.D:
-            self.movement_vec.x = 1
+            self.movement_vec.x += 1
 
     def on_key_release(self, symbol: int, _modifiers: int):
         if symbol == arcade.key.W:
-            self.movement_vec.y = 0
+            self.movement_vec.y -= 1
         elif symbol == arcade.key.S:
-            self.movement_vec.y = 0
+            self.movement_vec.y -= -1
         elif symbol == arcade.key.A:
-            self.movement_vec.x = 0
+            self.movement_vec.x -= -1
         elif symbol == arcade.key.D:
-            self.movement_vec.x = 0
+            self.movement_vec.x -= 1
 
     def get_maps_surrounding_player(self):
         min_x = floor((self.player.center_x - ServerGameView.TILEMAP_WIDTH_PX // 2) // ServerGameView.TILEMAP_WIDTH_PX)
@@ -247,5 +245,4 @@ class ServerGameView(arcade.View):
 def handle_server(conn: socket.socket, view: ServerGameView):
     while True:
         server_update = messages.read_server_update(conn.recv(2048))
-        # print(server_update)
         view.server_entity_list = server_update.entitiesUpdate
