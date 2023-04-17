@@ -32,6 +32,7 @@ class ServerGameView(arcade.View):
         # ------------------------------------------------------------
         init_loader()
 
+        self.window.conn = conn
         self.conn = conn
 
         self.scene = arcade.Scene()
@@ -159,7 +160,10 @@ class ServerGameView(arcade.View):
         self.entities.on_update()
 
     def update_entities(self):
-        for entity in self.server_entity_list:  # ToDO make it so the entity gets deleated when it is no longer given to you...
+        last_frame_id_set = set(self.entity_ids)
+        for entity in self.server_entity_list:
+            if entity.id in last_frame_id_set:
+                last_frame_id_set.remove(entity.id)
             animation_state = None
             direction = None
             match entity.type:
@@ -201,6 +205,11 @@ class ServerGameView(arcade.View):
                     self.c.direction = direction.LEFT
                 case "right":
                     self.c.direction = direction.RIGHT
+
+        if len(last_frame_id_set) > 0:
+            for entity_id in last_frame_id_set:
+                self.entities.remove(self.entity_ids[entity_id])
+                self.entity_ids.pop(entity_id)
 
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol == arcade.key.W:

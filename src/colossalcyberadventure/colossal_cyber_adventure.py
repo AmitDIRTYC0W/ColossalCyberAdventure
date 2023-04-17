@@ -2,6 +2,7 @@ import arcade
 
 from .login_screen import LoginScreenView
 from . import constants
+import socket
 
 
 class ColossalCyberAdventure(arcade.Window):
@@ -16,6 +17,7 @@ class ColossalCyberAdventure(arcade.Window):
             fullscreen=constants.FULLSCREEN,
         )
         self.background_color = self.BACKGROUND_COLOR
+        self.conn: None | socket.socket = None
 
     def setup(self):
         """Set up window
@@ -24,4 +26,6 @@ class ColossalCyberAdventure(arcade.Window):
         """
         self.show_view(LoginScreenView())
 
-        #  TODO die
+    def on_close(self):
+        if self.conn:
+            self.conn.close()

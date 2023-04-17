@@ -204,7 +204,7 @@ class Player(arcade.Sprite, IEntity):
     def get_direction(self):
         return self.direction
 
-    def get_position(self) -> tuple[float, float]:  # TODO send Goni everything
+    def get_position(self) -> tuple[float, float]:
         """Returns the player position relative to the map in px
 
         See Also
