@@ -79,7 +79,7 @@ class ServerGameView(arcade.View):
         self.loader = get_loader()
         self.maps_in_loading = []
 
-        # # add entities to scene:
+        # add entities to scene:
         # self.scene.add_sprite_list("entities", True, self.entities)
 
         # client stuff:
@@ -115,9 +115,8 @@ class ServerGameView(arcade.View):
     def on_draw(self):
         self.clear()
         self.scene.draw()
-        self.entities.draw()
-
         self.camera.use()
+        self.entities.draw()
 
     def on_update(self, delta_time: float):
         # updates entities:
