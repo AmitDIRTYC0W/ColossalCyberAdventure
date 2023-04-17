@@ -5,7 +5,7 @@ from src.colossalcyberadventure.tilemap import init_loader
 
 def main():
     # Start the tilemap loader process
-    init_loader()
+    # init_loader()
 
     # Start the game
     game = ColossalCyberAdventure()
