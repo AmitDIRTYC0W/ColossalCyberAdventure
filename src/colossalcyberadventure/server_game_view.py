@@ -123,6 +123,9 @@ class ServerGameView(arcade.View):
         # updates entities:
         self.update_entities()
 
+        # camera shit:
+        self.camera.center_camera_on_player()
+
         for x, y in self.get_maps_surrounding_player():
             if x >= 0 and y >= 0:
                 key = f"{x}-{y}"
@@ -153,9 +156,6 @@ class ServerGameView(arcade.View):
         update_vec = self.movement_vec.normalize() * 5
         movement_request = create_movement_request(update_vec.x, update_vec.y)
         self.conn.send(movement_request.to_bytes_packed())
-
-        # camera shit:
-        self.camera.center_camera_on_player()
 
         # updating the state and direction of all the entities:
         self.entities.update_animation()
