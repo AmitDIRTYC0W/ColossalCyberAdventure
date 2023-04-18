@@ -150,8 +150,8 @@ class ServerGameView(arcade.View):
             except queue.Empty:
                 pass
 
-        # if self.keyboard_state[k.Q]:
-        #     quit()
+        if self.keyboard_state[k.Q]:
+            quit()
 
         # player movement request:
         self.calculate_movement_vec()
