@@ -225,10 +225,6 @@ class ServerGameView(arcade.View):
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol in self.keyboard_state.keys():
             self.keyboard_state[symbol] = True
-        # if symbol == arcade.key.I:
-        #     self.inventory_state = not self.inventory_state
-        # if symbol == arcade.key.B:
-        #     self.bot_on = not self.bot_on
 
     def on_key_release(self, symbol: int, _modifiers: int):
         if symbol in self.keyboard_state.keys():
