@@ -14,8 +14,9 @@ from . import enemies, player
 from .camera import GameCam
 from .enemies import Skeleton, SkeletonAnimationState
 from .player import Player, PlayerAnimationState
+from .projectile import Projectile
 from .server import messages
-from .server.messages import create_movement_request
+from .server.messages import create_movement_request, create_shoot_request
 from .tilemap import tilemap_from_world, get_loader, init_loader
 
 
@@ -38,6 +39,9 @@ class ServerGameView(arcade.View):
         self.player_id = player_id
         self.keyboard_state = {k.W: False, k.A: False, k.S: False, k.D: False, k.C: False, k.H: False, k.Q: False,
                                k.I: False, k.V: False}
+
+        self.bullet_target = (0.0, 0.0)
+        self.on_shoot = False
 
         self.scene = arcade.Scene()
         # This whole part is just for the player and will be switched out eventually
@@ -159,6 +163,12 @@ class ServerGameView(arcade.View):
         movement_request = create_movement_request(update_vec.x, update_vec.y)
         self.conn.send(movement_request.to_bytes_packed())
 
+        # shooting:
+        if self.on_shoot:
+            shoot_request = create_shoot_request(self.bullet_target[0], self.bullet_target[1])
+            self.conn.send(shoot_request.to_bytes_packed())
+            self.on_shoot = False
+
         # camera shit:
         self.camera.center_camera_on_player()
 
@@ -173,6 +183,8 @@ class ServerGameView(arcade.View):
                 last_frame_id_set.remove(entity.id)
             animation_state = None
             direction = None
+            bullet_lock = None
+            print(entity.type)
             match entity.type:
                 case "player":
                     # update current player x, y in ghost player class (yay legacy code)
@@ -200,22 +212,37 @@ class ServerGameView(arcade.View):
                         self.entity_ids.update(temp_dict)
                     animation_state = SkeletonAnimationState
                     direction = enemies.Direction
+                case "bullet":
+                    print("potatttttt")
+                    try:
+                        self.c = self.entity_ids[entity.id]
+                    except:
+                        self.c = Projectile(entity.x, entity.y, self.bullet_target[0], self.bullet_target[1], ":data"
+                                                                                                              ":bullet"
+                                                                                                              "/0.png"
+                                            , 1)
+                        self.entities.append(self.c)
+                        temp_dict = {entity.id: self.c}
+                        self.entity_ids.update(temp_dict)
+                    bullet_lock = True
+
             self.c.center_x = entity.x
             self.c.center_y = entity.y
-            match entity.animationstate:
-                case "idle":
-                    self.c.animation_state = animation_state.IDLE
-                case "walk":
-                    self.c.animation_state = animation_state.WALK
-                case "attack":
-                    self.c.animation_state = animation_state.ATTACK
-                case "death":
-                    self.c.animation_state = animation_state.DEATH
-            match entity.direction:
-                case "left":
-                    self.c.direction = direction.LEFT
-                case "right":
-                    self.c.direction = direction.RIGHT
+            if not bullet_lock:
+                match entity.animationstate:
+                    case "idle":
+                        self.c.animation_state = animation_state.IDLE
+                    case "walk":
+                        self.c.animation_state = animation_state.WALK
+                    case "attack":
+                        self.c.animation_state = animation_state.ATTACK
+                    case "death":
+                        self.c.animation_state = animation_state.DEATH
+                match entity.direction:
+                    case "left":
+                        self.c.direction = direction.LEFT
+                    case "right":
+                        self.c.direction = direction.RIGHT
 
         if len(last_frame_id_set) > 0:
             for entity_id in last_frame_id_set:
@@ -242,6 +269,11 @@ class ServerGameView(arcade.View):
         if self.keyboard_state[k.D]:
             self.movement_vec.x += 1
 
+    def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
+        world_pos = self.mouse_to_world_position(x, y)
+        self.bullet_target = (world_pos.x - self.player.center_x, world_pos.y - self.player.center_y)
+        self.on_shoot = True
+
     def get_maps_surrounding_player(self):
         min_x = floor((self.player.center_x - ServerGameView.TILEMAP_WIDTH_PX // 2) // ServerGameView.TILEMAP_WIDTH_PX)
         min_y = floor(
@@ -265,4 +297,5 @@ class ServerGameView(arcade.View):
 def handle_server(conn: socket.socket, view: ServerGameView):
     while True:
         server_update = messages.read_server_update(conn.recv(2048))
+        print(server_update)
         view.server_entity_list = server_update.entitiesUpdate

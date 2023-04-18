@@ -25,8 +25,9 @@ class Projectile(arcade.Sprite):
         self.angle = degrees(atan2(direction.y, direction.x))
 
     def on_update(self, delta_time: float = 1 / 60):
-        self.distance = sqrt(abs(self.origin_x - self.center_x) ** 2 + abs(self.origin_y - self.center_y) ** 2)
-        self.center_x += self.change_x * delta_time
-        self.center_y += self.change_y * delta_time
-        if self.distance >= self.max_distance:
-            self.remove_from_sprite_lists()
+        pass
+        # self.distance = sqrt(abs(self.origin_x - self.center_x) ** 2 + abs(self.origin_y - self.center_y) ** 2)
+        # self.center_x += self.change_x * delta_time
+        # self.center_y += self.change_y * delta_time
+        # if self.distance >= self.max_distance:
+        #     self.remove_from_sprite_lists()
