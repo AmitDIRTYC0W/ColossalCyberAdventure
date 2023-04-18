@@ -51,7 +51,7 @@ class ServerGameView(arcade.View):
         # ------------------------------------------------------------------------------------------
         self.player = Player(self.enemy_projectile_list, self.player_projectile_list, self.item_list,
                              self.keyboard_state, self.scene, self.xp_list)
-        self.entities = arcade.SpriteList()
+        self.entities = arcade.SpriteList(use_spatial_hash=True)
 
         self.entity_ids = dict()
 
