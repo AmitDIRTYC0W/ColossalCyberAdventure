@@ -348,6 +348,8 @@ class Player(arcade.Sprite, IEntity):
             constants.TARGET_Y = random.randrange(0,constants.MAP_HEIGHT,600)
             print(constants.TARGET_X)
         self.auto_move(constants.TARGET_X,constants.TARGET_Y)
+
+
 class AdditionRequest:
     def __init__(self, addition_type):
         self.type = addition_type
