@@ -12,7 +12,7 @@ from pytiled_parser import parse_world
 
 from . import enemies, player
 from .camera import GameCam
-from .enemies import Skeleton, SkeletonAnimationState
+from .enemies import Skeleton, SkeletonAnimationState, Archer, ArcherAnimationState
 from .player import Player, PlayerAnimationState
 from .projectile import Projectile
 from .server import messages
@@ -210,6 +210,17 @@ class ServerGameView(arcade.View):
                         temp_dict = {entity.id: self.c}
                         self.entity_ids.update(temp_dict)
                     animation_state = SkeletonAnimationState
+                    direction = enemies.Direction
+                case "archer":
+                    try:
+                        self.c = self.entity_ids[entity.id]
+                    except:
+                        self.c = Archer(self.player, self.enemy_list, self.enemy_projectile_list,
+                                          self.player_projectile_list, self.xp_list)
+                        self.entities.append(self.c)
+                        temp_dict = {entity.id: self.c}
+                        self.entity_ids.update(temp_dict)
+                    animation_state = ArcherAnimationState
                     direction = enemies.Direction
                 case "bullet":
                     try:

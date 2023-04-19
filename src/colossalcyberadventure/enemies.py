@@ -404,36 +404,39 @@ class Archer(AEnemy):
         Run this function every update of the window
 
         """
-        max_distance_of_attack = 700
-
-        self.update_enemy_speed(delta_time)
-
-        self.center_x += self.change_x
-        self.center_y += self.change_y
-
-        self.check_death(Archer)
-
-        if self._state != self.animation_state.DEATH:
-            self.check_collisions()
-
-            distance_to_player = sqrt(
-                abs(self.center_x - self.player.center_x) ** 2 + abs(
-                    self.center_y - self.player.center_y) ** 2)
-
-            if self.change_x != 0 or self.change_y != 0:
-                self._state = self.animation_state.WALK
-            elif distance_to_player <= max_distance_of_attack and (self._state == self.animation_state.IDLE or
-                                                                   self._state == self.animation_state.ATTACK):
-                self._state = self.animation_state.ATTACK
-                if self.current_texture_index + 1 >= self._state.value[1] and \
-                        self.frame_counter + 1 > self.frames_per_texture:
-                    self.shoot()
-            else:
-                self._state = self.animation_state.IDLE
-
-            self.set_animation_direction(self.direction)
-
-        check_map_bounds(self)
+        # max_distance_of_attack = 700
+        #
+        # self.update_enemy_speed(delta_time)
+        #
+        # self.center_x += self.change_x
+        # self.center_y += self.change_y
+        #
+        # self.check_death(Archer)
+        #
+        # if self._state != self.animation_state.DEATH:
+        #     self.check_collisions()
+        #
+        #     distance_to_player = sqrt(
+        #         abs(self.center_x - self.player.center_x) ** 2 + abs(
+        #             self.center_y - self.player.center_y) ** 2)
+        #
+        #     if self.change_x != 0 or self.change_y != 0:
+        #         self._state = self.animation_state.WALK
+        #     elif distance_to_player <= max_distance_of_attack and (self._state == self.animation_state.IDLE or
+        #                                                            self._state == self.animation_state.ATTACK):
+        #         self._state = self.animation_state.ATTACK
+        #         if self.current_texture_index + 1 >= self._state.value[1] and \
+        #                 self.frame_counter + 1 > self.frames_per_texture:
+        #             self.shoot()
+        #     else:
+        #         self._state = self.animation_state.IDLE
+        #
+        #     self.set_animation_direction(self.direction)
+        #
+        # check_map_bounds(self)
+        if self._state.value[0] != self.animation_state.value[0]:
+            self.update_state(self.animation_state)
+        self.update_direction()
 
     def update_enemy_speed(self, delta_time: float):
         """Updates slimes change_x and change_y
