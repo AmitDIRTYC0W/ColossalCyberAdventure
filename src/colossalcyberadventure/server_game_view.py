@@ -217,7 +217,7 @@ class ServerGameView(arcade.View):
                         self.c = self.entity_ids[entity.id]
                     except:
                         self.c = Archer(self.player, self.enemy_list, self.enemy_projectile_list,
-                                          self.player_projectile_list, self.xp_list)
+                                        self.player_projectile_list, self.xp_list)
                         self.entities.append(self.c)
                         temp_dict = {entity.id: self.c}
                         self.entity_ids.update(temp_dict)
