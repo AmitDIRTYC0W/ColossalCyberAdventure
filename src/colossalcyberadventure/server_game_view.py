@@ -184,7 +184,6 @@ class ServerGameView(arcade.View):
             animation_state = None
             direction = None
             bullet_lock = None
-            print(entity.type)
             match entity.type:
                 case "player":
                     # update current player x, y in ghost player class (yay legacy code)
@@ -213,7 +212,6 @@ class ServerGameView(arcade.View):
                     animation_state = SkeletonAnimationState
                     direction = enemies.Direction
                 case "bullet":
-                    print("potatttttt")
                     try:
                         self.c = self.entity_ids[entity.id]
                     except:
@@ -271,7 +269,7 @@ class ServerGameView(arcade.View):
 
     def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
         world_pos = self.mouse_to_world_position(x, y)
-        self.bullet_target = (world_pos.x - self.player.center_x, world_pos.y - self.player.center_y)
+        self.bullet_target = (world_pos.x, world_pos.y)
         self.on_shoot = True
 
     def get_maps_surrounding_player(self):
@@ -297,5 +295,4 @@ class ServerGameView(arcade.View):
 def handle_server(conn: socket.socket, view: ServerGameView):
     while True:
         server_update = messages.read_server_update(conn.recv(2048))
-        print(server_update)
         view.server_entity_list = server_update.entitiesUpdate
