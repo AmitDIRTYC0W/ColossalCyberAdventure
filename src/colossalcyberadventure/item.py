@@ -18,21 +18,25 @@ class AItem(arcade.Sprite):
         return "item"
 
 
-class Coin(AItem):
-    Sprite_Scale = 0.4
-    COIN_PATH = ":data:items/coin.png"
+# class Coin(AItem):
+#     Sprite_Scale = 0.4
+#     COIN_PATH = ":data:items/coin.png"
+#
+#     def __init__(self, x_position: float, y_position: float):
+#         super().__init__(x_position, y_position)
+#
+#     def load_textures(self):
+#         """loads the right textures of the sprite
+#         """
+#         texture = arcade.load_texture(Coin.COIN_PATH)
+#         return texture
+#
+#     def get_kind(self):
+#         return "coin"
 
-    def __init__(self, x_position: float, y_position: float):
-        super().__init__(x_position, y_position)
-
-    def load_textures(self):
-        """loads the right textures of the sprite
-        """
-        texture = arcade.load_texture(Coin.COIN_PATH)
-        return texture
-
-    def get_kind(self):
-        return "coin"
+class Coin(arcade.Sprite):
+    def __init__(self, x, y):
+        super().__init__(":data:items/coin.png", center_x=x, center_y=y, scale=0.4)
 
 
 class HealthShroom(AItem):

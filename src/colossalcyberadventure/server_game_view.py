@@ -13,6 +13,7 @@ from pytiled_parser import parse_world
 from . import enemies, player
 from .camera import GameCam
 from .enemies import Skeleton, SkeletonAnimationState, Archer, ArcherAnimationState
+from .item import Coin
 from .player import Player, PlayerAnimationState
 from .projectile import Projectile
 from .server import messages
@@ -183,7 +184,7 @@ class ServerGameView(arcade.View):
                 last_frame_id_set.remove(entity.id)
             animation_state = None
             direction = None
-            bullet_lock = None
+            is_not_item_or_projectile = None
             match entity.type:
                 case "player":
                     # update current player x, y in ghost player class (yay legacy code)
@@ -233,11 +234,20 @@ class ServerGameView(arcade.View):
                         self.entities.append(self.c)
                         temp_dict = {entity.id: self.c}
                         self.entity_ids.update(temp_dict)
-                    bullet_lock = True
+                    is_not_item_or_projectile = True
+                case "coin":
+                    try:
+                        self.c = self.entity_ids[entity.id]
+                    except:
+                        self.c = Coin(entity.x, entity.y)
+                        self.entities.append(self.c)
+                        temp_dict = {entity.id: self.c}
+                        self.entity_ids.update(temp_dict)
+                    is_not_item_or_projectile = True
 
             self.c.center_x = entity.x
             self.c.center_y = entity.y
-            if not bullet_lock:
+            if not is_not_item_or_projectile:
                 match entity.animationstate:
                     case "idle":
                         self.c.animation_state = animation_state.IDLE
