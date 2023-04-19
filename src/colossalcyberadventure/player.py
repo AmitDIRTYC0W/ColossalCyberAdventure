@@ -1,5 +1,6 @@
 import time
 from enum import Enum
+from random import random
 
 import arcade
 import arcade.key as k
@@ -7,6 +8,7 @@ from arcade import SpriteList
 from arcade.hitbox import HitBox
 from pyglet.math import Vec2
 
+from . import constants
 from .common import check_map_bounds
 from .entity import IEntity
 from .projectile import Projectile
@@ -324,7 +326,28 @@ class Player(arcade.Sprite, IEntity):
         if self.health_bar.health_points <= 0:
             return True
 
+    def auto_move(self,x_target, y_target):
+        x_diff = x_target - self.center_x
+        y_diff = y_target - self.center_y
 
+        random_vec = Vec2(x_diff, y_diff)
+        random_vec = random_vec.normalize() * Vec2(Player.SPEED, Player.SPEED)
+
+        self.change_x = random_vec.x
+        self.change_y = random_vec.y
+        self.center_x += self.change_x
+        self.center_y += self.change_y
+        if abs(x_diff) <= Player.SPEED:
+            constants.TARGET_X = random.randrange(0, constants.MAP_WIDTH, 500)
+            constants.TARGET_Y = random.randrange(0, constants.MAP_HEIGHT, 600)
+            self.auto_move(constants.TARGET_X,constants.TARGET_Y)
+
+    def bot(self):
+        if int(time.time()) % 5 == 0:
+            constants.TARGET_X = random.randrange(0,constants.MAP_WIDTH,500)
+            constants.TARGET_Y = random.randrange(0,constants.MAP_HEIGHT,600)
+            print(constants.TARGET_X)
+        self.auto_move(constants.TARGET_X,constants.TARGET_Y)
 class AdditionRequest:
     def __init__(self, addition_type):
         self.type = addition_type
