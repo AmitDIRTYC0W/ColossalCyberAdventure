@@ -21,6 +21,7 @@ from .projectile import Projectile
 from .server import messages
 from .server.messages import create_movement_request, create_shoot_request, create_skill_use_request
 from .tilemap import tilemap_from_world, get_loader, init_loader
+from .xp import XP
 
 
 class ServerGameView(arcade.View):
@@ -31,7 +32,7 @@ class ServerGameView(arcade.View):
     WORLD_WIDTH_TILEMAPS = 40
     WORLD_HEIGHT_TILEMAPS = 40
 
-    def __init__(self, conn: socket.socket, player_id, coin_amount):
+    def __init__(self, conn: socket.socket, player_id, coin_amount, xp_amount):
         super().__init__()
 
         # ------------------------------------------------------------
@@ -204,7 +205,7 @@ class ServerGameView(arcade.View):
                 last_frame_id_set.remove(entity.id)
             animation_state = None
             direction = None
-            is_not_item_or_projectile = None
+            is_item_or_projectile = False
             match entity.type:
                 case "player":
                     # update current player x, y in ghost player class (yay legacy code)
@@ -252,7 +253,7 @@ class ServerGameView(arcade.View):
                         self.entities.append(self.c)
                         temp_dict = {entity.id: self.c}
                         self.entity_ids.update(temp_dict)
-                    is_not_item_or_projectile = True
+                    is_item_or_projectile = True
 
                 case "archerBullet":
                     try:
@@ -263,7 +264,7 @@ class ServerGameView(arcade.View):
                         self.entities.append(self.c)
                         temp_dict = {entity.id: self.c}
                         self.entity_ids.update(temp_dict)
-                    is_not_item_or_projectile = True
+                    is_item_or_projectile = True
 
                 case "coin":
                     try:
@@ -273,11 +274,20 @@ class ServerGameView(arcade.View):
                         self.entities.append(self.c)
                         temp_dict = {entity.id: self.c}
                         self.entity_ids.update(temp_dict)
-                    is_not_item_or_projectile = True
+                    is_item_or_projectile = True
+                case "xp":
+                    try:
+                        self.c = self.entity_ids[entity.id]
+                    except:
+                        self.c = XP(entity.x, entity.y)
+                        self.entities.append(self.c)
+                        temp_dict = {entity.id: self.c}
+                        self.entity_ids.update(temp_dict)
+                    is_item_or_projectile = True
 
             self.c.center_x = entity.x
             self.c.center_y = entity.y
-            if not is_not_item_or_projectile:
+            if not is_item_or_projectile:
                 match entity.animationstate:
                     case "idle":
                         self.c.animation_state = animation_state.IDLE
@@ -353,3 +363,7 @@ def handle_server(conn: socket.socket, view: ServerGameView):
                 match server_update.itemAdditionUpdate.item:
                     case "coin":
                         view.player.coin_counter += server_update.itemAdditionUpdate.change
+                    case "xp":
+                        pass
+                    case "mushroom":
+                        pass

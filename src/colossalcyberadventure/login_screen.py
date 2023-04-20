@@ -72,7 +72,8 @@ class LoginScreenView(arcade.View):
             match response.which():
                 case "success":
                     self.manager.clear()
-                    game_view = ServerGameView(s, response.success.playerid, response.success.coinamount)
+                    game_view = ServerGameView(s, response.success.playerid, response.success.coinamount,
+                                               response.success.xpamount)
                     self.window.show_view(game_view)
                 case "failure":
                     pass
@@ -87,7 +88,8 @@ class LoginScreenView(arcade.View):
             match response.which():
                 case "success":
                     self.manager.clear()
-                    game_view = ServerGameView(s, response.success.playerid, response.success.coinamount)
+                    game_view = ServerGameView(s, response.success.playerid, response.success.coinamount,
+                                               response.success.xpamount)
                     self.window.show_view(game_view)
                 case "failure":
                     pass
