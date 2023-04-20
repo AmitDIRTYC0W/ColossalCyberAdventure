@@ -13,6 +13,10 @@ def create_shoot_request(x: float, y: float):
     return client_update.ClientUpdate.new_message(shot=client_update.Shot.new_message(x=x, y=y))
 
 
+def create_skill_use_request(skill_num: int):
+    return client_update_capnp.ClientUpdate.new_message(useSkill=skill_num)
+
+
 def create_identification_request(username: str, password: str, register: bool):
     return identification.IdentificationRequest.new_message(
         username=username,

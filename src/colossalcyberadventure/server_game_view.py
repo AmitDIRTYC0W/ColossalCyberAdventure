@@ -19,7 +19,7 @@ from .item import Coin
 from .player import Player, PlayerAnimationState
 from .projectile import Projectile
 from .server import messages
-from .server.messages import create_movement_request, create_shoot_request
+from .server.messages import create_movement_request, create_shoot_request, create_skill_use_request
 from .tilemap import tilemap_from_world, get_loader, init_loader
 
 
@@ -132,6 +132,7 @@ class ServerGameView(arcade.View):
     def on_update(self, delta_time: float):
         # updates entities:
         self.update_entities()
+        print("potat")
 
         for x, y in self.get_maps_surrounding_player():
             if x >= 0 and y >= 0:
@@ -173,6 +174,22 @@ class ServerGameView(arcade.View):
             shoot_request = create_shoot_request(self.bullet_target[0], self.bullet_target[1])
             self.conn.send(shoot_request.to_bytes_packed())
             self.on_shoot = False
+
+        # skill checks...
+        if self.keyboard_state[k.C]:
+            skill_request = create_skill_use_request(1)
+            self.conn.send(skill_request.to_bytes_packed())
+            self.keyboard_state[k.C] = False
+
+        if self.keyboard_state[k.H]:
+            skill_request = create_skill_use_request(2)
+            self.conn.send(skill_request.to_bytes_packed())
+            self.keyboard_state[k.H] = False
+
+        if self.keyboard_state[k.V]:
+            skill_request = create_skill_use_request(3)
+            self.conn.send(skill_request.to_bytes_packed())
+            self.keyboard_state[k.V] = False
 
         # camera shit:
         self.camera.center_camera_on_player()
