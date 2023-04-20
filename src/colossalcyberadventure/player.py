@@ -1,5 +1,4 @@
 import time
-import random
 from enum import Enum
 
 import arcade
@@ -8,14 +7,12 @@ from arcade import SpriteList
 from arcade.hitbox import HitBox
 from pyglet.math import Vec2
 
-from . import constants
-from .common import check_map_bounds
 from .entity import IEntity
-from .projectile import Projectile
 from .healthbar import HealthBar
 from .inventory import Inventory
 from .item import Coin
 from .item import HealthShroom
+from .projectile import Projectile
 
 
 class PlayerAnimationState(Enum):
@@ -137,7 +134,6 @@ class Player(arcade.Sprite, IEntity):
         self.health_bar.draw()
 
     def update_animation(self, delta_time: float = 1 / 60):
-
         if self.frame_counter == 0 or self.should_reset_sprite_counter:
             self.frame_counter = 0
             self.current_texture_index += 1
