@@ -14,6 +14,7 @@ from . import enemies, player
 from .camera import GameCam
 from .enemies import Archer, ArcherAnimationState
 from .enemies import Skeleton, SkeletonAnimationState
+from .healthbar import HealthBar
 from .hud import HUD
 from .item import Coin, HealthShroom
 from .player import Player, PlayerAnimationState
@@ -89,6 +90,7 @@ class ServerGameView(arcade.View):
         self.loader = get_loader()
         self.maps_in_loading = []
         self.hud = HUD(self.player, self.camera, self)
+        self.health_bar = HealthBar(self.player, 70, 5, 1, arcade.color.BLACK, arcade.color.RED)
 
         # add entities to scene:
         # self.scene.add_sprite_list("entities", True, self.entities)
@@ -129,10 +131,12 @@ class ServerGameView(arcade.View):
         self.camera.use()
         self.entities.draw()
         self.hud.draw()
+        self.health_bar.draw()
 
     def on_update(self, delta_time: float):
         # updates entities:
         self.update_entities()
+        self.health_bar.on_update()
 
         for x, y in self.get_maps_surrounding_player():
             if x >= 0 and y >= 0:
@@ -368,6 +372,9 @@ def handle_server(conn: socket.socket, view: ServerGameView):
         match server_update.which():
             case "entitiesUpdate":
                 view.server_entity_list = server_update.entitiesUpdate
+            case "healthPoints":
+                print( server_update.healthPoints.hp)
+                view.health_bar.health_points = server_update.healthPoints.hp
             case "itemAdditionUpdate":
                 match server_update.itemAdditionUpdate.item:
                     case "coin":

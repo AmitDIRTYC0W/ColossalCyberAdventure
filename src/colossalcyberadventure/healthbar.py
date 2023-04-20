@@ -12,13 +12,13 @@ class HealthBar:
     FULL_HEALTH = 100
     LEVEL_TEXT_OFFSET = 15
 
-    def __init__(self, owner, width: float, height: float, outer_border_width,
+    def __init__(self, player, width: float, height: float, outer_border_width,
                  outer_color: tuple[int, int, int], inner_color: tuple[int, int, int]):
         self.health_points = HealthBar.STARTING_HP
 
-        self.owner = owner
-        self.owner_x = owner.get_position()[0]
-        self.owner_y = owner.get_position()[1]
+        self.owner = player
+        self.owner_x = player.get_position()[0]
+        self.owner_y = player.get_position()[1]
         self.center_x = -1  # placeholder
         self.center_y = -1  # placeholder
         self.calculate_center_x_y()
@@ -32,7 +32,7 @@ class HealthBar:
         self.inner_width = -1  # placeholder
         self.inner_center_x = -1  # placeholder
         self.calculate_inner_values()
-        self.level = owner.level
+        self.level = player.level
         self.level_text = Text(f"Level: {self.level}", self.center_x - self.width // 2,
                                self.center_y + HealthBar.LEVEL_TEXT_OFFSET, arcade.color.JET)
 
@@ -56,7 +56,7 @@ class HealthBar:
         self.level_text.x = self.center_x - self.width // 2
         self.level_text.y = self.center_y + HealthBar.LEVEL_TEXT_OFFSET
 
-    def update(self):
+    def on_update(self):
         self.level = self.owner.level
         self.owner_x = self.owner.get_position()[0]
         self.owner_y = self.owner.get_position()[1]
