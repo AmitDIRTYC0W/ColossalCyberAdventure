@@ -132,7 +132,6 @@ class ServerGameView(arcade.View):
     def on_update(self, delta_time: float):
         # updates entities:
         self.update_entities()
-        print("potat")
 
         for x, y in self.get_maps_surrounding_player():
             if x >= 0 and y >= 0:
@@ -244,18 +243,28 @@ class ServerGameView(arcade.View):
                         self.entity_ids.update(temp_dict)
                     animation_state = ArcherAnimationState
                     direction = enemies.Direction
-                case "bullet":
+                case "playerBullet":
                     try:
                         self.c = self.entity_ids[entity.id]
                     except:
-                        self.c = Projectile(entity.x, entity.y, self.bullet_target[0], self.bullet_target[1], ":data"
-                                                                                                              ":bullet"
-                                                                                                              "/0.png"
-                                            , 1)
+                        self.c = Projectile(entity.x, entity.y, self.bullet_target[0], self.bullet_target[1],
+                                            ":data:bullet/0.png", 1)
                         self.entities.append(self.c)
                         temp_dict = {entity.id: self.c}
                         self.entity_ids.update(temp_dict)
                     is_not_item_or_projectile = True
+
+                case "archerBullet":
+                    try:
+                        self.c = self.entity_ids[entity.id]
+                    except:
+                        self.c = Projectile(entity.x, entity.y, self.bullet_target[0], self.bullet_target[1],
+                                            ":data:enemies/archer/arrow/0.png", 2)
+                        self.entities.append(self.c)
+                        temp_dict = {entity.id: self.c}
+                        self.entity_ids.update(temp_dict)
+                    is_not_item_or_projectile = True
+
                 case "coin":
                     try:
                         self.c = self.entity_ids[entity.id]
