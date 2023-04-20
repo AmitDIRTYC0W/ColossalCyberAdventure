@@ -15,7 +15,7 @@ from .camera import GameCam
 from .enemies import Archer, ArcherAnimationState
 from .enemies import Skeleton, SkeletonAnimationState
 from .hud import HUD
-from .item import Coin
+from .item import Coin, HealthShroom
 from .player import Player, PlayerAnimationState
 from .projectile import Projectile
 from .server import messages
@@ -32,7 +32,7 @@ class ServerGameView(arcade.View):
     WORLD_WIDTH_TILEMAPS = 40
     WORLD_HEIGHT_TILEMAPS = 40
 
-    def __init__(self, conn: socket.socket, player_id, coin_amount, xp_amount):
+    def __init__(self, conn: socket.socket, player_id, coin_amount, xp_amount, mushroom_amount):
         super().__init__()
 
         # ------------------------------------------------------------
@@ -58,7 +58,7 @@ class ServerGameView(arcade.View):
         self.xp_list = arcade.SpriteList()
         # ------------------------------------------------------------------------------------------
         self.player = Player(self.enemy_projectile_list, self.player_projectile_list, self.item_list,
-                             self.keyboard_state, self.scene, self.xp_list, coin_amount)
+                             self.keyboard_state, self.scene, self.xp_list, coin_amount, xp_amount, mushroom_amount)
         self.entities = arcade.SpriteList(use_spatial_hash=True)
 
         self.entity_ids = dict()
@@ -216,7 +216,7 @@ class ServerGameView(arcade.View):
                         self.c = self.entity_ids[entity.id]
                     except:
                         self.c = Player(self.enemy_projectile_list, self.player_projectile_list, self.item_list,
-                                        self.keyboard_state, self.scene, self.xp_list, -1)
+                                        self.keyboard_state, self.scene, self.xp_list, -1, -1, -1)
                         self.entities.append(self.c)
                         temp_dict = {entity.id: self.c}
                         self.entity_ids.update(temp_dict)
@@ -280,6 +280,15 @@ class ServerGameView(arcade.View):
                         self.c = self.entity_ids[entity.id]
                     except:
                         self.c = XP(entity.x, entity.y)
+                        self.entities.append(self.c)
+                        temp_dict = {entity.id: self.c}
+                        self.entity_ids.update(temp_dict)
+                    is_item_or_projectile = True
+                case "mushroom":
+                    try:
+                        self.c = self.entity_ids[entity.id]
+                    except:
+                        self.c = HealthShroom(entity.x, entity.y)
                         self.entities.append(self.c)
                         temp_dict = {entity.id: self.c}
                         self.entity_ids.update(temp_dict)
