@@ -12,7 +12,9 @@ from pytiled_parser import parse_world
 
 from . import enemies, player
 from .camera import GameCam
-from .enemies import Skeleton, SkeletonAnimationState, Archer, ArcherAnimationState
+from .enemies import Archer, ArcherAnimationState
+from .enemies import Skeleton, SkeletonAnimationState
+from .hud import HUD
 from .item import Coin
 from .player import Player, PlayerAnimationState
 from .projectile import Projectile
@@ -29,7 +31,7 @@ class ServerGameView(arcade.View):
     WORLD_WIDTH_TILEMAPS = 40
     WORLD_HEIGHT_TILEMAPS = 40
 
-    def __init__(self, conn: socket.socket, player_id):
+    def __init__(self, conn: socket.socket, player_id, coin_amount):
         super().__init__()
 
         # ------------------------------------------------------------
@@ -55,7 +57,7 @@ class ServerGameView(arcade.View):
         self.xp_list = arcade.SpriteList()
         # ------------------------------------------------------------------------------------------
         self.player = Player(self.enemy_projectile_list, self.player_projectile_list, self.item_list,
-                             self.keyboard_state, self.scene, self.xp_list)
+                             self.keyboard_state, self.scene, self.xp_list, coin_amount)
         self.entities = arcade.SpriteList(use_spatial_hash=True)
 
         self.entity_ids = dict()
@@ -85,6 +87,7 @@ class ServerGameView(arcade.View):
         )
         self.loader = get_loader()
         self.maps_in_loading = []
+        self.hud = HUD(self.player, self.camera, self)
 
         # add entities to scene:
         # self.scene.add_sprite_list("entities", True, self.entities)
@@ -124,6 +127,7 @@ class ServerGameView(arcade.View):
         self.scene.draw()
         self.camera.use()
         self.entities.draw()
+        self.hud.draw()
 
     def on_update(self, delta_time: float):
         # updates entities:
@@ -195,7 +199,7 @@ class ServerGameView(arcade.View):
                         self.c = self.entity_ids[entity.id]
                     except:
                         self.c = Player(self.enemy_projectile_list, self.player_projectile_list, self.item_list,
-                                        self.keyboard_state, self.scene, self.xp_list)
+                                        self.keyboard_state, self.scene, self.xp_list, -1)
                         self.entities.append(self.c)
                         temp_dict = {entity.id: self.c}
                         self.entity_ids.update(temp_dict)
@@ -316,4 +320,10 @@ class ServerGameView(arcade.View):
 def handle_server(conn: socket.socket, view: ServerGameView):
     while True:
         server_update = messages.read_server_update(conn.recv(2048))
-        view.server_entity_list = server_update.entitiesUpdate
+        match server_update.which():
+            case "entitiesUpdate":
+                view.server_entity_list = server_update.entitiesUpdate
+            case "itemAdditionUpdate":
+                match server_update.itemAdditionUpdate.item:
+                    case "coin":
+                        view.player.coin_counter += server_update.itemAdditionUpdate.change

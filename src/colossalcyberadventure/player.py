@@ -1,6 +1,6 @@
 import time
+import random
 from enum import Enum
-from random import random
 
 import arcade
 import arcade.key as k
@@ -80,7 +80,7 @@ class Player(arcade.Sprite, IEntity):
     XP_PER_LEVEL = 5
 
     def __init__(self, enemy_projectile_list: SpriteList, player_projectile_list: SpriteList, item_array: SpriteList,
-                 keyboard_state: dict[int, bool], scene: arcade.Scene, xp_list: SpriteList):
+                 keyboard_state: dict[int, bool], scene: arcade.Scene, xp_list: SpriteList, starting_coin_amount: int):
         super().__init__(scale=Player.SPRITE_SCALE, path_or_texture="resources/player/idle/0.png")
         self.animation_state = PlayerAnimationState.IDLE
         if textures == TEXTURES_BASE:
@@ -107,7 +107,7 @@ class Player(arcade.Sprite, IEntity):
         self.health_bar = HealthBar(self, 70, 5, 1, arcade.color.BLACK, arcade.color.RED)
         self.should_reset_sprite_counter = False
         self.item_array = item_array
-        self.coin_counter = 0
+        self.coin_counter = starting_coin_amount
         self.health_shroom_counter = 0
         self.inventory = Inventory(
             self.coin_counter,
@@ -326,28 +326,26 @@ class Player(arcade.Sprite, IEntity):
         if self.health_bar.health_points <= 0:
             return True
 
-    def auto_move(self,x_target, y_target):
-        x_diff = x_target - self.center_x
-        y_diff = y_target - self.center_y
-
-        random_vec = Vec2(x_diff, y_diff)
-        random_vec = random_vec.normalize() * Vec2(Player.SPEED, Player.SPEED)
-
-        self.change_x = random_vec.x
-        self.change_y = random_vec.y
-        self.center_x += self.change_x
-        self.center_y += self.change_y
-        if abs(x_diff) <= Player.SPEED:
-            constants.TARGET_X = random.randrange(0, constants.MAP_WIDTH, 500)
-            constants.TARGET_Y = random.randrange(0, constants.MAP_HEIGHT, 600)
-            self.auto_move(constants.TARGET_X,constants.TARGET_Y)
-
-    def bot(self):
-        if int(time.time()) % 5 == 0:
-            constants.TARGET_X = random.randrange(0,constants.MAP_WIDTH,500)
-            constants.TARGET_Y = random.randrange(0,constants.MAP_HEIGHT,600)
-            print(constants.TARGET_X)
-        self.auto_move(constants.TARGET_X,constants.TARGET_Y)
+    # def auto_move(self,x_target, y_target):
+    #     x_diff = x_target - self.center_x
+    #     y_diff = y_target - self.center_y
+    #
+    #     random_vec = Vec2(x_diff, y_diff)
+    #     random_vec = random_vec.normalize() * Player.SPEED
+    #
+    #     self.change_x = random_vec.x
+    #     self.change_y = random_vec.y
+    #     self.center_x += self.change_x
+    #     self.center_y += self.change_y
+    #     if abs(x_diff) <= Player.SPEED:
+    #         constants.TARGET_X = random.randrange(0, constants.MAP_WIDTH, 500)
+    #         constants.TARGET_Y = random.randrange(0, constants.MAP_HEIGHT, 600)
+    #         self.auto_move(constants.TARGET_X,constants.TARGET_Y)
+    # def bot(self):
+    #     if int(time.time()) % 5 == 0:
+    #         constants.TARGET_X = random.randrange(0,constants.MAP_WIDTH,500)
+    #         constants.TARGET_Y = random.randrange(0,constants.MAP_HEIGHT,600)
+    #     self.auto_move(constants.TARGET_X,constants.TARGET_Y)
 
 
 class AdditionRequest:
