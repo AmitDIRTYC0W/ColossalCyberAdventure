@@ -106,10 +106,10 @@ class Player(arcade.Sprite, IEntity):
         self.should_reset_sprite_counter = False
         self.item_array = item_array
         self.coin_counter = starting_coin_amount
-        self.health_shroom_counter = 0
+        self.mushroom_amount = starting_mushroom_amount
         self.inventory = Inventory(
             self.coin_counter,
-            self.health_shroom_counter,
+            self.mushroom_amount,
             self,
             owner=self,
         )
@@ -307,7 +307,7 @@ class Player(arcade.Sprite, IEntity):
             if isinstance(item, Coin):
                 self.coin_counter += 1
             if isinstance(item, HealthShroom):
-                self.health_shroom_counter += 1
+                self.mushroom_amount += 1
             item.remove_from_sprite_lists()
 
         xp_collision_list = arcade.check_for_collision_with_list(self, self.xp_list)
@@ -317,7 +317,7 @@ class Player(arcade.Sprite, IEntity):
             xp.remove_from_sprite_lists()
 
     def get_item_counter(self):
-        return self.coin_counter, self.health_shroom_counter
+        return self.coin_counter, self.mushroom_amount
 
     def check_death(self):
         if self.health_bar.health_points <= 0:

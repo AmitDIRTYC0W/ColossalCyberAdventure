@@ -50,7 +50,7 @@ class Inventory:
 
     def update(self, camera_x, camera_y):
         self.coin_counter = self.player.coin_counter
-        self.health_shroom_counter = self.player.health_shroom_counter
+        self.health_shroom_counter = self.player.mushroom_amount
         self.coins_indicator.center_x = camera_x + constants.WIDTH / 2
         self.coins_indicator.center_y = camera_y + constants.SCREEN_HEIGHT / 2
         self.shroom_indicator.center_x = camera_x + 1.5 * constants.WIDTH + constants.MARGIN

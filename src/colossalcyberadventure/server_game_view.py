@@ -10,7 +10,7 @@ from arcade import key as k
 from pyglet.math import Vec2
 from pytiled_parser import parse_world
 
-from . import enemies, player
+from . import enemies, player, constants
 from .camera import GameCam
 from .enemies import Archer, ArcherAnimationState
 from .enemies import Skeleton, SkeletonAnimationState
@@ -108,6 +108,7 @@ class ServerGameView(arcade.View):
         tmp_spritelist = SpriteList()
         for spritelist in other_scene.sprite_lists:
             tmp_spritelist.extend(spritelist)
+            constants.texture_holder.update(spritelist)
         self.scene.add_sprite_list(key, True, tmp_spritelist)
 
     def mouse_to_world_position(self, click_x: float, click_y: float) -> Vec2:
@@ -326,6 +327,9 @@ class ServerGameView(arcade.View):
             self.keyboard_state[symbol] = True
         if symbol == arcade.key.I:
             self.hud.shown = not self.hud.shown
+        if symbol == arcade.key.Z:
+            mushroom_use_request = messages.create_item_use_request("mushroom")
+            self.conn.send(mushroom_use_request.to_bytes_packed())
 
     def on_key_release(self, symbol: int, _modifiers: int):
         if symbol in self.keyboard_state.keys():

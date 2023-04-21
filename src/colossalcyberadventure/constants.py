@@ -24,3 +24,5 @@ SCREEN_WIDTH = 0
 # server
 SERVER_PORT = 1354
 BUFFER_SIZE = 2048
+
+texture_holder = set()
