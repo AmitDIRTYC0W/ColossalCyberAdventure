@@ -324,6 +324,8 @@ class ServerGameView(arcade.View):
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol in self.keyboard_state.keys():
             self.keyboard_state[symbol] = True
+        if symbol == arcade.key.I:
+            self.hud.shown = not self.hud.shown
 
     def on_key_release(self, symbol: int, _modifiers: int):
         if symbol in self.keyboard_state.keys():
@@ -373,7 +375,6 @@ def handle_server(conn: socket.socket, view: ServerGameView):
             case "entitiesUpdate":
                 view.server_entity_list = server_update.entitiesUpdate
             case "healthPoints":
-                print( server_update.healthPoints.hp)
                 view.health_bar.health_points = server_update.healthPoints.hp
             case "itemAdditionUpdate":
                 match server_update.itemAdditionUpdate.item:

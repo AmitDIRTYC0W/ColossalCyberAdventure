@@ -12,10 +12,12 @@ class HUD:
         self.view = view
         self.width, self.height = width, height
         self.tex = arcade.load_texture(":data:items/coin.png")
+        self.shown = False
 
     def draw(self, *, filter=None, pixelated=None, blend_function=None) -> None:
-        arcade.draw_texture_rectangle(self.width // 2 + self.camera.position.x,
-                                      self.camera.position.y + self.view.window.height // 2, self.width, self.height,
-                                      self.tex)
-        arcade.draw_text(f"{self.owner.coin_counter}", self.width // 2 + self.width // 1.5 + self.camera.position.x,
-                         self.camera.position.y + self.view.window.height // 2 - 17, arcade.color.BLACK, 40)
+        if self.shown:
+            arcade.draw_texture_rectangle(self.width // 2 + self.camera.position.x,
+                                          self.camera.position.y + self.view.window.height // 2, self.width, self.height,
+                                          self.tex)
+            arcade.draw_text(f"{self.owner.coin_counter}", self.width // 2 + self.width // 1.5 + self.camera.position.x,
+                             self.camera.position.y + self.view.window.height // 2 - 17, arcade.color.BLACK, 40)
