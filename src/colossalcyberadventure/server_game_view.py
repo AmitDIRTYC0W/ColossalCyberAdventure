@@ -148,7 +148,7 @@ class ServerGameView(arcade.View):
         for x, y in self.get_maps_surrounding_player():
             if x >= 0 and y >= 0:
                 key = f"{x}-{y}"
-                if not (key in self.maps_in_loading or key in self.scene.name_mapping.keys()):
+                if not (key in self.maps_in_loading or key in self.scene._name_mapping.keys()):
                     self.maps_in_loading.append(key)
                     params = {
                         "x": x,
@@ -379,7 +379,7 @@ class ServerGameView(arcade.View):
     def remove_maps_outside_player_area(self):
         keys_to_remove = []
         maps = self.get_maps_surrounding_player()
-        for key in self.scene.name_mapping.keys():
+        for key in self.scene._name_mapping.keys():
             x, y = map(lambda num: int(num), key.split("-"))
             if not (x, y) in maps:
                 keys_to_remove.append(key)
