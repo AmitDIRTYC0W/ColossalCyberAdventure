@@ -12,6 +12,7 @@ from pytiled_parser import parse_world
 
 from . import enemies, player, constants
 from .camera import GameCam
+from .death_screen import DeathScreenView
 from .enemies import Archer, ArcherAnimationState
 from .enemies import Skeleton, SkeletonAnimationState
 from .healthbar import HealthBar
@@ -165,7 +166,9 @@ class ServerGameView(arcade.View):
             except queue.Empty:
                 pass
 
+        # close:
         if self.keyboard_state[k.Q]:
+            self.conn.close()
             quit()
 
         # player movement request:
@@ -195,6 +198,11 @@ class ServerGameView(arcade.View):
             skill_request = create_skill_use_request(3)
             self.conn.send(skill_request.to_bytes_packed())
             self.keyboard_state[k.V] = False
+
+        # check death:
+        if self.health_bar.health_points <= 0:
+            self.conn.close()
+            self.window.show_view(DeathScreenView())
 
         # camera shit:
         self.camera.center_camera_on_player()

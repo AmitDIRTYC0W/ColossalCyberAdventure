@@ -19,7 +19,7 @@ class DeathScreenView(arcade.View):
         self.v_box = arcade.gui.UIBoxLayout()
 
         restart_button = arcade.gui.UIFlatButton(
-            text="restart",
+            text="you died",
             width=DeathScreenView.BUTTON_WIDTH
         )
         self.v_box.add(restart_button.with_border(width=1))
@@ -30,10 +30,10 @@ class DeathScreenView(arcade.View):
         )
         self.v_box.add(quit_button.with_border(width=1))
 
-        @restart_button.event("on_click")
-        def on_click_settings(_event):
-            from .game import GameView
-            self.window.show_view(GameView())
+        # @restart_button.event("on_click")
+        # def on_click_settings(_event):
+        #     from .game import GameView
+        #     self.window.show_view(GameView())
 
         @quit_button.event("on_click")
         def on_click_settings(_event):
