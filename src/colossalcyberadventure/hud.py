@@ -26,5 +26,6 @@ class HUD:
             arcade.draw_texture_rectangle(self.width // 2 + self.camera.position.x,
                                           self.camera.position.y + self.view.window.height // 2 + self.height,
                                           self.width, self.height, self.mushroom_tex)
-            arcade.draw_text(f"{self.owner.coin_counter}", self.width // 2 + self.width // 1.5 + self.camera.position.x,
-                             self.camera.position.y + self.view.window.height // 2 - 17, arcade.color.BLACK, 40)
+            arcade.draw_text(f"{self.owner.mushroom_amount}", self.width // 2 + self.width // 1.5 + self.camera.position.x,
+                             self.camera.position.y + self.view.window.height // 2 + self.height - 17,
+                             arcade.color.BLACK, 40)
