@@ -5,7 +5,7 @@ from colossalcyberadventure.player import Player
 
 
 class HUD:
-    def __init__(self, owner: Player, camera: Camera, view: arcade.View, width=60, height=60):
+    def __init__(self, owner: Player, camera: Camera, view, width=60, height=60):
         super().__init__()
         self.owner = owner
         self.camera = camera
@@ -29,3 +29,15 @@ class HUD:
             arcade.draw_text(f"{self.owner.mushroom_amount}", self.width // 2 + self.width // 1.5 + self.camera.position.x,
                              self.camera.position.y + self.view.window.height // 2 + self.height - 17,
                              arcade.color.BLACK, 40)
+
+            if self.view.xp >= 20:
+                level = 3
+            elif self.view.xp >= 10:
+                level = 2
+            elif self.view.xp >= 5:
+                level = 1
+            else:
+                level = 0
+
+            arcade.draw_text(f"Level: {level}", self.camera.position.x + 10, self.camera.position.y + 10,
+                             arcade.color.BLACK, 30)

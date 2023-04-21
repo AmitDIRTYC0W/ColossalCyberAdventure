@@ -3,7 +3,7 @@ from enum import Enum
 
 import arcade
 import arcade.key as k
-from arcade import SpriteList
+from arcade import SpriteList, Text
 from arcade.hitbox import HitBox
 from pyglet.math import Vec2
 
@@ -99,10 +99,8 @@ class Player(arcade.Sprite, IEntity):
         self.texture = textures[PlayerAnimationState.IDLE][self.direction][0]
         self.frame_counter = 0
         self.current_texture_index = 0
-        self.xp = starting_xp_amount
-        self.level = 3
+        self.level = 0
         self.xp_list = xp_list
-        self.health_bar = HealthBar(self, 70, 5, 1, arcade.color.BLACK, arcade.color.RED)
         self.should_reset_sprite_counter = False
         self.item_array = item_array
         self.coin_counter = starting_coin_amount
@@ -113,6 +111,13 @@ class Player(arcade.Sprite, IEntity):
             self,
             owner=self,
         )
+        self.xp_amount = starting_xp_amount
+        if self.xp_amount >= 20:
+            self.level = 3
+        elif self.xp_amount >= 10:
+            self.level = 2
+        elif self.xp_amount >= 5:
+            self.level = 1
 
     def update_state(self, new_state: PlayerAnimationState):
         """Update the player state and reset counters
@@ -131,7 +136,6 @@ class Player(arcade.Sprite, IEntity):
 
     def draw(self, *, draw_filter=None, pixelated=None, blend_function=None):
         super().draw(filter=draw_filter, pixelated=pixelated, blend_function=blend_function)
-        self.health_bar.draw()
 
     def update_animation(self, delta_time: float = 1 / 60):
         if self.frame_counter == 0 or self.should_reset_sprite_counter:
@@ -166,6 +170,12 @@ class Player(arcade.Sprite, IEntity):
         Run this function every update of the window
 
         """
+        if self.xp_amount >= 20:
+            self.level = 3
+        elif self.xp_amount >= 10:
+            self.level = 2
+        elif self.xp_amount >= 5:
+            self.level = 1
         if self._state.value[0] != self.animation_state.value[0]:
             self.update_state(self.animation_state)
         self.update_direction()

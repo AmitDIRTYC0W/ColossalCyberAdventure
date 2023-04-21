@@ -4,7 +4,7 @@ import threading
 from math import floor
 
 import arcade
-from arcade import Scene
+from arcade import Scene, Text
 from arcade import SpriteList
 from arcade import key as k
 from pyglet.math import Vec2
@@ -34,7 +34,7 @@ class ServerGameView(arcade.View):
     WORLD_WIDTH_TILEMAPS = 40
     WORLD_HEIGHT_TILEMAPS = 40
 
-    def __init__(self, conn: socket.socket, player_id, coin_amount, xp_amount, mushroom_amount):
+    def __init__(self, conn: socket.socket, player_id, coin_amount, xp_amount, mushroom_amount, hp):
         super().__init__()
 
         # ------------------------------------------------------------
@@ -59,6 +59,7 @@ class ServerGameView(arcade.View):
         self.item_list = arcade.SpriteList()
         self.xp_list = arcade.SpriteList()
         # ------------------------------------------------------------------------------------------
+        self.xp = xp_amount
         self.player = Player(self.enemy_projectile_list, self.player_projectile_list, self.item_list,
                              self.keyboard_state, self.scene, self.xp_list, coin_amount, xp_amount, mushroom_amount)
         self.entities = arcade.SpriteList(use_spatial_hash=True)
@@ -92,6 +93,10 @@ class ServerGameView(arcade.View):
         self.maps_in_loading = []
         self.hud = HUD(self.player, self.camera, self)
         self.health_bar = HealthBar(self.player, 70, 5, 1, arcade.color.BLACK, arcade.color.RED)
+        self.health_bar.health_points = hp
+
+        self.level_text = Text(f"Level: {self.player.level}", self.player.center_x - self.player.width // 2,
+                               self.player.center_y + HealthBar.LEVEL_TEXT_OFFSET, arcade.color.JET)
 
         # add entities to scene:
         # self.scene.add_sprite_list("entities", True, self.entities)
@@ -211,6 +216,8 @@ class ServerGameView(arcade.View):
         self.entities.update_animation()
         self.entities.on_update()
 
+        constants.texture_holder.update(self.entities)
+
     def update_entities(self):
         last_frame_id_set = set(self.entity_ids)
         for entity in self.server_entity_list:
@@ -229,7 +236,7 @@ class ServerGameView(arcade.View):
                         self.c = self.entity_ids[entity.id]
                     except:
                         self.c = Player(self.enemy_projectile_list, self.player_projectile_list, self.item_list,
-                                        self.keyboard_state, self.scene, self.xp_list, -1, -1, -1)
+                                        self.keyboard_state, self.scene, None, 100, self.xp, 100)
                         self.entities.append(self.c)
                         temp_dict = {entity.id: self.c}
                         self.entity_ids.update(temp_dict)
@@ -393,6 +400,6 @@ def handle_server(conn: socket.socket, view: ServerGameView):
                     case "coin":
                         view.player.coin_counter += server_update.itemAdditionUpdate.change
                     case "xp":
-                        pass
+                        view.xp += server_update.itemAdditionUpdate.change
                     case "mushroom":
-                        pass
+                        view.player.mushroom_amount += server_update.itemAdditionUpdate.change

@@ -16,7 +16,7 @@ class HealthBar:
                  outer_color: tuple[int, int, int], inner_color: tuple[int, int, int]):
         self.health_points = HealthBar.STARTING_HP
 
-        self.owner = player
+        self.player = player
         self.owner_x = player.get_position()[0]
         self.owner_y = player.get_position()[1]
         self.center_x = -1  # placeholder
@@ -32,9 +32,9 @@ class HealthBar:
         self.inner_width = -1  # placeholder
         self.inner_center_x = -1  # placeholder
         self.calculate_inner_values()
-        self.level = player.level
-        self.level_text = Text(f"Level: {self.level}", self.center_x - self.width // 2,
-                               self.center_y + HealthBar.LEVEL_TEXT_OFFSET, arcade.color.JET)
+        # self.level = player.level
+        # self.level_text = Text(f"Level: {self.level}", self.center_x - self.width // 2,
+        #                        self.center_y + HealthBar.LEVEL_TEXT_OFFSET, arcade.color.JET)
 
     def draw(self):
         self.calculate_inner_values()
@@ -42,7 +42,7 @@ class HealthBar:
                                      self.inner_color)
         arcade.draw_rectangle_outline(self.center_x, self.center_y, self.width, self.height, self.outer_color,
                                       self.border_width)
-        self.level_text.draw()
+        # self.level_text.draw()
 
     def calculate_center_x_y(self):
         self.center_x = self.owner_x
@@ -52,14 +52,14 @@ class HealthBar:
         self.inner_width = self.health_points / HealthBar.FULL_HEALTH * (self.width - 2 * self.border_width)
         self.inner_center_x = self.center_x - (self.width - self.inner_width) / 2 + self.border_width
 
-    def update_text_x_y(self):
-        self.level_text.x = self.center_x - self.width // 2
-        self.level_text.y = self.center_y + HealthBar.LEVEL_TEXT_OFFSET
+    # def update_text_x_y(self):
+    #     self.level_text.x = self.center_x - self.width // 2
+    #     self.level_text.y = self.center_y + HealthBar.LEVEL_TEXT_OFFSET
 
     def on_update(self):
-        self.level = self.owner.level
-        self.owner_x = self.owner.get_position()[0]
-        self.owner_y = self.owner.get_position()[1]
+        # self.level = self.player.level
+        self.owner_x = self.player.get_position()[0]
+        self.owner_y = self.player.get_position()[1]
         self.calculate_center_x_y()
         self.calculate_inner_values()
-        self.update_text_x_y()
+        # self.update_text_x_y()
