@@ -14,7 +14,7 @@ def create_shoot_request(x: float, y: float):
 
 
 def create_skill_use_request(skill_num: int):
-    return client_update_capnp.ClientUpdate.new_message(useSkill=skill_num)
+    return client_update.ClientUpdate.new_message(useSkill=skill_num)
 
 
 def create_identification_request(username: str, password: str, register: bool):
@@ -26,8 +26,8 @@ def create_identification_request(username: str, password: str, register: bool):
 
 
 def read_identification_response(b: bytes):
-    return identification_capnp.IdentificationResponse.from_bytes_packed(b)
+    return identification.IdentificationResponse.from_bytes_packed(b)
 
 
 def create_item_use_request(item_type: str):
-    return client_update_capnp.ClientUpdate.new_message(useItem=item_type)
+    return client_update.ClientUpdate.new_message(useItem=item_type)

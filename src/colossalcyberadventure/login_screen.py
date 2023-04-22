@@ -63,7 +63,7 @@ class LoginScreenView(arcade.View):
         @login_button.event("on_click")
         def on_click_login(_event):
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect(("localhost", constants.SERVER_PORT))
+            s.connect((self.ip_field.text, constants.SERVER_PORT))
             s.send(
                 create_identification_request(self.username_field.text, self.password_field.text, False)
                 .to_bytes_packed()
@@ -82,7 +82,7 @@ class LoginScreenView(arcade.View):
         @register_button.event("on_click")
         def on_click_register(_event):
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect(("localhost", constants.SERVER_PORT))
+            s.connect((self.ip_field.text, constants.SERVER_PORT))
             request = create_identification_request(self.username_field.text, self.password_field.text, True)
             s.send(request.to_bytes_packed())
             response = read_identification_response(s.recv(constants.BUFFER_SIZE))
