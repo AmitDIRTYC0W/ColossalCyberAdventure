@@ -112,7 +112,7 @@ class ServerGameView(arcade.View):
 
     def connect_scenes(self, other_scene: Scene, key: str):
         tmp_spritelist = SpriteList()
-        for spritelist in other_scene.sprite_lists:
+        for spritelist in other_scene._sprite_lists:
             tmp_spritelist.extend(spritelist)
             constants.texture_holder.update(spritelist)
         self.scene.add_sprite_list(key, True, tmp_spritelist)
