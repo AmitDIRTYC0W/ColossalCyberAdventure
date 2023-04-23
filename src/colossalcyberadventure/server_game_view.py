@@ -25,6 +25,8 @@ from .server.messages import create_movement_request, create_shoot_request, crea
 from .tilemap import tilemap_from_world, get_loader, init_loader
 from .xp import XP
 
+textures = set()
+
 
 class ServerGameView(arcade.View):
     BACKGROUND_COLOR = arcade.color.JET
@@ -219,6 +221,7 @@ class ServerGameView(arcade.View):
         constants.texture_holder.update(self.entities)
 
     def update_entities(self):
+        global textures
         last_frame_id_set = set(self.entity_ids)
         for entity in self.server_entity_list:
             if entity.id in last_frame_id_set:
@@ -237,6 +240,7 @@ class ServerGameView(arcade.View):
                     except:
                         self.c = Player(self.enemy_projectile_list, self.player_projectile_list, self.item_list,
                                         self.keyboard_state, self.scene, None, 100, self.xp, 100)
+                        textures.add(self.c)
                         self.entities.append(self.c)
                         temp_dict = {entity.id: self.c}
                         self.entity_ids.update(temp_dict)
@@ -248,6 +252,7 @@ class ServerGameView(arcade.View):
                     except:
                         self.c = Skeleton(self.player, self.enemy_list, self.enemy_projectile_list,
                                           self.player_projectile_list, self.xp_list)
+                        textures.add(self.c)
                         self.entities.append(self.c)
                         temp_dict = {entity.id: self.c}
                         self.entity_ids.update(temp_dict)
@@ -259,6 +264,7 @@ class ServerGameView(arcade.View):
                     except:
                         self.c = Archer(self.player, self.enemy_list, self.enemy_projectile_list,
                                         self.player_projectile_list, self.xp_list)
+                        textures.add(self.c)
                         self.entities.append(self.c)
                         temp_dict = {entity.id: self.c}
                         self.entity_ids.update(temp_dict)
@@ -270,6 +276,7 @@ class ServerGameView(arcade.View):
                     except:
                         self.c = Projectile(entity.x, entity.y, self.bullet_target[0], self.bullet_target[1],
                                             ":data:bullet/0.png", 1)
+                        textures.add(self.c)
                         self.entities.append(self.c)
                         temp_dict = {entity.id: self.c}
                         self.entity_ids.update(temp_dict)
@@ -281,6 +288,7 @@ class ServerGameView(arcade.View):
                     except:
                         self.c = Projectile(entity.x, entity.y, self.bullet_target[0], self.bullet_target[1],
                                             ":data:enemies/archer/arrow/0.png", 2)
+                        textures.add(self.c)
                         self.entities.append(self.c)
                         temp_dict = {entity.id: self.c}
                         self.entity_ids.update(temp_dict)
@@ -291,6 +299,7 @@ class ServerGameView(arcade.View):
                         self.c = self.entity_ids[entity.id]
                     except:
                         self.c = Coin(entity.x, entity.y)
+                        textures.add(self.c)
                         self.entities.append(self.c)
                         temp_dict = {entity.id: self.c}
                         self.entity_ids.update(temp_dict)
@@ -300,6 +309,7 @@ class ServerGameView(arcade.View):
                         self.c = self.entity_ids[entity.id]
                     except:
                         self.c = XP(entity.x, entity.y)
+                        textures.add(self.c)
                         self.entities.append(self.c)
                         temp_dict = {entity.id: self.c}
                         self.entity_ids.update(temp_dict)
@@ -309,6 +319,7 @@ class ServerGameView(arcade.View):
                         self.c = self.entity_ids[entity.id]
                     except:
                         self.c = HealthShroom(entity.x, entity.y)
+                        textures.add(self.c)
                         self.entities.append(self.c)
                         temp_dict = {entity.id: self.c}
                         self.entity_ids.update(temp_dict)
@@ -396,10 +407,11 @@ def handle_server(conn: socket.socket, view: ServerGameView):
             case "healthPoints":
                 view.health_bar.health_points = server_update.healthPoints.hp
             case "itemAdditionUpdate":
+                print(server_update)
                 match server_update.itemAdditionUpdate.item:
                     case "coin":
-                        view.player.coin_counter += server_update.itemAdditionUpdate.change
+                        view.player.coin_counter = server_update.itemAdditionUpdate.amount
                     case "xp":
-                        view.xp += server_update.itemAdditionUpdate.change
+                        view.xp = server_update.itemAdditionUpdate.amount
                     case "mushroom":
-                        view.player.mushroom_amount += server_update.itemAdditionUpdate.change
+                        view.player.mushroom_amount = server_update.itemAdditionUpdate.amount

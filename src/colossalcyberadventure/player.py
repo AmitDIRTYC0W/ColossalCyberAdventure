@@ -79,7 +79,7 @@ class Player(arcade.Sprite, IEntity):
     def __init__(self, enemy_projectile_list: SpriteList, player_projectile_list: SpriteList, item_array: SpriteList,
                  keyboard_state: dict[int, bool], scene: arcade.Scene, xp_list: SpriteList, starting_coin_amount: int,
                  starting_xp_amount, starting_mushroom_amount):
-        super().__init__(scale=Player.SPRITE_SCALE, path_or_texture="resources/player/idle/0.png")
+        super().__init__(scale=Player.SPRITE_SCALE, path_or_texture=":data:player/idle/0.png")
         self.animation_state = PlayerAnimationState.IDLE
         if textures == TEXTURES_BASE:
             load_textures()
