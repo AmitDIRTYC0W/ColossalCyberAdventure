@@ -1,6 +1,6 @@
 from multiprocessing import freeze_support
-from src.colossalcyberadventure.colossal_cyber_adventure import ColossalCyberAdventure
-from src.colossalcyberadventure.tilemap import init_loader
+from colossalcyberadventure.colossal_cyber_adventure import ColossalCyberAdventure
+from colossalcyberadventure.tilemap import init_loader
 
 
 def main():

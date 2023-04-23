@@ -1,6 +1,6 @@
 import arcade
 
-from src.colossalcyberadventure.constants import MAP_WIDTH, MAP_HEIGHT
+from colossalcyberadventure.constants import MAP_WIDTH, MAP_HEIGHT
 
 
 def check_map_bounds(sprite: arcade.Sprite):
