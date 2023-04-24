@@ -1,6 +1,8 @@
 import queue
+import random
 import socket
 import threading
+import time
 from math import floor
 
 import arcade
@@ -65,6 +67,8 @@ class ServerGameView(arcade.View):
         self.player = Player(self.enemy_projectile_list, self.player_projectile_list, self.item_list,
                              self.keyboard_state, self.scene, self.xp_list, coin_amount, xp_amount, mushroom_amount)
         self.entities = arcade.SpriteList(use_spatial_hash=True)
+        self.start_bot = time.gmtime(0)
+        self.bot_on = False
 
         self.entity_ids = dict()
 
@@ -349,6 +353,8 @@ class ServerGameView(arcade.View):
                 self.entity_ids.pop(entity_id)
 
     def on_key_press(self, symbol: int, modifiers: int):
+        if symbol == k.B:
+            self.bot_on = not self.bot_on
         if symbol in self.keyboard_state.keys():
             self.keyboard_state[symbol] = True
         if symbol == arcade.key.I:
@@ -362,16 +368,27 @@ class ServerGameView(arcade.View):
             self.keyboard_state[symbol] = False
 
     def calculate_movement_vec(self):
-        self.movement_vec.x = 0
-        self.movement_vec.y = 0
-        if self.keyboard_state[k.W]:
-            self.movement_vec.y += 1
-        if self.keyboard_state[k.S]:
-            self.movement_vec.y += -1
-        if self.keyboard_state[k.A]:
-            self.movement_vec.x += -1
-        if self.keyboard_state[k.D]:
-            self.movement_vec.x += 1
+        if self.bot_on:
+            if time.gmtime(0).tm_sec - self.start_bot.tm_sec > 5:
+                self.start_bot = time.gmtime(0)
+                if random.random() > 0.5:
+                    self.movement_vec = Vec2(random.randint(-1, 2), 0)
+                else:
+                    self.movement_vec = Vec2(0, random.randint(-1, 2))
+        # if self.keyboard_state[k.B]:
+        #     self.start_bot = time.gmtime(0)
+        #     self.movement_vec = Vec2(random.randint(10, 100))
+        else:
+            self.movement_vec.x = 0
+            self.movement_vec.y = 0
+            if self.keyboard_state[k.W]:
+                self.movement_vec.y += 1
+            if self.keyboard_state[k.S]:
+                self.movement_vec.y += -1
+            if self.keyboard_state[k.A]:
+                self.movement_vec.x += -1
+            if self.keyboard_state[k.D]:
+                self.movement_vec.x += 1
 
     def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
         world_pos = self.mouse_to_world_position(x, y)
