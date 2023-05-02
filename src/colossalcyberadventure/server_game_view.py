@@ -67,7 +67,7 @@ class ServerGameView(arcade.View):
         self.player = Player(self.enemy_projectile_list, self.player_projectile_list, self.item_list,
                              self.keyboard_state, self.scene, self.xp_list, coin_amount, xp_amount, mushroom_amount)
         self.entities = arcade.SpriteList(use_spatial_hash=True)
-        self.start_bot = time.gmtime(0)
+        self.start_bot = 0
         self.bot_on = False
 
         self.entity_ids = dict()
@@ -369,12 +369,15 @@ class ServerGameView(arcade.View):
 
     def calculate_movement_vec(self):
         if self.bot_on:
-            if time.gmtime(0).tm_sec - self.start_bot.tm_sec > 5:
-                self.start_bot = time.gmtime(0)
+            if time.time() - self.start_bot > 6:
+                self.start_bot = time.time()
+                choice = 0
+                while choice == 0:
+                    choice = random.randint(-1, 1)
                 if random.random() > 0.5:
-                    self.movement_vec = Vec2(random.randint(-1, 2), 0)
+                    self.movement_vec = Vec2(choice, 0)
                 else:
-                    self.movement_vec = Vec2(0, random.randint(-1, 2))
+                    self.movement_vec = Vec2(0, choice)
         # if self.keyboard_state[k.B]:
         #     self.start_bot = time.gmtime(0)
         #     self.movement_vec = Vec2(random.randint(10, 100))
@@ -424,7 +427,6 @@ def handle_server(conn: socket.socket, view: ServerGameView):
             case "healthPoints":
                 view.health_bar.health_points = server_update.healthPoints.hp
             case "itemAdditionUpdate":
-                print(server_update)
                 match server_update.itemAdditionUpdate.item:
                     case "coin":
                         view.player.coin_counter = server_update.itemAdditionUpdate.amount
