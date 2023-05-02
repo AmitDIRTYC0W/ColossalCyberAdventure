@@ -375,9 +375,16 @@ class ServerGameView(arcade.View):
                 while choice == 0:
                     choice = random.randint(-1, 1)
                 if random.random() > 0.5:
-                    self.movement_vec = Vec2(choice, 0)
+                    if self.player.center_x > 1000:
+                        self.movement_vec = Vec2(choice, 0)
+                    else:
+                        self.movement_vec = Vec2(1, 0)
                 else:
-                    self.movement_vec = Vec2(0, choice)
+                    if self.player.center_y > 1000:
+                        self.movement_vec = Vec2(0, choice)
+                    else:
+                        self.movement_vec = Vec2(0, 1)
+
         # if self.keyboard_state[k.B]:
         #     self.start_bot = time.gmtime(0)
         #     self.movement_vec = Vec2(random.randint(10, 100))
